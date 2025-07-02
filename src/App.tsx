@@ -1,0 +1,369 @@
+import { useState, useCallback, useRef, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { FaTimes } from 'react-icons/fa';
+import AdminPage from "./pages/AdminPage";
+import StationDetailPage from "./pages/StationDetailPage";
+import StationScrapePage from "./pages/StationScrapePage";
+import TopNavigation from "./components/TopNavigation";
+import BottomNavigation from "./components/BottomNavigation";
+import MobilePlayer from "./components/MobilePlayer";
+import DesktopPlayer from "./components/DesktopPlayer";
+import HomeContent from "./components/HomeContent";
+import PopularContent from "./components/PopularContent";
+import StationMap from "./components/StationMap";
+import StationInfoPage from "./pages/StationInfoPage";
+import BrowseContent from "./components/BrowseContent";
+import BrowseAllContent from "./components/BrowseAllContent";
+import StationNormalizationPage from "./pages/StationNormalizationPage";
+import HealthCheckPage from "./pages/HealthCheckPage";
+import type { Station } from "./types/Station";
+
+function App() {
+  const navigate = useNavigate();
+  const audioRef = useRef<HTMLAudioElement>(null);
+  
+  const [currentStation, setCurrentStation] = useState<Station | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("home");
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // TODO: Replace with real auth
+
+  // Handle audio playback
+  useEffect(() => {
+    if (audioRef.current && currentStation) {
+      if (isPlaying) {
+        setIsLoading(true);
+        audioRef.current.play()
+          .then(() => setIsLoading(false))
+          .catch(err => {
+            console.error('Failed to play:', err);
+            setIsLoading(false);
+          });
+      } else {
+        audioRef.current.pause();
+        setIsLoading(false);
+      }
+    }
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (audioRef.current && currentStation) {
+      setIsLoading(true);
+      audioRef.current.src = currentStation.streamUrl;
+      audioRef.current.addEventListener('loadstart', () => setIsLoading(true));
+      audioRef.current.addEventListener('canplay', () => setIsLoading(false));
+      audioRef.current.addEventListener('error', () => setIsLoading(false));
+      
+      if (isPlaying) {
+        audioRef.current.play()
+          .then(() => setIsLoading(false))
+          .catch(err => {
+            console.error('Failed to play:', err);
+            setIsLoading(false);
+          });
+      }
+    }
+  }, [currentStation, isPlaying]);
+
+
+  const handlePlayStation = useCallback((station: Station) => {
+    // If it's the same station, just toggle play/pause
+    if (currentStation && currentStation.id === station.id) {
+      setIsPlaying(!isPlaying);
+    } else {
+      // Different station - set it and start playing
+      setCurrentStation(station);
+      setIsPlaying(true);
+    }
+  }, [currentStation, isPlaying]);
+
+  const handlePlayPause = useCallback(() => {
+    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
+
+  const handleTabChange = useCallback((tab: string) => {
+    setActiveTab(tab);
+  }, []);
+
+  const handleLogin = useCallback(() => {
+    // TODO: Implement login modal
+    setIsLoggedIn(!isLoggedIn); // For now, just toggle login state
+    console.log('Login toggled:', !isLoggedIn);
+  }, [isLoggedIn]);
+
+  const handleSettings = useCallback(() => {
+    navigate('/admin');
+  }, [navigate]);
+
+  const handleStationInfo = useCallback((station: Station) => {
+    navigate(`/station/${station.id}/info`);
+  }, [navigate]);
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <HomeContent
+            searchTerm={searchTerm}
+            onPlayStation={handlePlayStation}
+            onNavigateToDiscover={() => setActiveTab('discover')}
+            onStationInfo={handleStationInfo}
+            isLoggedIn={isLoggedIn}
+          />
+        );
+      case 'browse':
+        return (
+          <BrowseAllContent
+            searchTerm={searchTerm}
+            onPlayStation={handlePlayStation}
+            onStationInfo={handleStationInfo}
+            onBack={() => {}} // No back button needed since this is the main Browse page
+          />
+        );
+      case 'discover':
+        return (
+          <StationMap 
+            onPlayStation={handlePlayStation}
+            searchTerm={searchTerm}
+            selectedCountry=""
+            selectedGenre=""
+            selectedType=""
+          />
+        );
+      case 'favorites':
+        return (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">❤️</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Your Favorites
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Sign in to save your favorite stations and sync them across devices.
+            </p>
+            <button 
+              onClick={handleLogin}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Sign In
+            </button>
+          </div>
+        );
+      case 'more':
+        return (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-900">Settings</h3>
+              </div>
+              <div className="p-6 space-y-4">
+                <button 
+                  onClick={() => navigate('/admin')}
+                  className="w-full text-left p-4 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  Admin Panel
+                </button>
+                <button className="w-full text-left p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                  About
+                </button>
+                <button className="w-full text-left p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                  Help & Support
+                </button>
+              </div>
+            </div>
+            
+            {/* Mobile Ad Space */}
+            <div className="lg:hidden bg-white rounded-xl border border-gray-200 p-6">
+              <div className="h-24 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center text-sm text-gray-500">
+                Advertisement Space
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <HomeContent 
+            searchTerm={searchTerm} 
+            onPlayStation={handlePlayStation} 
+            onNavigateToDiscover={() => setActiveTab('discover')}
+            onStationInfo={handleStationInfo}
+            isLoggedIn={isLoggedIn}
+          />
+        );
+    }
+  };
+
+  return (
+    <Routes>
+      <Route 
+        path="/" 
+        element={
+          <div className="flex flex-col h-screen bg-gray-50">
+            {/* Shared Audio Element */}
+            <audio ref={audioRef} />
+            
+            {/* Top Navigation (Desktop) */}
+            <TopNavigation
+              activeTab={activeTab}
+              searchTerm={searchTerm}
+              onTabChange={handleTabChange}
+              onSearchChange={setSearchTerm}
+              onLogin={handleLogin}
+              onSettings={handleSettings}
+              isLoggedIn={isLoggedIn}
+            />
+
+            {/* Mobile Search Bar */}
+            <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search stations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-4 pr-10 py-2 w-full text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  style={{ fontSize: '16px' }}
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <FaTimes className="text-sm" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <main className="flex-1 overflow-y-auto p-4 lg:p-6" style={{ 
+              paddingBottom: currentStation ? (window.innerWidth >= 1024 ? '0' : '8.5rem') : (window.innerWidth >= 1024 ? '0' : '4rem') 
+            }}>
+              {renderTabContent()}
+            </main>
+
+            {/* Desktop Player */}
+            {currentStation && (
+              <DesktopPlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+              />
+            )}
+
+            {/* Mobile Player */}
+            {currentStation && (
+              <MobilePlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+onExpand={() => console.log('Expand player')}
+              />
+            )}
+
+            {/* Bottom Navigation (Mobile) */}
+            <BottomNavigation
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+
+          </div>
+        } 
+      />
+      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/admin/normalize" element={<StationNormalizationPage />} />
+      <Route path="/admin/health" element={<HealthCheckPage />} />
+      <Route path="/scrape" element={<StationScrapePage />} />
+      <Route 
+        path="/station/:id" 
+        element={
+          <StationDetailPage 
+            currentStation={currentStation}
+            onPlayStation={handlePlayStation}
+            isPlaying={isPlaying}
+          />
+        } 
+      />
+      <Route 
+        path="/station/:id/info" 
+        element={
+          <div className="flex flex-col h-screen bg-gray-50">
+            {/* Shared Audio Element */}
+            <audio ref={audioRef} />
+            
+            {/* Top Navigation (Desktop) */}
+            <TopNavigation
+              activeTab={activeTab}
+              searchTerm={searchTerm}
+              onTabChange={handleTabChange}
+              onSearchChange={setSearchTerm}
+              onLogin={handleLogin}
+              onSettings={handleSettings}
+              isLoggedIn={isLoggedIn}
+            />
+
+            {/* Mobile Search Bar */}
+            <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search stations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-4 pr-10 py-2 w-full text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  style={{ fontSize: '16px' }}
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <FaTimes className="text-sm" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Station Info Page Content */}
+            <StationInfoPage 
+              currentStation={currentStation}
+              onPlayStation={handlePlayStation}
+              isPlaying={isPlaying}
+            />
+
+            {/* Desktop Player */}
+            {currentStation && (
+              <DesktopPlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+              />
+            )}
+
+            {/* Mobile Player */}
+            {currentStation && (
+              <MobilePlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+                onExpand={() => console.log('Expand player')}
+              />
+            )}
+
+            {/* Bottom Navigation (Mobile) */}
+            <BottomNavigation
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+          </div>
+        } 
+      />
+    </Routes>
+  );
+}
+
+export default App;
