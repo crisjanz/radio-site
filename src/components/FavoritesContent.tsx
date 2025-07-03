@@ -1,4 +1,4 @@
-import { FaHeart, FaMusic, FaInfoCircle } from 'react-icons/fa';
+import { FaHeart, FaMusic, FaInfoCircle, FaUser } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface FavoritesContentProps {
@@ -7,6 +7,8 @@ interface FavoritesContentProps {
   onStationInfo: (station: Station) => void;
   onToggleFavorite: (station: Station) => void;
   isLoggedIn: boolean;
+  onLogin?: () => void;
+  user?: { email: string } | null;
 }
 
 export default function FavoritesContent({ 
@@ -14,7 +16,9 @@ export default function FavoritesContent({
   onPlayStation, 
   onStationInfo, 
   onToggleFavorite,
-  isLoggedIn 
+  isLoggedIn,
+  onLogin,
+  user
 }: FavoritesContentProps) {
   if (!isLoggedIn) {
     return (
@@ -26,6 +30,12 @@ export default function FavoritesContent({
         <p className="text-gray-600 mb-6">
           Sign in to save your favorite stations and sync them across devices.
         </p>
+        <button 
+          onClick={onLogin}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Sign In
+        </button>
       </div>
     );
   }
@@ -51,6 +61,22 @@ export default function FavoritesContent({
           <FaHeart className="text-red-500" />
           Your Favorites ({favorites.length})
         </h2>
+        
+        {/* Login/Logout Button - Mobile & Desktop */}
+        <div className="flex items-center gap-4">
+          {user && (
+            <span className="text-sm text-gray-600 hidden sm:block">
+              {user.email}
+            </span>
+          )}
+          <button
+            onClick={onLogin}
+            className="flex items-center gap-2 px-4 py-2 text-sm border rounded-lg transition-colors text-red-600 border-red-300 hover:bg-red-50"
+          >
+            <FaUser className="text-xs" />
+            Sign Out
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
