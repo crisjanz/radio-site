@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_CONFIG } from '../config/api';
 import { 
   FaArrowLeft, 
   FaPlay, 
@@ -37,10 +38,12 @@ export default function StationInfoPage({
   const [station, setStation] = useState<Station | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE = API_CONFIG.BASE_URL;
+
   useEffect(() => {
     const fetchStation = async () => {
       try {
-        const response = await fetch(`http://192.168.1.69:3001/stations/${id}`);
+        const response = await fetch(`${API_BASE}/stations/${id}`);
         if (response.ok) {
           const data = await response.json();
           setStation(data);

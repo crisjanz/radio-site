@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaFire, FaPlay, FaChartLine, FaMusic } from 'react-icons/fa';
 import type { Station } from '../types/Station';
+import { API_CONFIG } from '../config/api';
 
 interface PopularContentProps {
   searchTerm: string;
@@ -15,10 +16,12 @@ export default function PopularContent({
   const [loading, setLoading] = useState(true);
   const [timeFrame, setTimeFrame] = useState<'week' | 'month' | 'all'>('week');
 
+  const API_BASE = API_CONFIG.BASE_URL;
+
   useEffect(() => {
     const fetchStations = async () => {
       try {
-        const response = await fetch('http://192.168.1.69:3001/stations');
+        const response = await fetch(`${API_BASE}/stations`);
         if (response.ok) {
           const data = await response.json();
           // For now, simulate popularity by randomizing order

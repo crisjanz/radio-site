@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { FaMusic, FaInfoCircle, FaArrowLeft, FaGlobe } from 'react-icons/fa';
 import type { Station } from '../types/Station';
+import { API_CONFIG } from '../config/api';
+
+
 
 interface CountryContentProps {
   onPlayStation: (station: Station) => void;
@@ -24,11 +27,13 @@ export default function CountryContent({
   const [loading, setLoading] = useState(true);
   const [stationsLoading, setStationsLoading] = useState(false);
 
+  const API_BASE = API_CONFIG.BASE_URL;
+
   useEffect(() => {
     const fetchCountries = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://192.168.1.69:3001/stations/countries');
+        const response = await fetch('${API_BASE}/stations/countries');
         if (response.ok) {
           const data = await response.json();
           setCountries(data);
@@ -48,7 +53,7 @@ export default function CountryContent({
     setStationsLoading(true);
     
     try {
-      const response = await fetch(`http://192.168.1.69:3001/stations?country=${encodeURIComponent(country)}`);
+      const response = await fetch(`${API_BASE}/stations?country=${encodeURIComponent(country)}`);
       if (response.ok) {
         const stations = await response.json();
         setCountries(prev => prev.map(c => 

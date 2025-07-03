@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Station } from '../types/Station';
+import { API_CONFIG } from '../config/api';
 import { 
   FaPlay, 
   FaPause, 
@@ -39,7 +40,7 @@ const StationDetailPage: React.FC<StationDetailPageProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [currentSong, setCurrentSong] = useState<string | null>(null);
 
-  const API_BASE = 'http://192.168.1.69:3001';
+  const API_BASE = API_CONFIG.BASE_URL;
 
   useEffect(() => {
     const fetchStation = async () => {

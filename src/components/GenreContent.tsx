@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { FaMusic, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
 import type { Station } from '../types/Station';
+import { API_CONFIG } from '../config/api';
+
+
 
 interface GenreContentProps {
   onPlayStation: (station: Station) => void;
@@ -24,11 +27,13 @@ export default function GenreContent({
   const [loading, setLoading] = useState(true);
   const [stationsLoading, setStationsLoading] = useState(false);
 
+  const API_BASE = API_CONFIG.BASE_URL;
+
   useEffect(() => {
     const fetchGenres = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://192.168.1.69:3001/stations/genres');
+        const response = await fetch('${API_BASE}/stations/genres');
         if (response.ok) {
           const data = await response.json();
           setGenres(data);
@@ -48,7 +53,7 @@ export default function GenreContent({
     setStationsLoading(true);
     
     try {
-      const response = await fetch(`http://192.168.1.69:3001/stations?genre=${encodeURIComponent(genre)}`);
+      const response = await fetch(`${API_BASE}/stations?genre=${encodeURIComponent(genre)}`);
       if (response.ok) {
         const stations = await response.json();
         setGenres(prev => prev.map(g => 

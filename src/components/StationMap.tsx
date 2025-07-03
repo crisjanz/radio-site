@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { FaPlay, FaGlobe, FaMusic, FaInfoCircle } from 'react-icons/fa';
 import type { Station } from '../types/Station';
+import { API_CONFIG } from '../config/api';
 
 // Fix for default markers in React Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -87,7 +88,7 @@ const StationMap: React.FC<StationMapProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE = 'http://192.168.1.69:3001';
+  const API_BASE = API_CONFIG.BASE_URL;
 
   // Fetch stations with coordinates
   useEffect(() => {

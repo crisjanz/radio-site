@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaMusic, FaInfoCircle, FaArrowLeft, FaArrowRight, FaFilter, FaTimes } from 'react-icons/fa';
+import { API_CONFIG } from '../config/api';
 import type { Station } from '../types/Station';
 
 interface BrowseAllContentProps {
@@ -63,6 +64,8 @@ export default function BrowseAllContent({
     liveOnly: false
   });
 
+  const API_BASE = API_CONFIG.BASE_URL;
+
   // Check if this is the main browse page (no back functionality)
   const isMainBrowsePage = !onBack || onBack.toString() === '() => {}';
 
@@ -73,10 +76,10 @@ export default function BrowseAllContent({
         let url;
         if (searchTerm.trim()) {
           // Use search endpoint if there's a search term
-          url = `http://192.168.1.69:3001/stations/search?q=${encodeURIComponent(searchTerm)}`;
+          url = `${API_BASE}/stations/search?q=${encodeURIComponent(searchTerm)}`;
         } else {
           // Use regular stations endpoint with pagination
-          url = `http://192.168.1.69:3001/stations?page=${currentPage}&limit=${STATIONS_PER_PAGE}`;
+          url = `${API_BASE}/stations?page=${currentPage}&limit=${STATIONS_PER_PAGE}`;
         }
         
         const response = await fetch(url);

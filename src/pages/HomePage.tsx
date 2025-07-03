@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { FaMusic } from 'react-icons/fa';
 import RadioPlayer from '../components/RadioPlayer';
+import { API_CONFIG } from '../config/api';
 
 
 type Station = {
@@ -24,8 +25,10 @@ export default function HomePage() {
   const [filterGenre, setFilterGenre] = useState('');
   const [filterType, setFilterType] = useState('');
 
+  const API_BASE = API_CONFIG.BASE_URL;
+
   useEffect(() => {
-    fetch('http://192.168.1.69:3001/stations')
+    fetch(`${API_BASE}/stations`)
       .then((res) => res.json())
       .then((data) => {
         setStations(data);
