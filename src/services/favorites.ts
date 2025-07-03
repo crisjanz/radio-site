@@ -11,7 +11,7 @@ export interface FavoriteResponse {
 }
 
 class FavoritesService {
-  private baseUrl = `${API_CONFIG.BASE_URL}/favorites`;
+  private baseUrl = `${API_CONFIG.BASE_URL}/api/favorites`;
 
   async getFavorites(): Promise<Station[]> {
     try {

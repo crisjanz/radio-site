@@ -349,6 +349,7 @@ function App() {
                         ) : (
                           <button
                             onClick={() => {
+                              console.log('Mobile sign in clicked');
                               handleLogin();
                               setMobileUserMenuOpen(false);
                             }}
