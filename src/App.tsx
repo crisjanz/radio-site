@@ -1,7 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { FaTimes, FaSearch } from 'react-icons/fa';
+import { FaTimes, FaSearch, FaUser } from 'react-icons/fa';
 import { authService, type User } from './services/auth';
+import { favoritesService } from './services/favorites';
 import AdminPage from "./pages/AdminPage";
 import StationDetailPage from "./pages/StationDetailPage";
 import StationScrapePage from "./pages/StationScrapePage";
@@ -41,27 +42,18 @@ function App() {
       const user = await authService.verifyToken();
       setUser(user);
       
-      // Load favorites from localStorage
+      // Load favorites from database
       if (user) {
-        const savedFavorites = localStorage.getItem(`favorites_${user.id}`);
-        if (savedFavorites) {
-          try {
-            setFavorites(JSON.parse(savedFavorites));
-          } catch (e) {
-            console.error('Failed to parse saved favorites:', e);
-          }
-        }
+        const userFavorites = await favoritesService.getFavorites();
+        setFavorites(userFavorites);
+      } else {
+        setFavorites([]);
       }
     };
     initAuth();
   }, []);
 
-  // Save favorites to localStorage when they change
-  useEffect(() => {
-    if (user && favorites.length >= 0) {
-      localStorage.setItem(`favorites_${user.id}`, JSON.stringify(favorites));
-    }
-  }, [user, favorites]);
+  // No longer need to save to localStorage - favorites are now stored in database
 
   // Handle audio playback
   useEffect(() => {
@@ -129,6 +121,7 @@ function App() {
       // User is logged in, so log them out
       authService.logout();
       setUser(null);
+      setFavorites([]); // Clear favorites on logout
     } else {
       // User is not logged in, show login modal
       setShowLoginModal(true);
@@ -138,28 +131,27 @@ function App() {
   const handleLoginSubmit = useCallback(async (email: string, password: string) => {
     const response = await authService.login(email, password);
     setUser(response.user);
+    // Load user's favorites after login
+    const userFavorites = await favoritesService.getFavorites();
+    setFavorites(userFavorites);
   }, []);
 
   const handleSignupSubmit = useCallback(async (email: string, password: string) => {
     const response = await authService.signup(email, password);
     setUser(response.user);
+    // New users start with empty favorites
+    setFavorites([]);
   }, []);
 
   const handlePasswordReset = useCallback(async (email: string) => {
     await authService.resetPassword(email);
   }, []);
 
-  const handleToggleFavorite = useCallback((station: Station) => {
+  const handleToggleFavorite = useCallback(async (station: Station) => {
     if (!user) return;
     
-    setFavorites(prev => {
-      const isCurrentlyFavorite = prev.some(fav => fav.id === station.id);
-      if (isCurrentlyFavorite) {
-        return prev.filter(fav => fav.id !== station.id);
-      } else {
-        return [...prev, station];
-      }
-    });
+    const result = await favoritesService.toggleFavorite(station);
+    setFavorites(result.favorites);
   }, [user]);
 
 
@@ -297,14 +289,21 @@ function App() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <img src="/streemr-main.png" alt="Streemr" className="w-35 h-10" />
-
                 </div>
-                <button
-                  onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-                  className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <FaSearch className="text-lg" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleLogin}
+                    className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <FaUser className="text-lg" />
+                  </button>
+                  <button
+                    onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                    className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <FaSearch className="text-lg" />
+                  </button>
+                </div>
               </div>
               
               {mobileSearchOpen && (
