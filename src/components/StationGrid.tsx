@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaPlay, FaGlobe, FaMusic, FaInfoCircle } from "react-icons/fa";
 import { getStationLogo } from "../utils/streamMetadata";
+import { apiRequest, API_CONFIG } from "../config/api";
 import type { Station } from "../types/Station";
 
 interface StationGridProps {
@@ -28,13 +29,7 @@ const StationGrid: React.FC<StationGridProps> = ({
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('http://192.168.1.69:3001/stations');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch stations: ${response.status}`);
-        }
-        
-        const data = await response.json();
+        const data = await apiRequest(API_CONFIG.ENDPOINTS.STATIONS);
         setStations(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load stations');
@@ -76,7 +71,7 @@ const StationGrid: React.FC<StationGridProps> = ({
           <p className="font-medium">Failed to connect to backend</p>
           <p className="text-sm text-gray-600 mt-1">{error}</p>
         </div>
-        <p className="text-sm text-gray-500">Make sure your backend server is running on 192.168.1.69:3001</p>
+        <p className="text-sm text-gray-500">Backend server: {API_CONFIG.BASE_URL}</p>
       </div>
     );
   }

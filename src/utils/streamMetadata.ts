@@ -1,3 +1,5 @@
+import { buildApiUrl, API_CONFIG } from '../config/api';
+
 // Utility to fetch stream metadata
 interface StreamMetadata {
   title?: string;
@@ -11,7 +13,7 @@ export const fetchStreamMetadata = async (streamUrl: string): Promise<StreamMeta
     console.log('📡 Calling backend metadata API for:', streamUrl);
     
     // First, try to get metadata from your backend if it provides it
-    const response = await fetch(`http://192.168.1.69:3001/metadata?stream=${encodeURIComponent(streamUrl)}`, {
+    const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.METADATA, { stream: streamUrl }), {
       headers: {
         'Accept': 'application/json',
       },

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaFire, FaMusic, FaInfoCircle } from 'react-icons/fa';
+import { apiRequest, API_CONFIG, buildApiUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
 interface HomeContentProps {
@@ -26,18 +27,15 @@ export default function HomeContent({
   useEffect(() => {
     const fetchStations = async () => {
       try {
-        const response = await fetch('http://192.168.1.69:3001/stations');
-        if (response.ok) {
-          const stations = await response.json();
-          // For now, simulate trending by taking random subset
-          const shuffled = stations.sort(() => 0.5 - Math.random());
-          setTrendingStations(shuffled.slice(0, 8));
-          setRecentStations(shuffled.slice(8, 16));
-          
-          // Simulate favorite stations for logged in users
-          if (isLoggedIn) {
-            setFavoriteStations(shuffled.slice(16, 20)); // Simulate 4 favorites
-          }
+        const stations = await apiRequest(API_CONFIG.ENDPOINTS.STATIONS);
+        // For now, simulate trending by taking random subset
+        const shuffled = stations.sort(() => 0.5 - Math.random());
+        setTrendingStations(shuffled.slice(0, 8));
+        setRecentStations(shuffled.slice(8, 16));
+        
+        // Simulate favorite stations for logged in users
+        if (isLoggedIn) {
+          setFavoriteStations(shuffled.slice(16, 20)); // Simulate 4 favorites
         }
       } catch (err) {
         console.error('Failed to load stations:', err);
@@ -59,14 +57,8 @@ export default function HomeContent({
 
       setSearching(true);
       try {
-        const response = await fetch(`http://192.168.1.69:3001/stations/search?q=${encodeURIComponent(searchTerm)}`);
-        if (response.ok) {
-          const data = await response.json();
-          setSearchResults(data);
-        } else {
-          console.error('Search request failed:', response.status, response.statusText);
-          setSearchResults([]);
-        }
+        const data = await apiRequest(buildApiUrl(API_CONFIG.ENDPOINTS.SEARCH, { q: searchTerm }));
+        setSearchResults(data);
       } catch (err) {
         console.error('Failed to search stations:', err);
         setSearchResults([]);

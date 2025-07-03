@@ -10,7 +10,11 @@
       "Bash(git -C /Users/cristianjanz/radio-back status)",
       "Bash(git -C /Users/cristianjanz/radio-back add .)",
       "Bash(git -C /Users/cristianjanz/radio-back push -u origin main)",
-      "Bash(git -C:*)"
+      "Bash(git -C:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "Bash(npx prisma generate:*)"
     ],
     "deny": []
   }
