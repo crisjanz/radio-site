@@ -331,6 +331,7 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering onPlay
+    console.log('Heart clicked for station:', station.name, 'onToggleFavorite exists:', !!onToggleFavorite);
     onToggleFavorite?.(station);
   };
   

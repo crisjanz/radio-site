@@ -34,6 +34,7 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
   const [favorites, setFavorites] = useState<Station[]>([]);
 
   // Initialize authentication and favorites
@@ -92,6 +93,20 @@ function App() {
     }
   }, [currentStation, isPlaying]);
 
+  // Close mobile user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileUserMenuOpen) {
+        setMobileUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [mobileUserMenuOpen]);
+
 
   const handlePlayStation = useCallback((station: Station) => {
     // If it's the same station, just toggle play/pause
@@ -148,9 +163,14 @@ function App() {
   }, []);
 
   const handleToggleFavorite = useCallback(async (station: Station) => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user logged in');
+      return;
+    }
     
+    console.log('Toggling favorite for station:', station.name, station.id);
     const result = await favoritesService.toggleFavorite(station);
+    console.log('Toggle result:', result);
     setFavorites(result.favorites);
   }, [user]);
 
@@ -291,12 +311,55 @@ function App() {
                   <img src="/streemr-main.png" alt="Streemr" className="w-35 h-10" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleLogin}
-                    className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <FaUser className="text-lg" />
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
+                      className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <FaUser className="text-lg" />
+                    </button>
+                    
+                    {/* Mobile User Dropdown */}
+                    {mobileUserMenuOpen && (
+                      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        {user ? (
+                          <>
+                            <div className="px-4 py-3 border-b border-gray-100">
+                              <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setActiveTab('favorites');
+                                setMobileUserMenuOpen(false);
+                              }}
+                              className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            >
+                              My Favorites
+                            </button>
+                            <button
+                              onClick={() => {
+                                handleLogin();
+                                setMobileUserMenuOpen(false);
+                              }}
+                              className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                            >
+                              Sign Out
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              handleLogin();
+                              setMobileUserMenuOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            Sign In
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
                     className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
