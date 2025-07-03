@@ -15,6 +15,8 @@ interface ScrapedData {
   phone?: string;
   email?: string;
   website?: string;
+  favicon?: string;
+  logo?: string;
   hours?: string;
   category?: string;
   rating?: number;
@@ -129,6 +131,8 @@ const StationScrapePage: React.FC = () => {
           phone: sourceData.phone || selectedStation?.phone,
           email: sourceData.email || selectedStation?.email,
           homepage: sourceData.website || selectedStation?.homepage,
+          favicon: sourceData.favicon || selectedStation?.favicon,
+          logo: sourceData.logo || selectedStation?.logo,
           facebookUrl: sourceData.socialMedia?.facebook || selectedStation?.facebookUrl,
           twitterUrl: sourceData.socialMedia?.twitter || selectedStation?.twitterUrl,
           instagramUrl: sourceData.socialMedia?.instagram || selectedStation?.instagramUrl,
@@ -229,6 +233,12 @@ const StationScrapePage: React.FC = () => {
           break;
         case 'website':
           merged.homepage = sourceData.website || selectedStation?.homepage;
+          break;
+        case 'favicon':
+          merged.favicon = sourceData.favicon || selectedStation?.favicon;
+          break;
+        case 'logo':
+          merged.logo = sourceData.logo || selectedStation?.logo;
           break;
         case 'coordinates':
           if (sourceData.coordinates) {

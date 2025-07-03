@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaMusic, FaInfoCircle, FaArrowLeft, FaHeadphones } from 'react-icons/fa';
+import { FaMusic, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface GenreContentProps {

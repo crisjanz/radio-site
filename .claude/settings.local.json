@@ -4,7 +4,13 @@
       "Bash(curl:*)",
       "Bash(grep:*)",
       "Bash(sqlite3:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(git init:*)",
+      "Bash(git -C /Users/cristianjanz/radio-back remote add origin https://github.com/crisjanz/radio-back.git)",
+      "Bash(git -C /Users/cristianjanz/radio-back status)",
+      "Bash(git -C /Users/cristianjanz/radio-back add .)",
+      "Bash(git -C /Users/cristianjanz/radio-back push -u origin main)",
+      "Bash(git -C:*)"
     ],
     "deny": []
   }

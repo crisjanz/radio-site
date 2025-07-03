@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaPlay, FaFire, FaGlobe, FaMusic, FaInfoCircle } from 'react-icons/fa';
+import { FaFire, FaMusic, FaInfoCircle } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface HomeContentProps {
@@ -13,7 +13,6 @@ interface HomeContentProps {
 export default function HomeContent({ 
   searchTerm, 
   onPlayStation,
-  onNavigateToDiscover,
   onStationInfo,
   isLoggedIn = false
 }: HomeContentProps) {

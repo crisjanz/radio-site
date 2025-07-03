@@ -7,6 +7,8 @@ interface ScrapedData {
   phone?: string;
   email?: string;
   website?: string;
+  favicon?: string;
+  logo?: string;
   hours?: string;
   category?: string;
   rating?: number;
@@ -58,6 +60,8 @@ export default function FieldSelector({
     { key: 'description', label: 'Description', primary: primaryData?.description, secondary: secondaryData?.description },
     { key: 'address', label: 'Address', primary: primaryData?.address, secondary: secondaryData?.address },
     { key: 'website', label: 'Website', primary: primaryData?.website, secondary: secondaryData?.website },
+    { key: 'favicon', label: 'Favicon', primary: primaryData?.favicon, secondary: secondaryData?.favicon },
+    { key: 'logo', label: 'Logo', primary: primaryData?.logo, secondary: secondaryData?.logo },
     { key: 'coordinates', label: 'Coordinates', primary: primaryData?.coordinates ? `${primaryData.coordinates.latitude}, ${primaryData.coordinates.longitude}` : null, secondary: secondaryData?.coordinates ? `${secondaryData.coordinates.latitude}, ${secondaryData.coordinates.longitude}` : null },
     { key: 'facebook', label: 'Facebook', primary: primaryData?.socialMedia?.facebook, secondary: secondaryData?.socialMedia?.facebook },
     { key: 'twitter', label: 'Twitter', primary: primaryData?.socialMedia?.twitter, secondary: secondaryData?.socialMedia?.twitter },
@@ -84,6 +88,8 @@ export default function FieldSelector({
             case 'description': currentValue = selectedStation?.description; break;
             case 'address': currentValue = selectedStation?.address; break;
             case 'website': currentValue = selectedStation?.homepage; break;
+            case 'favicon': currentValue = selectedStation?.favicon; break;
+            case 'logo': currentValue = selectedStation?.logo; break;
             case 'coordinates': 
               currentValue = selectedStation?.latitude && selectedStation?.longitude 
                 ? `${selectedStation.latitude}, ${selectedStation.longitude}` 
@@ -132,6 +138,29 @@ export default function FieldSelector({
                     }`}></div>
                     <span className="text-sm font-medium text-gray-700">Primary URL</span>
                   </div>
+                  
+                  {/* Image preview for favicon/logo fields */}
+                  {(field.key === 'favicon' || field.key === 'logo') && field.primary && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`${field.key === 'favicon' ? 'w-6 h-6' : 'w-8 h-6'} bg-gray-100 rounded border flex items-center justify-center overflow-hidden`}>
+                        <img
+                          src={field.primary}
+                          alt={`${field.key} preview`}
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<span class="text-xs text-red-400">❌</span>';
+                            }
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs text-gray-500">Preview</span>
+                    </div>
+                  )}
+                  
                   <p className="text-sm text-gray-900 break-all">{field.primary}</p>
                 </div>
               )}
@@ -151,6 +180,29 @@ export default function FieldSelector({
                     }`}></div>
                     <span className="text-sm font-medium text-gray-700">Secondary URL</span>
                   </div>
+                  
+                  {/* Image preview for favicon/logo fields */}
+                  {(field.key === 'favicon' || field.key === 'logo') && field.secondary && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`${field.key === 'favicon' ? 'w-6 h-6' : 'w-8 h-6'} bg-gray-100 rounded border flex items-center justify-center overflow-hidden`}>
+                        <img
+                          src={field.secondary}
+                          alt={`${field.key} preview`}
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<span class="text-xs text-red-400">❌</span>';
+                            }
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs text-gray-500">Preview</span>
+                    </div>
+                  )}
+                  
                   <p className="text-sm text-gray-900 break-all">{field.secondary}</p>
                 </div>
               )}

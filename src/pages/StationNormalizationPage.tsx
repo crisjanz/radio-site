@@ -115,7 +115,8 @@ export default function StationNormalizationPage() {
     }
   };
 
-  const handleApproval = (changeId: number, status: 'approved' | 'rejected', customValue?: string) => {
+
+const handleApproval = (changeId: number, status: 'approved' | 'rejected' | 'pending', customValue?: string) => {
     setPendingChanges(prev => prev.map(change => {
       if (change.stationId === changeId) {
         return {

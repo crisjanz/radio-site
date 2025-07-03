@@ -70,10 +70,11 @@ export default function ScrapingInput({
       </div>
 
       <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-        <p className="text-xs font-medium text-blue-800 mb-2">💡 Pro Tip: Use Both URLs!</p>
+        <p className="text-xs font-medium text-blue-800 mb-2">💡 What gets scraped automatically:</p>
         <div className="text-xs text-blue-700 space-y-1">
-          <p><strong>Station Website:</strong> Phone, email, description, social media</p>
+          <p><strong>Station Website:</strong> Phone, email, description, social media, logo, favicon</p>
           <p><strong>Google Maps:</strong> Coordinates, address verification</p>
+          <p><strong>🎨 NEW!</strong> Automatic logo and favicon detection from websites</p>
           <p>Data will be automatically merged from both sources!</p>
         </div>
       </div>

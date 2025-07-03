@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaMusic, FaInfoCircle, FaArrowLeft, FaArrowRight, FaFilter, FaTimes, FaSearch } from 'react-icons/fa';
+import { FaMusic, FaInfoCircle, FaArrowLeft, FaArrowRight, FaFilter, FaTimes } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface BrowseAllContentProps {
