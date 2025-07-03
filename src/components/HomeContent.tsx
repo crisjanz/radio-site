@@ -378,20 +378,20 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
         {onToggleFavorite && (
           <button
             onClick={handleFavoriteClick}
-            className="absolute top-2 left-2 w-8 h-8 bg-white/80 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm"
+            className="absolute top-2 left-2 w-7 h-7 bg-white/80 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm"
             title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
-            {isFavorite ? <FaHeart className="text-sm" /> : <FaRegHeart className="text-sm" />}
+            {isFavorite ? <FaHeart className="text-xs" /> : <FaRegHeart className="text-xs" />}
           </button>
         )}
         
         {/* Info button - always visible on mobile, hover on desktop */}
         <button
           onClick={handleInfoClick}
-          className="absolute top-2 right-2 w-8 h-8 text-gray-600 hover:text-gray-800 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
+          className="absolute top-2 right-2 w-7 h-7 bg-white/80 text-gray-600 hover:text-gray-800 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm"
           title="Station Info"
         >
-          <FaInfoCircle className="text-sm" />
+          <FaInfoCircle className="text-xs" />
         </button>
       </div>
       

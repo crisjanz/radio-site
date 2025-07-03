@@ -321,14 +321,20 @@ function App() {
                     
                     {/* Mobile User Dropdown */}
                     {mobileUserMenuOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                      <div 
+                        className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {user ? (
                           <>
                             <div className="px-4 py-3 border-b border-gray-100">
                               <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
                             </div>
                             <button
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('My Favorites clicked');
                                 setActiveTab('favorites');
                                 setMobileUserMenuOpen(false);
                               }}
@@ -337,7 +343,10 @@ function App() {
                               My Favorites
                             </button>
                             <button
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('Sign Out clicked');
                                 handleLogin();
                                 setMobileUserMenuOpen(false);
                               }}
@@ -348,7 +357,9 @@ function App() {
                           </>
                         ) : (
                           <button
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
                               console.log('Mobile sign in clicked');
                               handleLogin();
                               setMobileUserMenuOpen(false);
