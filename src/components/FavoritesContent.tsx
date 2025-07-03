@@ -1,4 +1,4 @@
-import { FaHeart, FaMusic, FaInfoCircle, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaMusic, FaInfoCircle } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface FavoritesContentProps {
