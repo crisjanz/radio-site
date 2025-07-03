@@ -95,7 +95,7 @@ function App() {
 
   // Close mobile user menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = () => {
       if (mobileUserMenuOpen) {
         setMobileUserMenuOpen(false);
       }
