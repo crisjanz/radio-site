@@ -32,8 +32,7 @@ export default function TopNavigation({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
-              <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8" />
-              <h1 className="text-2xl font-bold text-gray-900">Streemr</h1>
+              <img src="/streemr-main.png" alt="Streemr" className="w-41 h-12" />
             </div>
           </div>
           

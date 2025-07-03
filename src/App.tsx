@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaSearch } from 'react-icons/fa';
 import AdminPage from "./pages/AdminPage";
 import StationDetailPage from "./pages/StationDetailPage";
 import StationScrapePage from "./pages/StationScrapePage";
@@ -28,6 +28,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("home");
   const [isLoggedIn, setIsLoggedIn] = useState(false); // TODO: Replace with real auth
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   // Handle audio playback
   useEffect(() => {
@@ -205,30 +206,42 @@ function App() {
 
             {/* Mobile Header with Branding */}
             <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
-              <div className="flex items-center justify-center mb-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <img src="/streemr-play.png" alt="Streemr" className="w-6 h-6" />
-                  <h1 className="text-lg font-bold text-gray-900">Streemr</h1>
+                  <img src="/streemr-main.png" alt="Streemr" className="w-35 h-10" />
+
                 </div>
+                <button
+                  onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                  className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <FaSearch className="text-lg" />
+                </button>
               </div>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search stations..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-4 pr-10 py-2 w-full text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                  style={{ fontSize: '16px' }}
-                />
-                {searchTerm && (
-                  <button
-                    onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <FaTimes className="text-sm" />
-                  </button>
-                )}
-              </div>
+              
+              {mobileSearchOpen && (
+                <div className="mt-3">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search stations..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-4 pr-10 py-2 w-full text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                      style={{ fontSize: '16px' }}
+                      autoFocus
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <FaTimes className="text-sm" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Main Content */}
@@ -319,13 +332,19 @@ onExpand={() => console.log('Expand player')}
               isLoggedIn={isLoggedIn}
             />
 
-            {/* Mobile Header with Branding */}
+ {/* Mobile Header with Branding */}
             <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
-              <div className="flex items-center justify-center mb-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <img src="/streemr-play.png" alt="Streemr" className="w-6 h-6" />
-                  <h1 className="text-lg font-bold text-gray-900">Streemr</h1>
+                  <img src="/streemr-main.png" alt="Streemr" className="w-35 h-10" />
+
                 </div>
+                <button
+                  onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                  className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <FaSearch className="text-lg" />
+                </button>
               </div>
               <div className="relative">
                 <input
