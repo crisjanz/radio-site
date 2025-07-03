@@ -6,7 +6,6 @@ interface TopNavigationProps {
   onTabChange: (tab: string) => void;
   onSearchChange: (value: string) => void;
   onLogin: () => void;
-  onSettings: () => void;
   isLoggedIn?: boolean;
 }
 
@@ -16,7 +15,6 @@ export default function TopNavigation({
   onTabChange, 
   onSearchChange,
   onLogin,
-  onSettings,
   isLoggedIn = false
 }: TopNavigationProps) {
   const tabs = [
@@ -33,7 +31,10 @@ export default function TopNavigation({
       <div className="px-6 py-4 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-gray-900">World Radio</h1>
+            <div className="flex items-center gap-3">
+              <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8" />
+              <h1 className="text-2xl font-bold text-gray-900">Streemr</h1>
+            </div>
           </div>
           
           <div className="flex items-center gap-4">
@@ -71,14 +72,6 @@ export default function TopNavigation({
               {isLoggedIn ? 'Sign Out' : 'Sign In'}
             </button>
             
-            {/* Settings */}
-            <button
-              onClick={onSettings}
-              className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-              title="Settings"
-            >
-              <FaCog />
-            </button>
           </div>
         </div>
       </div>

@@ -93,8 +93,9 @@ function App() {
   }, [isLoggedIn]);
 
   const handleSettings = useCallback(() => {
-    navigate('/admin');
-  }, [navigate]);
+    // Settings removed for security
+    console.log('Settings access removed');
+  }, []);
 
   const handleStationInfo = useCallback((station: Station) => {
     navigate(`/station/${station.id}/info`);
@@ -157,12 +158,6 @@ function App() {
                 <h3 className="text-lg font-semibold text-gray-900">Settings</h3>
               </div>
               <div className="p-6 space-y-4">
-                <button 
-                  onClick={() => navigate('/admin')}
-                  className="w-full text-left p-4 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                  Admin Panel
-                </button>
                 <button className="w-full text-left p-4 hover:bg-gray-50 rounded-lg transition-colors">
                   About
                 </button>
@@ -209,7 +204,6 @@ function App() {
               onTabChange={handleTabChange}
               onSearchChange={setSearchTerm}
               onLogin={handleLogin}
-              onSettings={handleSettings}
               isLoggedIn={isLoggedIn}
             />
 
@@ -279,11 +273,31 @@ onExpand={() => console.log('Expand player')}
       <Route 
         path="/station/:id" 
         element={
-          <StationDetailPage 
-            currentStation={currentStation}
-            onPlayStation={handlePlayStation}
-            isPlaying={isPlaying}
-          />
+          <div className="min-h-screen bg-gray-50">
+            <StationDetailPage 
+              currentStation={currentStation}
+              onPlayStation={handlePlayStation}
+              isPlaying={isPlaying}
+            />
+            
+            {/* Mobile Player (when playing) */}
+            {currentStation && (
+              <MobilePlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+                onExpand={() => console.log('Expand player')}
+              />
+            )}
+
+            {/* Bottom Navigation (Mobile) */}
+            <BottomNavigation
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+
+          </div>
         } 
       />
       <Route 
@@ -300,7 +314,6 @@ onExpand={() => console.log('Expand player')}
               onTabChange={handleTabChange}
               onSearchChange={setSearchTerm}
               onLogin={handleLogin}
-              onSettings={handleSettings}
               isLoggedIn={isLoggedIn}
             />
 

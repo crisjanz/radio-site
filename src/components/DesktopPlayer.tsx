@@ -105,10 +105,11 @@ export default function DesktopPlayer({
         </div>
       </div>
 
-      {/* Ad Space */}
+      {/* Streemr Branding */}
       <div className="ml-6 flex-shrink-0">
-        <div className="w-60 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center text-xs text-gray-500">
-          Advertisement Space
+        <div className="w-60 h-12 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg flex items-center justify-center gap-2">
+          <img src="/streemr-play.png" alt="Streemr" className="w-6 h-6" />
+          <span className="text-xs font-medium text-gray-700">Powered by Streemr</span>
         </div>
       </div>
     </div>
