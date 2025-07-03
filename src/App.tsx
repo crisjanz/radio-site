@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { FaTimes, FaSearch } from 'react-icons/fa';
+import { authService, type User } from './services/auth';
 import AdminPage from "./pages/AdminPage";
 import StationDetailPage from "./pages/StationDetailPage";
 import StationScrapePage from "./pages/StationScrapePage";
@@ -14,8 +15,10 @@ import StationMap from "./components/StationMap";
 import StationInfoPage from "./pages/StationInfoPage";
 //import BrowseContent from "./components/BrowseContent";
 import BrowseAllContent from "./components/BrowseAllContent";
+import FavoritesContent from "./components/FavoritesContent";
 import StationNormalizationPage from "./pages/StationNormalizationPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
+import LoginModal from "./components/LoginModal";
 import type { Station } from "./types/Station";
 
 function App() {
@@ -27,8 +30,38 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("home");
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // TODO: Replace with real auth
+  const [user, setUser] = useState<User | null>(null);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [favorites, setFavorites] = useState<Station[]>([]);
+
+  // Initialize authentication and favorites
+  useEffect(() => {
+    const initAuth = async () => {
+      const user = await authService.verifyToken();
+      setUser(user);
+      
+      // Load favorites from localStorage
+      if (user) {
+        const savedFavorites = localStorage.getItem(`favorites_${user.id}`);
+        if (savedFavorites) {
+          try {
+            setFavorites(JSON.parse(savedFavorites));
+          } catch (e) {
+            console.error('Failed to parse saved favorites:', e);
+          }
+        }
+      }
+    };
+    initAuth();
+  }, []);
+
+  // Save favorites to localStorage when they change
+  useEffect(() => {
+    if (user && favorites.length >= 0) {
+      localStorage.setItem(`favorites_${user.id}`, JSON.stringify(favorites));
+    }
+  }, [user, favorites]);
 
   // Handle audio playback
   useEffect(() => {
@@ -85,13 +118,49 @@ function App() {
 
   const handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab);
-  }, []);
+    // Navigate to home if we're currently on a station detail page
+    if (window.location.pathname.startsWith('/station/')) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleLogin = useCallback(() => {
-    // TODO: Implement login modal
-    setIsLoggedIn(!isLoggedIn); // For now, just toggle login state
-    console.log('Login toggled:', !isLoggedIn);
-  }, [isLoggedIn]);
+    if (user) {
+      // User is logged in, so log them out
+      authService.logout();
+      setUser(null);
+    } else {
+      // User is not logged in, show login modal
+      setShowLoginModal(true);
+    }
+  }, [user]);
+
+  const handleLoginSubmit = useCallback(async (email: string, password: string) => {
+    const response = await authService.login(email, password);
+    setUser(response.user);
+  }, []);
+
+  const handleSignupSubmit = useCallback(async (email: string, password: string) => {
+    const response = await authService.signup(email, password);
+    setUser(response.user);
+  }, []);
+
+  const handlePasswordReset = useCallback(async (email: string) => {
+    await authService.resetPassword(email);
+  }, []);
+
+  const handleToggleFavorite = useCallback((station: Station) => {
+    if (!user) return;
+    
+    setFavorites(prev => {
+      const isCurrentlyFavorite = prev.some(fav => fav.id === station.id);
+      if (isCurrentlyFavorite) {
+        return prev.filter(fav => fav.id !== station.id);
+      } else {
+        return [...prev, station];
+      }
+    });
+  }, [user]);
 
 
   const handleStationInfo = useCallback((station: Station) => {
@@ -107,7 +176,9 @@ function App() {
             onPlayStation={handlePlayStation}
             onNavigateToDiscover={() => setActiveTab('discover')}
             onStationInfo={handleStationInfo}
-            isLoggedIn={isLoggedIn}
+            isLoggedIn={!!user}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           />
         );
       case 'browse':
@@ -117,6 +188,9 @@ function App() {
             onPlayStation={handlePlayStation}
             onStationInfo={handleStationInfo}
             onBack={() => {}} // No back button needed since this is the main Browse page
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+            isLoggedIn={!!user}
           />
         );
       case 'discover':
@@ -130,22 +204,33 @@ function App() {
           />
         );
       case 'favorites':
+        if (!user) {
+          return (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">❤️</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Your Favorites
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Sign in to save your favorite stations and sync them across devices.
+              </p>
+              <button 
+                onClick={handleLogin}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          );
+        }
         return (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">❤️</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Your Favorites
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Sign in to save your favorite stations and sync them across devices.
-            </p>
-            <button 
-              onClick={handleLogin}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Sign In
-            </button>
-          </div>
+          <FavoritesContent
+            favorites={favorites}
+            onPlayStation={handlePlayStation}
+            onStationInfo={handleStationInfo}
+            onToggleFavorite={handleToggleFavorite}
+            isLoggedIn={!!user}
+          />
         );
       case 'more':
         return (
@@ -179,13 +264,16 @@ function App() {
             onPlayStation={handlePlayStation} 
             onNavigateToDiscover={() => setActiveTab('discover')}
             onStationInfo={handleStationInfo}
-            isLoggedIn={isLoggedIn}
+            isLoggedIn={!!user}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           />
         );
     }
   };
 
   return (
+    <>
     <Routes>
       <Route 
         path="/" 
@@ -201,7 +289,7 @@ function App() {
               onTabChange={handleTabChange}
               onSearchChange={setSearchTerm}
               onLogin={handleLogin}
-              isLoggedIn={isLoggedIn}
+              isLoggedIn={!!user}
             />
 
             {/* Mobile Header with Branding */}
@@ -245,9 +333,11 @@ function App() {
             </div>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto p-4 lg:p-6" style={{ 
-              paddingBottom: currentStation ? (window.innerWidth >= 1024 ? '0' : '8.5rem') : (window.innerWidth >= 1024 ? '0' : '4rem') 
-            }}>
+            <main className={`flex-1 overflow-y-auto p-4 lg:p-6 ${
+              currentStation 
+                ? 'pb-32 lg:pb-6' // Bottom padding when player + nav are visible (mobile)
+                : 'pb-20 lg:pb-6' // Bottom padding when only nav is visible (mobile)
+            }`}>
               {renderTabContent()}
             </main>
 
@@ -288,7 +378,11 @@ onExpand={() => console.log('Expand player')}
       <Route 
         path="/station/:id" 
         element={
-          <div className="min-h-screen bg-gray-50">
+          <div className={`min-h-screen bg-gray-50 ${
+            currentStation 
+              ? 'pb-32 lg:pb-0' // Bottom padding when player + nav are visible (mobile)
+              : 'pb-20 lg:pb-0' // Bottom padding when only nav is visible (mobile)
+          }`}>
             <StationDetailPage 
               currentStation={currentStation}
               onPlayStation={handlePlayStation}
@@ -329,7 +423,7 @@ onExpand={() => console.log('Expand player')}
               onTabChange={handleTabChange}
               onSearchChange={setSearchTerm}
               onLogin={handleLogin}
-              isLoggedIn={isLoggedIn}
+              isLoggedIn={!!user}
             />
 
  {/* Mobile Header with Branding */}
@@ -403,6 +497,16 @@ onExpand={() => console.log('Expand player')}
         } 
       />
     </Routes>
+
+    {/* Login Modal */}
+    <LoginModal
+      isOpen={showLoginModal}
+      onClose={() => setShowLoginModal(false)}
+      onLogin={handleLoginSubmit}
+      onSignup={handleSignupSubmit}
+      onPasswordReset={handlePasswordReset}
+    />
+    </>
   );
 }
 

@@ -69,7 +69,8 @@ export default function StationList({
                       <img
                         src={station.favicon}
                         alt={`${station.name} logo`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-fill"
+                        style={{ width: '100%', height: '100%' }}
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
                           e.currentTarget.nextElementSibling?.classList.remove('hidden');

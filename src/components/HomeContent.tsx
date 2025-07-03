@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { FaFire, FaMusic, FaInfoCircle } from 'react-icons/fa';
+import { useState, useEffect, useRef } from 'react';
+import { FaFire, FaMusic, FaInfoCircle, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { apiRequest, API_CONFIG, buildApiUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
@@ -9,34 +9,46 @@ interface HomeContentProps {
   onNavigateToDiscover: () => void;
   onStationInfo?: (station: Station) => void;
   isLoggedIn?: boolean;
+  favorites?: Station[];
+  onToggleFavorite?: (station: Station) => void;
 }
 
 export default function HomeContent({ 
   searchTerm, 
   onPlayStation,
   onStationInfo,
-  isLoggedIn = false
+  isLoggedIn = false,
+  favorites = [],
+  onToggleFavorite
 }: HomeContentProps) {
   const [trendingStations, setTrendingStations] = useState<Station[]>([]);
   const [recentStations, setRecentStations] = useState<Station[]>([]);
-  const [favoriteStations, setFavoriteStations] = useState<Station[]>([]);
   const [searchResults, setSearchResults] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
+  const favoritesScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchStations = async () => {
       try {
         const stations = await apiRequest(API_CONFIG.ENDPOINTS.STATIONS);
-        // For now, simulate trending by taking random subset
-        const shuffled = stations.sort(() => 0.5 - Math.random());
-        setTrendingStations(shuffled.slice(0, 8));
-        setRecentStations(shuffled.slice(8, 16));
         
-        // Simulate favorite stations for logged in users
-        if (isLoggedIn) {
-          setFavoriteStations(shuffled.slice(16, 20)); // Simulate 4 favorites
-        }
+        // Sort by Radio Browser popularity (clickcount + votes)
+        const popularStations = [...stations].sort((a, b) => {
+          const aScore = (a.clickcount || 0) + (a.votes || 0) * 2; // Weight votes higher
+          const bScore = (b.clickcount || 0) + (b.votes || 0) * 2;
+          return bScore - aScore;
+        });
+        
+        // Sort by most recent (createdAt)
+        const recentStations = [...stations].sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
+        setTrendingStations(popularStations.slice(0, 8));
+        setRecentStations(recentStations.slice(0, 8));
+        
+        // Favorites are now managed globally in App.tsx
       } catch (err) {
         console.error('Failed to load stations:', err);
       } finally {
@@ -72,6 +84,25 @@ export default function HomeContent({
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
+  const isFavorite = (stationId: number) => {
+    return favorites.some(fav => fav.id === stationId);
+  };
+
+  const scrollFavorites = (direction: 'left' | 'right') => {
+    if (favoritesScrollRef.current) {
+      const scrollAmount = 280; // Approximate width of 2 cards
+      const currentScroll = favoritesScrollRef.current.scrollLeft;
+      const targetScroll = direction === 'left' 
+        ? currentScroll - scrollAmount 
+        : currentScroll + scrollAmount;
+      
+      favoritesScrollRef.current.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   // Use search results if searching, otherwise use default content
   const showSearchResults = searchTerm.trim() !== '';
   const filteredTrending = showSearchResults ? [] : trendingStations;
@@ -86,7 +117,15 @@ export default function HomeContent({
   }
 
   return (
-    <div className="space-y-8">
+    <>
+      <style>
+        {`
+          .favorites-scroll::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
+      <div className="space-y-8">
       {/* Hero Section - Desktop Only */}
       {!searchTerm && (
         <div className="hidden lg:block text-center py-4 lg:py-8">
@@ -128,6 +167,8 @@ export default function HomeContent({
                   station={station} 
                   onPlay={() => onPlayStation(station)}
                   onInfo={onStationInfo}
+                  isFavorite={isFavorite(station.id)}
+                  onToggleFavorite={isLoggedIn ? onToggleFavorite : undefined}
                 />
               ))}
             </div>
@@ -145,8 +186,8 @@ export default function HomeContent({
         </section>
       )}
 
-      {/* Your Favorites - Only show for logged in users */}
-      {isLoggedIn && favoriteStations.length > 0 && !showSearchResults && (
+      {/* Your Favorites - Horizontal scrolling row */}
+      {isLoggedIn && favorites.length > 0 && !showSearchResults && (
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl lg:text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -154,19 +195,47 @@ export default function HomeContent({
               Your Favorites
             </h2>
             <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-              Manage
+              See All
             </button>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-            {favoriteStations.map((station) => (
-              <StationCard 
-                key={station.id} 
-                station={station} 
-                onPlay={() => onPlayStation(station)}
-                onInfo={onStationInfo}
-              />
-            ))}
+          <div className="relative">
+            {/* Left Arrow */}
+            <button
+              onClick={() => scrollFavorites('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white shadow-lg rounded-full flex items-center justify-center text-gray-600 hover:text-gray-900 hover:shadow-xl transition-all duration-200"
+            >
+              <FaChevronLeft className="text-sm" />
+            </button>
+            
+            {/* Right Arrow */}
+            <button
+              onClick={() => scrollFavorites('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white shadow-lg rounded-full flex items-center justify-center text-gray-600 hover:text-gray-900 hover:shadow-xl transition-all duration-200"
+            >
+              <FaChevronRight className="text-sm" />
+            </button>
+            
+            <div 
+              ref={favoritesScrollRef}
+              className="flex gap-4 overflow-x-auto pb-4 px-10 favorites-scroll"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}
+            >
+              {favorites.slice(0, 8).map((station) => (
+                <div key={station.id} className="flex-shrink-0 w-32">
+                  <StationCard 
+                    station={station} 
+                    onPlay={() => onPlayStation(station)}
+                    onInfo={onStationInfo}
+                    isFavorite={true}
+                    onToggleFavorite={onToggleFavorite}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -177,7 +246,7 @@ export default function HomeContent({
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl lg:text-2xl font-bold text-gray-900 flex items-center gap-2">
               <FaFire className="text-orange-500" />
-              Trending This Week
+              Most Popular
             </h2>
             <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
               See All
@@ -191,6 +260,8 @@ export default function HomeContent({
                 station={station} 
                 onPlay={() => onPlayStation(station)}
                 onInfo={onStationInfo}
+                isFavorite={isFavorite(station.id)}
+                onToggleFavorite={isLoggedIn ? onToggleFavorite : undefined}
               />
             ))}
           </div>
@@ -216,6 +287,8 @@ export default function HomeContent({
                 station={station} 
                 onPlay={() => onPlayStation(station)}
                 onInfo={onStationInfo}
+                isFavorite={isFavorite(station.id)}
+                onToggleFavorite={isLoggedIn ? onToggleFavorite : undefined}
               />
             ))}
           </div>
@@ -235,6 +308,7 @@ export default function HomeContent({
         </div>
       )}
     </div>
+    </>
   );
 }
 
@@ -243,14 +317,21 @@ interface StationCardProps {
   station: Station;
   onPlay: () => void;
   onInfo?: (station: Station) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: (station: Station) => void;
 }
 
-function StationCard({ station, onPlay, onInfo }: StationCardProps) {
+function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavorite }: StationCardProps) {
   console.log('Station data:', station.name, 'favicon:', station.favicon);
   
   const handleInfoClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering onPlay
     onInfo?.(station);
+  };
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering onPlay
+    onToggleFavorite?.(station);
   };
   
   return (
@@ -259,12 +340,24 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
       onClick={onPlay}
     >
       {/* Icon */}
-      <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+      <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
         {station.favicon && station.favicon.trim() !== '' ? (
           <img
             src={station.favicon}
             alt={station.name}
-            className="max-w-full max-h-full object-contain"
+            className="w-full h-full object-cover"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              const aspectRatio = img.naturalWidth / img.naturalHeight;
+              
+              // If image is very wide or very tall, use contain with padding
+              if (aspectRatio > 2 || aspectRatio < 0.5) {
+                img.className = "w-full h-full object-contain p-2";
+              } else {
+                // For roughly square images, use cover to fill
+                img.className = "w-full h-full object-cover";
+              }
+            }}
             onError={(e) => {
               console.log('Favicon failed to load:', station.favicon);
               const target = e.currentTarget;
@@ -279,6 +372,17 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
         <div className={`favicon-fallback flex items-center justify-center text-gray-500 text-2xl ${station.favicon && station.favicon.trim() !== '' ? 'hidden' : ''}`}>
           <FaMusic />
         </div>
+        
+        {/* Favorite button - top left */}
+        {onToggleFavorite && (
+          <button
+            onClick={handleFavoriteClick}
+            className="absolute top-2 left-2 w-8 h-8 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
+            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            {isFavorite ? <FaHeart className="text-sm" /> : <FaRegHeart className="text-sm" />}
+          </button>
+        )}
         
         {/* Info button - always visible on mobile, hover on desktop */}
         <button

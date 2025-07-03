@@ -83,12 +83,13 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
       <div className="flex items-center justify-between gap-2 lg:gap-4">
         {/* Station info */}
         <div className="flex items-center gap-2 lg:gap-4 flex-1 min-w-0">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-200">
+          <div className="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden border border-gray-200">
             {stationLogo && !logoError ? (
               <img
                 src={stationLogo}
                 alt={`${currentStation.name} logo`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill"
+                style={{ width: '100%', height: '100%' }}
                 onError={handleLogoError}
               />
             ) : (

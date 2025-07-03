@@ -154,12 +154,13 @@ const StationLogo: React.FC<{ station: Station; logoUrl: string | null }> = ({ s
   const [logoError, setLogoError] = useState(false);
 
   return (
-    <div className="w-12 h-12 rounded-xl flex items-center justify-center ml-3 flex-shrink-0 overflow-hidden border border-gray-200">
+    <div className="w-12 h-12 rounded-xl ml-3 flex-shrink-0 overflow-hidden border border-gray-200">
       {logoUrl && !logoError ? (
         <img
           src={logoUrl}
           alt={`${station.name} logo`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-fill"
+          style={{ width: '100%', height: '100%' }}
           onError={() => setLogoError(true)}
         />
       ) : (

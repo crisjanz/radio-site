@@ -46,7 +46,8 @@ export default function DesktopPlayer({
             <img
               src={station.favicon}
               alt={`${station.name} logo`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-fill"
+              style={{ width: '100%', height: '100%' }}
               onError={(e) => {
                 const target = e.currentTarget;
                 target.style.display = 'none';

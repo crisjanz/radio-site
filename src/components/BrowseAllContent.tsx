@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaMusic, FaInfoCircle, FaArrowLeft, FaArrowRight, FaFilter, FaTimes } from 'react-icons/fa';
+import { FaMusic, FaInfoCircle, FaArrowLeft, FaArrowRight, FaFilter, FaTimes, FaHeart, FaRegHeart } from 'react-icons/fa';
 import { API_CONFIG } from '../config/api';
 import type { Station } from '../types/Station';
 
@@ -8,6 +8,9 @@ interface BrowseAllContentProps {
   onStationInfo?: (station: Station) => void;
   onBack: () => void;
   searchTerm?: string;
+  favorites?: Station[];
+  onToggleFavorite?: (station: Station) => void;
+  isLoggedIn?: boolean;
 }
 
 const STATIONS_PER_PAGE = 20;
@@ -48,7 +51,10 @@ export default function BrowseAllContent({
   onPlayStation, 
   onStationInfo,
   onBack,
-  searchTerm = ''
+  searchTerm = '',
+  favorites = [],
+  onToggleFavorite,
+  isLoggedIn = false
 }: BrowseAllContentProps) {
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
@@ -193,6 +199,11 @@ export default function BrowseAllContent({
   const handleInfoClick = (e: React.MouseEvent, station: Station) => {
     e.stopPropagation();
     onStationInfo?.(station);
+  };
+
+  // Helper function to check if station is favorite
+  const isFavorite = (stationId: number) => {
+    return favorites.some(fav => fav.id === stationId);
   };
 
   if (loading) {
@@ -427,6 +438,8 @@ export default function BrowseAllContent({
             station={station} 
             onPlay={() => onPlayStation(station)}
             onInfo={onStationInfo ? (e) => handleInfoClick(e, station) : undefined}
+            isFavorite={isFavorite(station.id)}
+            onToggleFavorite={isLoggedIn ? onToggleFavorite : undefined}
           />
         ))}
       </div>
@@ -580,21 +593,39 @@ interface StationCardProps {
   station: Station;
   onPlay: () => void;
   onInfo?: (e: React.MouseEvent) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: (station: Station) => void;
 }
 
-function StationCard({ station, onPlay, onInfo }: StationCardProps) {
+function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavorite }: StationCardProps) {
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleFavorite?.(station);
+  };
   return (
     <div 
       className="group cursor-pointer"
       onClick={onPlay}
     >
       {/* Icon */}
-      <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+      <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
         {station.favicon && station.favicon.trim() !== '' ? (
           <img
             src={station.favicon}
             alt={station.name}
-            className="max-w-full max-h-full object-contain"
+            className="w-full h-full object-cover"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              const aspectRatio = img.naturalWidth / img.naturalHeight;
+              
+              // If image is very wide or very tall, use contain with padding
+              if (aspectRatio > 2 || aspectRatio < 0.5) {
+                img.className = "w-full h-full object-contain p-2";
+              } else {
+                // For roughly square images, use cover to fill
+                img.className = "w-full h-full object-cover";
+              }
+            }}
             onError={(e) => {
               const target = e.currentTarget;
               target.style.display = 'none';
@@ -608,6 +639,17 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
         <div className={`favicon-fallback flex items-center justify-center text-gray-500 text-2xl ${station.favicon && station.favicon.trim() !== '' ? 'hidden' : ''}`}>
           <FaMusic />
         </div>
+        
+        {/* Favorite button - top left */}
+        {onToggleFavorite && (
+          <button
+            onClick={handleFavoriteClick}
+            className="absolute top-2 left-2 w-8 h-8 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
+            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            {isFavorite ? <FaHeart className="text-sm" /> : <FaRegHeart className="text-sm" />}
+          </button>
+        )}
         
         {/* Info button */}
         {onInfo && (

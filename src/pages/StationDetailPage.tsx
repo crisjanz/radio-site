@@ -135,7 +135,8 @@ const StationDetailPage: React.FC<StationDetailPageProps> = ({
                 <img
                   src={station.favicon || station.logo}
                   alt={station.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-fill"
+                  style={{ width: '100%', height: '100%' }}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
