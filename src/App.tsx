@@ -203,8 +203,14 @@ function App() {
               isLoggedIn={isLoggedIn}
             />
 
-            {/* Mobile Search Bar */}
+            {/* Mobile Header with Branding */}
             <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
+              <div className="flex items-center justify-center mb-3">
+                <div className="flex items-center gap-2">
+                  <img src="/streemr-play.png" alt="Streemr" className="w-6 h-6" />
+                  <h1 className="text-lg font-bold text-gray-900">Streemr</h1>
+                </div>
+              </div>
               <div className="relative">
                 <input
                   type="text"
@@ -313,8 +319,14 @@ onExpand={() => console.log('Expand player')}
               isLoggedIn={isLoggedIn}
             />
 
-            {/* Mobile Search Bar */}
+            {/* Mobile Header with Branding */}
             <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
+              <div className="flex items-center justify-center mb-3">
+                <div className="flex items-center gap-2">
+                  <img src="/streemr-play.png" alt="Streemr" className="w-6 h-6" />
+                  <h1 className="text-lg font-bold text-gray-900">Streemr</h1>
+                </div>
+              </div>
               <div className="relative">
                 <input
                   type="text"
