@@ -14,7 +14,9 @@
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
       "Bash(ls:*)",
-      "Bash(npx prisma generate:*)"
+      "Bash(npx prisma generate:*)",
+      "Bash(node:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

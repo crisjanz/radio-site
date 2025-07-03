@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaHeartbeat, FaPlay, FaCheck, FaTimes, FaExclamationTriangle, FaClock, FaSpinner, FaArrowLeft, FaCog } from 'react-icons/fa';
+import { API_CONFIG } from '../config/api';
 
 interface HealthCheckResult {
   id: number;
@@ -41,7 +42,7 @@ export default function HealthCheckPage() {
   const [maxStations, setMaxStations] = useState(25);
   const [retesting, setRetesting] = useState<Set<number>>(new Set());
 
-  const API_BASE = 'http://192.168.1.69:3001';
+  const API_BASE = API_CONFIG.BASE_URL;
 
   // Load problematic stations on mount
   useEffect(() => {

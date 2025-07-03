@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaCheck, FaTimes, FaSpinner, FaEye, FaSave, FaUndo } from 'react-icons/fa';
+import { API_CONFIG } from '../config/api';
 
 interface Station {
   id: number;
@@ -62,7 +63,7 @@ export default function StationNormalizationPage() {
 
   const fetchStations = async () => {
     try {
-      const response = await fetch('http://192.168.1.69:3001/admin/stations/normalize');
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/stations/normalize`);
       if (response.ok) {
         const data = await response.json();
         setStations(data.stations);
@@ -78,7 +79,7 @@ export default function StationNormalizationPage() {
 
   const fetchRules = async () => {
     try {
-      const response = await fetch('http://192.168.1.69:3001/admin/normalization-rules');
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/normalization-rules`);
       if (response.ok) {
         const data = await response.json();
         setRules(data);
@@ -100,7 +101,7 @@ export default function StationNormalizationPage() {
   const analyzeStations = async () => {
     setProcessing(true);
     try {
-      const response = await fetch('http://192.168.1.69:3001/admin/stations/analyze', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/stations/analyze`, {
         method: 'POST'
       });
       if (response.ok) {
@@ -145,7 +146,7 @@ const handleApproval = (changeId: number, status: 'approved' | 'rejected' | 'pen
 
     setProcessing(true);
     try {
-      const response = await fetch('http://192.168.1.69:3001/admin/stations/apply-normalization', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/stations/apply-normalization`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

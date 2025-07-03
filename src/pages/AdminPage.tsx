@@ -4,6 +4,7 @@ import ImportWizard from '../components/ImportWizard';
 import StationFormModal from '../components/StationFormModal';
 import StationFilters from '../components/StationFilters';
 import StationList from '../components/StationList';
+import { API_CONFIG } from '../config/api';
 import type { Station } from '../types/Station';
 
 export default function AdminPage() {
@@ -27,7 +28,7 @@ export default function AdminPage() {
     cityStatus: '', // 'with-city', 'without-city', or ''
   });
 
-  const API = 'http://192.168.1.69:3001/stations';
+  const API = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.STATIONS}`;
 
   // Load stations from backend
   const fetchStations = async () => {

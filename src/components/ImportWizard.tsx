@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaDownload, FaGlobe, FaFilter, FaCheck, FaTimes, FaEye, FaSpinner } from 'react-icons/fa';
+import { API_CONFIG } from '../config/api';
 
 interface ImportFilters {
   country: string;
@@ -59,7 +60,7 @@ const ImportWizard: React.FC<ImportWizardProps> = ({ onClose, onImportComplete }
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE = 'http://192.168.1.69:3001';
+  const API_BASE = API_CONFIG.BASE_URL;
 
   // Load countries on mount
   useEffect(() => {

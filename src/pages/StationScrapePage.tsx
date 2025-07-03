@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
+import { API_CONFIG } from '../config/api';
 import type { Station } from '../types/Station';
 import StationSelector from '../components/StationSelector';
 import ScrapingInput from '../components/ScrapingInput';
@@ -60,7 +61,7 @@ const StationScrapePage: React.FC = () => {
     country: '',
   });
 
-  const API_BASE = 'http://192.168.1.69:3001';
+  const API_BASE = API_CONFIG.BASE_URL;
 
   // Load stations for selection
   useEffect(() => {
