@@ -92,10 +92,6 @@ function App() {
     console.log('Login toggled:', !isLoggedIn);
   }, [isLoggedIn]);
 
-  const handleSettings = useCallback(() => {
-    // Settings removed for security
-    console.log('Settings access removed');
-  }, []);
 
   const handleStationInfo = useCallback((station: Station) => {
     navigate(`/station/${station.id}/info`);

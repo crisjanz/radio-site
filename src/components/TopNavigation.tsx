@@ -1,4 +1,4 @@
-import { FaHome, FaList, FaGlobe, FaHeart, FaEllipsisH, FaSearch, FaUser, FaCog, FaTimes } from 'react-icons/fa';
+import { FaHome, FaList, FaGlobe, FaHeart, FaEllipsisH, FaSearch, FaUser, FaTimes } from 'react-icons/fa';
 
 interface TopNavigationProps {
   activeTab: string;
