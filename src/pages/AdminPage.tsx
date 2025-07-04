@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FaPlus, FaMagic, FaRobot, FaCogs, FaHeartbeat } from 'react-icons/fa';
+import { FaPlus, FaMagic, FaRobot, FaCogs, FaHeartbeat, FaImage } from 'react-icons/fa';
 import ImportWizard from '../components/ImportWizard';
 import StationFormModal from '../components/StationFormModal';
 import StationFilters from '../components/StationFilters';
@@ -246,6 +246,16 @@ export default function AdminPage() {
               >
                 <FaCogs className="text-sm" />
                 Normalize Data
+              </a>
+              
+              <a
+                href={`${API_CONFIG.BASE_URL}/admin/images`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <FaImage className="text-sm" />
+                Image Editor
               </a>
               
               <button

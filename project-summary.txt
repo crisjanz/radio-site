@@ -231,3 +231,85 @@ This project has evolved from a simple radio streaming concept into a full-featu
 - Responsive design that works beautifully on mobile and desktop
 
 The application is now ready for real-world usage and could easily be extended with additional features as needed!
+
+---
+
+## 🖼️ **Admin Image Editor Tool - Implementation Plan**
+
+### Overview
+Building a comprehensive admin tool for downloading, editing, and managing station favicon images using Fabric.js with local server storage to simplify favicon handling across the application.
+
+### Backend Implementation
+
+#### 1. Create Image Management Routes (`/Users/cristianjanz/radio-back/src/routes/images.ts`)
+- **Download endpoint**: `POST /images/download/:stationId` - Downloads original favicon and stores locally
+- **Upload endpoint**: `POST /images/upload/:stationId` - Accepts edited image and updates database
+- **List broken favicons**: `GET /images/broken` - Returns stations with non-working favicon URLs
+- **Batch download**: `POST /images/batch-download` - Downloads multiple favicons at once
+
+#### 2. Create Public Images Directory
+- Create `/Users/cristianjanz/radio-back/public/station-images/` directory
+- Serve static files from this directory via Express
+- Store images as `{stationId}.png` or `{stationId}.jpg`
+
+#### 3. Update Database Schema (if needed)
+- Add `localImagePath` field to Station model to track locally stored images
+- Update favicon URLs to point to local images after editing
+
+### Frontend Implementation
+
+#### 1. Create Image Editor Page (`/Users/cristianjanz/radio-site/src/pages/ImageEditorPage.tsx`)
+- **Station selector**: Dropdown or search to select station
+- **Image preview**: Show current favicon with download status
+- **Fabric.js canvas**: Interactive editor for image manipulation
+- **Save controls**: Save to database and update favicon URL
+
+#### 2. Add to Admin Navigation
+- Add "Image Editor" link to existing AdminPage
+- Route setup in main app routing
+
+#### 3. Fabric.js Editor Features
+- **Canvas setup**: Responsive canvas with Fabric.js
+- **Load image**: Load downloaded favicon into canvas
+- **Make square**: Crop or pad to square aspect ratio
+- **Background colors**: Color picker for background
+- **Borders**: Add colored borders with thickness control
+- **Resize**: Standard sizes (64x64, 128x128, 256x256)
+- **Export**: Export as PNG with optimized quality
+
+#### 4. Batch Processing Interface
+- **Station list**: Show all stations with favicon status
+- **Bulk actions**: Select multiple stations for batch download
+- **Progress tracking**: Show download/processing progress
+- **Fix broken URLs**: Automatically try HTTP→HTTPS conversion
+
+### File Structure
+```
+radio-back/
+├── src/routes/images.ts (new)
+├── public/station-images/ (new directory)
+└── package.json (add: multer, sharp for image processing)
+
+radio-site/
+├── src/pages/ImageEditorPage.tsx (new)
+├── src/components/ImageEditor.tsx (new)
+└── package.json (add: fabric)
+```
+
+### Implementation Steps
+1. **Backend**: Create image routes and storage setup
+2. **Frontend**: Install Fabric.js and create basic editor interface  
+3. **Integration**: Connect editor to backend APIs
+4. **Batch features**: Add bulk processing capabilities
+5. **Testing**: Test with various image types and sizes
+
+### Dependencies to Add
+- **Backend**: `multer` (file uploads), `sharp` (image processing)
+- **Frontend**: `fabric` (image editor), `@types/fabric` (TypeScript types)
+
+### Problem Being Solved
+- **Current Issue**: Complex client-side favicon fallback logic causing delays and broken images
+- **Solution**: Download and standardize all favicons server-side, use simple direct URLs
+- **Benefits**: Faster loading, consistent image sizes, professional appearance, better user experience
+
+This approach gives you full control over favicon images with professional editing capabilities while keeping everything simple and maintainable.

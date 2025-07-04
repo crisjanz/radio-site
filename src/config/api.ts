@@ -62,7 +62,7 @@ export const apiRequest = async (endpoint: string, options?: RequestInit) => {
   }
 };
 
-// Helper function to get favicon URL - simple, just use what's in the database
+// Helper function to get favicon URL - handle both local and external URLs
 export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: string }) => {
   // Use favicon first, fallback to logo
   const imageUrl = station.favicon || station.logo;
@@ -71,6 +71,12 @@ export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: st
     return null;
   }
   
+  // If it's a local path (starts with /station-images/), prepend backend URL
+  if (imageUrl.startsWith('/station-images/')) {
+    return `${API_CONFIG.BASE_URL}${imageUrl}`;
+  }
+  
+  // Otherwise return as-is (external URL)
   return imageUrl;
 };
 

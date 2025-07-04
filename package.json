@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
+    "@types/fabric": "^5.3.10",
+    "fabric": "^6.7.0",
     "howler": "^2.2.4",
     "leaflet": "^1.9.4",
     "react": "^19.1.0",
