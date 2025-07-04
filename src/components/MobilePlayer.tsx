@@ -52,7 +52,7 @@ export default function MobilePlayer({
               />
             ) : null}
             <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${getFaviconUrl(station) ? 'hidden' : ''}`}>
-              <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
+              <img src="/streemr-play.png" alt="Streemr" className="w-16 h-16 object-contain" />
             </div>
           </div>
 

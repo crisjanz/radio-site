@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Station } from '../types/Station';
-import { API_CONFIG, getFaviconUrl } from '../config/api';
+import { API_CONFIG, getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import { 
   FaPlay, 
   FaPause, 
@@ -139,13 +139,16 @@ const StationDetailPage: React.FC<StationDetailPageProps> = ({
                   style={{ width: '100%', height: '100%' }}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
+                    if (fallback) {
+                      fallback.classList.remove('hidden');
+                    }
                   }}
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
-                </div>
-              )}
+              ) : null}
+              <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station) ? 'hidden' : ''}`}>
+                <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
+              </div>
             </div>
 
             {/* Station Info */}
