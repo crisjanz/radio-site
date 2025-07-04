@@ -135,10 +135,21 @@ const StationDetailPage: React.FC<StationDetailPageProps> = ({
                 <img
                   src={getFaviconUrl(station)!}
                   alt={station.name}
-                  className="w-full h-full object-fill"
-                  style={{ width: '100%', height: '100%' }}
+                  className="w-full h-full object-cover"
                   data-original-url={station.favicon}
                   data-attempt="https"
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    const aspectRatio = img.naturalWidth / img.naturalHeight;
+                    
+                    // If image is very wide or very tall, use contain with padding
+                    if (aspectRatio > 2 || aspectRatio < 0.5) {
+                      img.className = "w-full h-full object-contain p-2";
+                    } else {
+                      // For roughly square images, use cover to fill
+                      img.className = "w-full h-full object-cover";
+                    }
+                  }}
                   onError={(e) => {
                     const target = e.currentTarget;
                     const attempt = target.getAttribute('data-attempt');
