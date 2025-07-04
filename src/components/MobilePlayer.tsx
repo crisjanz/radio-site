@@ -28,12 +28,17 @@ export default function MobilePlayer({
                 alt={`${station.name} logo`}
                 className="w-full h-full object-fill"
                 style={{ width: '100%', height: '100%' }}
+                data-original-url={station.favicon}
+                data-attempt="https"
                 onError={(e) => {
                   const target = e.currentTarget;
+                  const attempt = target.getAttribute('data-attempt');
+                  const originalUrl = target.getAttribute('data-original-url');
                   
-                  // If this was the HTTPS attempt, try the proxy
-                  if (station.favicon?.startsWith('http://') && target.src === station.favicon.replace('http://', 'https://')) {
+                  // If this was the HTTPS attempt and original was HTTP, try the proxy
+                  if (attempt === 'https' && originalUrl?.startsWith('http://')) {
                     target.src = getProxyFaviconUrl(station.id);
+                    target.setAttribute('data-attempt', 'proxy');
                     return;
                   }
                   

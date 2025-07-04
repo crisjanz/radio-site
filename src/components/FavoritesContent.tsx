@@ -126,6 +126,8 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
             src={getFaviconUrl(station)!}
             alt={station.name}
             className="w-full h-full object-cover"
+            data-original-url={station.favicon}
+            data-attempt="https"
             onLoad={(e) => {
               const img = e.currentTarget;
               const aspectRatio = img.naturalWidth / img.naturalHeight;
@@ -140,10 +142,13 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
             }}
             onError={(e) => {
               const target = e.currentTarget;
+              const attempt = target.getAttribute('data-attempt');
+              const originalUrl = target.getAttribute('data-original-url');
               
-              // If this was the HTTPS attempt, try the proxy
-              if (station.favicon?.startsWith('http://') && target.src === station.favicon.replace('http://', 'https://')) {
+              // If this was the HTTPS attempt and original was HTTP, try the proxy
+              if (attempt === 'https' && originalUrl?.startsWith('http://')) {
                 target.src = getProxyFaviconUrl(station.id);
+                target.setAttribute('data-attempt', 'proxy');
                 return;
               }
               
