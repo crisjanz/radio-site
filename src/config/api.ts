@@ -62,40 +62,15 @@ export const apiRequest = async (endpoint: string, options?: RequestInit) => {
   }
 };
 
-// Helper function to get safe favicon URL - uses proxy for HTTP URLs on .app domains
+// Helper function to get favicon URL - simple, just use what's in the database
 export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: string }) => {
   // Use favicon first, fallback to logo
   const imageUrl = station.favicon || station.logo;
   
   if (!imageUrl || imageUrl.trim() === '') {
-    console.log('No favicon or logo for station:', station.id);
     return null;
   }
   
-  // If image is already HTTPS, use it directly
-  if (imageUrl.startsWith('https://')) {
-    console.log('Using HTTPS image directly:', imageUrl);
-    return imageUrl;
-  }
-  
-  // For HTTP images on .app domains, use proxy immediately
-  if (imageUrl.startsWith('http://') && window.location.hostname.endsWith('.app')) {
-    console.log('Using proxy for HTTP image on .app domain:', imageUrl);
-    return getProxyFaviconUrl(station.id);
-  }
-  
-  // For HTTP images on other domains, try HTTPS version first
-  if (imageUrl.startsWith('http://')) {
-    const httpsUrl = imageUrl.replace('http://', 'https://');
-    console.log('Converting HTTP to HTTPS:', imageUrl, '->', httpsUrl);
-    return httpsUrl;
-  }
-  
-  console.log('Using image as-is:', imageUrl);
   return imageUrl;
 };
 
-// Helper function to get proxy favicon URL as fallback
-export const getProxyFaviconUrl = (stationId: number) => {
-  return `${API_CONFIG.BASE_URL}/favicon/${stationId}`;
-};

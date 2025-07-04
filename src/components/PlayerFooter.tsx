@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaGlobe, FaExternalLinkAlt } from "react-icons/fa";
 import RadioPlayer from "./RadioPlayer";
-import { fetchStreamMetadata, getStationLogo } from "../utils/streamMetadata";
+import { fetchStreamMetadata } from "../utils/streamMetadata";
 
 interface Station {
   id: number;
@@ -29,8 +29,7 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
     if (!currentStation) return;
 
     // Set station logo
-    const logo = getStationLogo(currentStation);
-    setStationLogo(logo);
+    setStationLogo(currentStation.favicon || null);
     setLogoError(false);
     
     // Reset metadata state

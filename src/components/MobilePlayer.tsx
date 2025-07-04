@@ -1,5 +1,4 @@
 import { FaPlay, FaPause, FaSpinner } from 'react-icons/fa';
-import { getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
 interface MobilePlayerProps {
@@ -22,27 +21,14 @@ export default function MobilePlayer({
         <div className="flex items-center px-4 py-3">
           {/* Station Logo */}
           <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 mr-3">
-            {getFaviconUrl(station) ? (
+            {station.favicon ? (
               <img
-                src={getFaviconUrl(station)!}
+                src={station.favicon}
                 alt={`${station.name} logo`}
                 className="w-full h-full object-fill"
                 style={{ width: '100%', height: '100%' }}
-                data-original-url={station.favicon}
-                data-attempt="https"
                 onError={(e) => {
                   const target = e.currentTarget;
-                  const attempt = target.getAttribute('data-attempt');
-                  const originalUrl = target.getAttribute('data-original-url');
-                  
-                  // If this was the HTTPS attempt and original was HTTP, try the proxy
-                  if (attempt === 'https' && originalUrl?.startsWith('http://')) {
-                    target.src = getProxyFaviconUrl(station.id);
-                    target.setAttribute('data-attempt', 'proxy');
-                    return;
-                  }
-                  
-                  // Otherwise, show fallback
                   target.style.display = 'none';
                   const fallback = target.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
                   if (fallback) {
@@ -51,7 +37,7 @@ export default function MobilePlayer({
                 }}
               />
             ) : null}
-            <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${getFaviconUrl(station) ? 'hidden' : ''}`}>
+            <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
               <img src="/streemr-play.png" alt="Streemr" className="w-16 h-16 object-contain" />
             </div>
           </div>

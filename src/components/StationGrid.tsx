@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaPlay, FaGlobe, FaMusic, FaInfoCircle } from "react-icons/fa";
-import { getStationLogo } from "../utils/streamMetadata";
 import { apiRequest, API_CONFIG } from "../config/api";
 import type { Station } from "../types/Station";
 
@@ -89,8 +88,6 @@ const StationGrid: React.FC<StationGridProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {filteredStations.map((station) => {
-        const logoUrl = getStationLogo(station);
-        
         return (
           <div
             key={station.id}
@@ -106,7 +103,7 @@ const StationGrid: React.FC<StationGridProps> = ({
                     {station.country}
                   </p>
                 </div>
-                <StationLogo station={station} logoUrl={logoUrl} />
+                <StationLogo station={station} />
               </div>
               
               {(station.genre || station.type) && (
@@ -150,14 +147,14 @@ const StationGrid: React.FC<StationGridProps> = ({
 };
 
 // Separate component for station logo with error handling
-const StationLogo: React.FC<{ station: Station; logoUrl: string | null }> = ({ station, logoUrl }) => {
+const StationLogo: React.FC<{ station: Station }> = ({ station }) => {
   const [logoError, setLogoError] = useState(false);
 
   return (
     <div className="w-12 h-12 rounded-xl ml-3 flex-shrink-0 overflow-hidden border border-gray-200">
-      {logoUrl && !logoError ? (
+      {station.favicon && !logoError ? (
         <img
-          src={logoUrl}
+          src={station.favicon}
           alt={`${station.name} logo`}
           className="w-full h-full object-fill"
           style={{ width: '100%', height: '100%' }}

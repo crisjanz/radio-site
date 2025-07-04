@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaFire, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { apiRequest, API_CONFIG, buildApiUrl, getFaviconUrl, getProxyFaviconUrl } from '../config/api';
+import { apiRequest, API_CONFIG, buildApiUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
 interface HomeContentProps {
@@ -322,8 +322,6 @@ interface StationCardProps {
 }
 
 function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavorite }: StationCardProps) {
-  console.log('Station data:', station.name, 'favicon:', station.favicon);
-  
   const handleInfoClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering onPlay
     onInfo?.(station);
@@ -331,7 +329,6 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering onPlay
-    console.log('Heart clicked for station:', station.name, 'onToggleFavorite exists:', !!onToggleFavorite);
     onToggleFavorite?.(station);
   };
   
@@ -342,44 +339,13 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
     >
       {/* Icon */}
       <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-        {getFaviconUrl(station) ? (
+        {station.favicon ? (
           <img
-            src={getFaviconUrl(station)!}
+            src={station.favicon}
             alt={station.name}
             className="w-full h-full object-cover"
-            data-original-url={station.favicon}
-            data-attempt="https"
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              console.log('Favicon loaded successfully:', img.src, 'for station:', station.name);
-              const aspectRatio = img.naturalWidth / img.naturalHeight;
-              
-              // If image is very wide or very tall, use contain with padding
-              if (aspectRatio > 2 || aspectRatio < 0.5) {
-                img.className = "w-full h-full object-contain p-2";
-              } else {
-                // For roughly square images, use cover to fill
-                img.className = "w-full h-full object-cover";
-              }
-            }}
             onError={(e) => {
-              console.log('Favicon failed to load:', getFaviconUrl(station), 'Station:', station.name, 'Original URL:', station.favicon);
               const target = e.currentTarget;
-              const attempt = target.getAttribute('data-attempt');
-              const originalUrl = target.getAttribute('data-original-url');
-              
-              console.log('Error details - Attempt:', attempt, 'Original URL:', originalUrl);
-              
-              // If this was the HTTPS attempt and original was HTTP, try the proxy
-              if (attempt === 'https' && originalUrl?.startsWith('http://')) {
-                console.log('Trying proxy for HTTP URL:', originalUrl);
-                target.src = getProxyFaviconUrl(station.id);
-                target.setAttribute('data-attempt', 'proxy');
-                return;
-              }
-              
-              // Otherwise, show fallback
-              console.log('Showing fallback icon for:', station.name);
               target.style.display = 'none';
               const fallback = target.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
               if (fallback) {
@@ -388,7 +354,7 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
             }}
           />
         ) : null}
-        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station) ? 'hidden' : ''}`}>
+        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
           <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
         </div>
         

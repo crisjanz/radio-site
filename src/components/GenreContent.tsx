@@ -214,23 +214,11 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
     >
       {/* Icon */}
       <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-        {station.favicon && station.favicon.trim() !== '' ? (
+        {station.favicon ? (
           <img
             src={station.favicon}
             alt={station.name}
             className="w-full h-full object-cover"
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              const aspectRatio = img.naturalWidth / img.naturalHeight;
-              
-              // If image is very wide or very tall, use contain with padding
-              if (aspectRatio > 2 || aspectRatio < 0.5) {
-                img.className = "w-full h-full object-contain p-2";
-              } else {
-                // For roughly square images, use cover to fill
-                img.className = "w-full h-full object-cover";
-              }
-            }}
             onError={(e) => {
               const target = e.currentTarget;
               target.style.display = 'none';
@@ -241,8 +229,8 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
             }}
           />
         ) : null}
-        <div className={`favicon-fallback flex items-center justify-center ${station.favicon && station.favicon.trim() !== '' ? 'hidden' : ''}`}>
-          <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
+        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
+          <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
         </div>
         
         {/* Info button */}

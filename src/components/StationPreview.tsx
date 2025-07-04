@@ -450,7 +450,7 @@ export default function StationPreview({
           <div className="w-32">
             {/* Icon - matches HomeContent StationCard */}
             <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center rounded-xl shadow-sm">
-              {previewData.favicon && previewData.favicon.trim() !== '' ? (
+              {previewData.favicon ? (
                 <img
                   src={previewData.favicon}
                   alt={previewData.name}
@@ -465,7 +465,7 @@ export default function StationPreview({
                   }}
                 />
               ) : null}
-              <div className={`favicon-fallback flex items-center justify-center ${previewData.favicon && previewData.favicon.trim() !== '' ? 'hidden' : ''}`}>
+              <div className={`favicon-fallback flex items-center justify-center ${previewData.favicon ? 'hidden' : ''}`}>
                 <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
               </div>
             </div>

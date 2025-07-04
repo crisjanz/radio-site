@@ -1,5 +1,4 @@
 import { FaHeart, FaUser } from 'react-icons/fa';
-import { getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
 interface FavoritesContentProps {
@@ -121,38 +120,13 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
     >
       {/* Icon */}
       <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-        {getFaviconUrl(station) ? (
+        {station.favicon ? (
           <img
-            src={getFaviconUrl(station)!}
+            src={station.favicon}
             alt={station.name}
             className="w-full h-full object-cover"
-            data-original-url={station.favicon}
-            data-attempt="https"
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              const aspectRatio = img.naturalWidth / img.naturalHeight;
-              
-              // If image is very wide or very tall, use contain with padding
-              if (aspectRatio > 2 || aspectRatio < 0.5) {
-                img.className = "w-full h-full object-contain p-2";
-              } else {
-                // For roughly square images, use cover to fill
-                img.className = "w-full h-full object-cover";
-              }
-            }}
             onError={(e) => {
               const target = e.currentTarget;
-              const attempt = target.getAttribute('data-attempt');
-              const originalUrl = target.getAttribute('data-original-url');
-              
-              // If this was the HTTPS attempt and original was HTTP, try the proxy
-              if (attempt === 'https' && originalUrl?.startsWith('http://')) {
-                target.src = getProxyFaviconUrl(station.id);
-                target.setAttribute('data-attempt', 'proxy');
-                return;
-              }
-              
-              // Otherwise, show fallback
               target.style.display = 'none';
               const fallback = target.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
               if (fallback) {
@@ -161,7 +135,7 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
             }}
           />
         ) : null}
-        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station) ? 'hidden' : ''}`}>
+        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
           <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
         </div>
         
