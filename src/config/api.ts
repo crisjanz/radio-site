@@ -63,33 +63,36 @@ export const apiRequest = async (endpoint: string, options?: RequestInit) => {
 };
 
 // Helper function to get safe favicon URL - uses proxy for HTTP URLs on .app domains
-export const getFaviconUrl = (station: { id: number; favicon?: string }) => {
-  if (!station.favicon || station.favicon.trim() === '') {
-    console.log('No favicon for station:', station.id);
+export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: string }) => {
+  // Use favicon first, fallback to logo
+  const imageUrl = station.favicon || station.logo;
+  
+  if (!imageUrl || imageUrl.trim() === '') {
+    console.log('No favicon or logo for station:', station.id);
     return null;
   }
   
-  // If favicon is already HTTPS, use it directly
-  if (station.favicon.startsWith('https://')) {
-    console.log('Using HTTPS favicon directly:', station.favicon);
-    return station.favicon;
+  // If image is already HTTPS, use it directly
+  if (imageUrl.startsWith('https://')) {
+    console.log('Using HTTPS image directly:', imageUrl);
+    return imageUrl;
   }
   
-  // For HTTP favicons on .app domains, use proxy immediately
-  if (station.favicon.startsWith('http://') && window.location.hostname.endsWith('.app')) {
-    console.log('Using proxy for HTTP favicon on .app domain:', station.favicon);
+  // For HTTP images on .app domains, use proxy immediately
+  if (imageUrl.startsWith('http://') && window.location.hostname.endsWith('.app')) {
+    console.log('Using proxy for HTTP image on .app domain:', imageUrl);
     return getProxyFaviconUrl(station.id);
   }
   
-  // For HTTP favicons on other domains, try HTTPS version first
-  if (station.favicon.startsWith('http://')) {
-    const httpsUrl = station.favicon.replace('http://', 'https://');
-    console.log('Converting HTTP to HTTPS:', station.favicon, '->', httpsUrl);
+  // For HTTP images on other domains, try HTTPS version first
+  if (imageUrl.startsWith('http://')) {
+    const httpsUrl = imageUrl.replace('http://', 'https://');
+    console.log('Converting HTTP to HTTPS:', imageUrl, '->', httpsUrl);
     return httpsUrl;
   }
   
-  console.log('Using favicon as-is:', station.favicon);
-  return station.favicon;
+  console.log('Using image as-is:', imageUrl);
+  return imageUrl;
 };
 
 // Helper function to get proxy favicon URL as fallback
