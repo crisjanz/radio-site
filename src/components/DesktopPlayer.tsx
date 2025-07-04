@@ -1,4 +1,4 @@
-import { FaPlay, FaPause, FaVolumeUp, FaVolumeDown, FaVolumeMute, FaMusic, FaSpinner } from 'react-icons/fa';
+import { FaPlay, FaPause, FaVolumeUp, FaVolumeDown, FaVolumeMute, FaSpinner } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface DesktopPlayerProps {

@@ -1,6 +1,5 @@
 // src/pages/HomePage.tsx
 import { useEffect, useState } from 'react';
-import { FaMusic } from 'react-icons/fa';
 import RadioPlayer from '../components/RadioPlayer';
 import { API_CONFIG } from '../config/api';
 

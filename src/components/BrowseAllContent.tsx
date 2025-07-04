@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaMusic, FaArrowLeft, FaArrowRight, FaFilter, FaTimes, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaFilter, FaTimes, FaHeart, FaRegHeart } from 'react-icons/fa';
 import { API_CONFIG, getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 

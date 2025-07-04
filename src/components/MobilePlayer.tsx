@@ -1,4 +1,4 @@
-import { FaPlay, FaPause, FaMusic, FaSpinner } from 'react-icons/fa';
+import { FaPlay, FaPause, FaSpinner } from 'react-icons/fa';
 import { getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 

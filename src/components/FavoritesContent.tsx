@@ -1,4 +1,4 @@
-import { FaHeart, FaMusic, FaUser } from 'react-icons/fa';
+import { FaHeart, FaUser } from 'react-icons/fa';
 import { getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 

@@ -1,4 +1,4 @@
-import { FaSpinner, FaSave, FaEye, FaFacebook, FaTwitter, FaInstagram, FaYoutube, FaMusic } from 'react-icons/fa';
+import { FaSpinner, FaSave, FaEye, FaFacebook, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface StationPreviewProps {

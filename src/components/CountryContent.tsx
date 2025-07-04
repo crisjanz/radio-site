@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaMusic, FaInfoCircle, FaArrowLeft, FaGlobe } from 'react-icons/fa';
+import { FaInfoCircle, FaArrowLeft, FaGlobe } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 import { API_CONFIG } from '../config/api';
 

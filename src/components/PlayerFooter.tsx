@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaMusic, FaGlobe, FaExternalLinkAlt } from "react-icons/fa";
+import { FaGlobe, FaExternalLinkAlt } from "react-icons/fa";
 import RadioPlayer from "./RadioPlayer";
 import { fetchStreamMetadata, getStationLogo } from "../utils/streamMetadata";
 

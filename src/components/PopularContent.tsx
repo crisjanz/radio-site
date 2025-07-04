@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaFire, FaPlay, FaChartLine, FaMusic } from 'react-icons/fa';
+import { FaFire, FaPlay, FaChartLine } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 import { API_CONFIG } from '../config/api';
 
