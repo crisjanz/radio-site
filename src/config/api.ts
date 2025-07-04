@@ -62,7 +62,7 @@ export const apiRequest = async (endpoint: string, options?: RequestInit) => {
   }
 };
 
-// Helper function to get safe favicon URL - tries HTTPS first, falls back to proxy
+// Helper function to get safe favicon URL - uses proxy for HTTP URLs on .app domains
 export const getFaviconUrl = (station: { id: number; favicon?: string }) => {
   if (!station.favicon || station.favicon.trim() === '') {
     console.log('No favicon for station:', station.id);
@@ -75,7 +75,13 @@ export const getFaviconUrl = (station: { id: number; favicon?: string }) => {
     return station.favicon;
   }
   
-  // For HTTP favicons, try HTTPS version first
+  // For HTTP favicons on .app domains, use proxy immediately
+  if (station.favicon.startsWith('http://') && window.location.hostname.endsWith('.app')) {
+    console.log('Using proxy for HTTP favicon on .app domain:', station.favicon);
+    return getProxyFaviconUrl(station.id);
+  }
+  
+  // For HTTP favicons on other domains, try HTTPS version first
   if (station.favicon.startsWith('http://')) {
     const httpsUrl = station.favicon.replace('http://', 'https://');
     console.log('Converting HTTP to HTTPS:', station.favicon, '->', httpsUrl);
