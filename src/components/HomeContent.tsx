@@ -351,6 +351,7 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
             data-attempt="https"
             onLoad={(e) => {
               const img = e.currentTarget;
+              console.log('Favicon loaded successfully:', img.src, 'for station:', station.name);
               const aspectRatio = img.naturalWidth / img.naturalHeight;
               
               // If image is very wide or very tall, use contain with padding
@@ -362,19 +363,23 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
               }
             }}
             onError={(e) => {
-              console.log('Favicon failed to load:', getFaviconUrl(station));
+              console.log('Favicon failed to load:', getFaviconUrl(station), 'Station:', station.name, 'Original URL:', station.favicon);
               const target = e.currentTarget;
               const attempt = target.getAttribute('data-attempt');
               const originalUrl = target.getAttribute('data-original-url');
               
+              console.log('Error details - Attempt:', attempt, 'Original URL:', originalUrl);
+              
               // If this was the HTTPS attempt and original was HTTP, try the proxy
               if (attempt === 'https' && originalUrl?.startsWith('http://')) {
+                console.log('Trying proxy for HTTP URL:', originalUrl);
                 target.src = getProxyFaviconUrl(station.id);
                 target.setAttribute('data-attempt', 'proxy');
                 return;
               }
               
               // Otherwise, show fallback
+              console.log('Showing fallback icon for:', station.name);
               target.style.display = 'none';
               const fallback = target.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
               if (fallback) {
