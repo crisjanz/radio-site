@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Station } from '../types/Station';
-import { API_CONFIG, getFaviconUrl, getProxyFaviconUrl } from '../config/api';
+import { API_CONFIG, getFaviconUrl } from '../config/api';
 import { 
   FaPlay, 
   FaPause, 
