@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Station } from '../types/Station';
-import { API_CONFIG, getFaviconUrl } from '../config/api';
+import { API_CONFIG, getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import { 
   FaPlay, 
   FaPause, 
@@ -137,9 +137,23 @@ const StationDetailPage: React.FC<StationDetailPageProps> = ({
                   alt={station.name}
                   className="w-full h-full object-fill"
                   style={{ width: '100%', height: '100%' }}
+                  data-original-url={station.favicon}
+                  data-attempt="https"
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
+                    const target = e.currentTarget;
+                    const attempt = target.getAttribute('data-attempt');
+                    const originalUrl = target.getAttribute('data-original-url');
+                    
+                    // If this was the HTTPS attempt and original was HTTP, try the proxy
+                    if (attempt === 'https' && originalUrl?.startsWith('http://')) {
+                      target.src = getProxyFaviconUrl(station.id);
+                      target.setAttribute('data-attempt', 'proxy');
+                      return;
+                    }
+                    
+                    // Otherwise, show fallback
+                    target.style.display = 'none';
+                    const fallback = target.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
                     if (fallback) {
                       fallback.classList.remove('hidden');
                     }
