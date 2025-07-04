@@ -94,7 +94,7 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <FaMusic className="text-white text-lg" />
+                <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
               </div>
             )}
           </div>

@@ -118,7 +118,7 @@ export default function StationInfoPage({
                 className="max-w-full max-h-full object-contain"
               />
             ) : (
-              <FaMusic className="text-gray-500 text-4xl" />
+              <img src="/streemr-play.png" alt="Streemr" className="w-16 h-16 object-contain" />
             )}
           </div>
           

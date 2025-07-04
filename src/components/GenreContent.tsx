@@ -241,8 +241,8 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
             }}
           />
         ) : null}
-        <div className={`favicon-fallback flex items-center justify-center text-gray-500 text-2xl ${station.favicon && station.favicon.trim() !== '' ? 'hidden' : ''}`}>
-          <FaMusic />
+        <div className={`favicon-fallback flex items-center justify-center ${station.favicon && station.favicon.trim() !== '' ? 'hidden' : ''}`}>
+          <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
         </div>
         
         {/* Info button */}

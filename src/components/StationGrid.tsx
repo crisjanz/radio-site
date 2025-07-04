@@ -164,8 +164,8 @@ const StationLogo: React.FC<{ station: Station; logoUrl: string | null }> = ({ s
           onError={() => setLogoError(true)}
         />
       ) : (
-        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
-          <FaMusic className="text-lg" />
+        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+          <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
         </div>
       )}
     </div>

@@ -465,8 +465,8 @@ export default function StationPreview({
                   }}
                 />
               ) : null}
-              <div className={`favicon-fallback flex items-center justify-center text-gray-500 text-2xl ${previewData.favicon && previewData.favicon.trim() !== '' ? 'hidden' : ''}`}>
-                <FaMusic />
+              <div className={`favicon-fallback flex items-center justify-center ${previewData.favicon && previewData.favicon.trim() !== '' ? 'hidden' : ''}`}>
+                <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
               </div>
             </div>
             

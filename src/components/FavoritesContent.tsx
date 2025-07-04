@@ -161,8 +161,8 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
             }}
           />
         ) : null}
-        <div className={`favicon-fallback flex items-center justify-center text-gray-500 text-2xl ${getFaviconUrl(station) ? 'hidden' : ''}`}>
-          <FaMusic />
+        <div className={`favicon-fallback flex items-center justify-center ${getFaviconUrl(station) ? 'hidden' : ''}`}>
+          <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
         </div>
         
         {/* Favorite button - top left */}

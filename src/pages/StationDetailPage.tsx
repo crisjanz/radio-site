@@ -133,7 +133,7 @@ const StationDetailPage: React.FC<StationDetailPageProps> = ({
             <div className="w-24 h-24 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0 bg-white">
               {getFaviconUrl(station) ? (
                 <img
-                  src={getFaviconUrl(station)}
+                  src={getFaviconUrl(station)!}
                   alt={station.name}
                   className="w-full h-full object-fill"
                   style={{ width: '100%', height: '100%' }}
@@ -142,8 +142,8 @@ const StationDetailPage: React.FC<StationDetailPageProps> = ({
                   }}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <FaBroadcastTower className="text-2xl" />
+                <div className="w-full h-full flex items-center justify-center">
+                  <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
                 </div>
               )}
             </div>

@@ -137,7 +137,7 @@ export default function HomePage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg px-4 py-3 flex items-center justify-between gap-4 z-50">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gray-200 flex items-center justify-center rounded overflow-hidden">
-              <FaMusic className="text-gray-500 text-xl" />
+              <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
             </div>
             <div className="text-sm">
               <div className="font-medium">{currentStation.name}</div>

@@ -57,8 +57,8 @@ export default function DesktopPlayer({
               }}
             />
           ) : null}
-          <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white ${station.favicon ? 'hidden' : ''}`}>
-            <FaMusic />
+          <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
+            <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
           </div>
         </div>
 

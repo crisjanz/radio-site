@@ -126,8 +126,8 @@ export default function PopularContent({
                       }}
                     />
                   ) : null}
-                  <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-500 ${station.favicon ? 'hidden' : ''}`}>
-                    <FaMusic />
+                  <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
+                    <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
                   </div>
                 </div>
 
