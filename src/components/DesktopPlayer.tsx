@@ -1,5 +1,4 @@
 import { FaPlay, FaPause, FaVolumeUp, FaVolumeDown, FaVolumeMute, FaMusic, FaSpinner } from 'react-icons/fa';
-import { useState } from 'react';
 import type { Station } from '../types/Station';
 
 interface DesktopPlayerProps {
@@ -7,25 +6,25 @@ interface DesktopPlayerProps {
   isPlaying: boolean;
   isLoading?: boolean;
   onPlayPause: () => void;
+  volume: number;
+  isMuted: boolean;
+  onVolumeChange: (volume: number) => void;
+  onToggleMute: () => void;
 }
 
 export default function DesktopPlayer({ 
   station, 
   isPlaying, 
   isLoading = false,
-  onPlayPause 
+  onPlayPause,
+  volume,
+  isMuted,
+  onVolumeChange,
+  onToggleMute
 }: DesktopPlayerProps) {
-  const [volume, setVolume] = useState(80);
-  const [isMuted, setIsMuted] = useState(false);
-
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseInt(e.target.value);
-    setVolume(newVolume);
-    setIsMuted(newVolume === 0);
-  };
-
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
+    onVolumeChange(newVolume);
   };
 
   const getVolumeIcon = () => {
@@ -89,7 +88,7 @@ export default function DesktopPlayer({
         {/* Volume Controls */}
         <div className="flex items-center gap-2">
           <button
-            onClick={toggleMute}
+            onClick={onToggleMute}
             className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <VolumeIcon className="text-sm" />

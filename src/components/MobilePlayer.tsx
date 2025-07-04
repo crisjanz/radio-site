@@ -1,4 +1,5 @@
 import { FaPlay, FaPause, FaMusic, FaSpinner } from 'react-icons/fa';
+import { getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
 interface MobilePlayerProps {
@@ -21,14 +22,22 @@ export default function MobilePlayer({
         <div className="flex items-center px-4 py-3">
           {/* Station Logo */}
           <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 mr-3">
-            {station.favicon ? (
+            {getFaviconUrl(station) ? (
               <img
-                src={station.favicon}
+                src={getFaviconUrl(station)!}
                 alt={`${station.name} logo`}
                 className="w-full h-full object-fill"
                 style={{ width: '100%', height: '100%' }}
                 onError={(e) => {
                   const target = e.currentTarget;
+                  
+                  // If this was the HTTPS attempt, try the proxy
+                  if (station.favicon?.startsWith('http://') && target.src === station.favicon.replace('http://', 'https://')) {
+                    target.src = getProxyFaviconUrl(station.id);
+                    return;
+                  }
+                  
+                  // Otherwise, show fallback
                   target.style.display = 'none';
                   const fallback = target.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
                   if (fallback) {
@@ -37,7 +46,7 @@ export default function MobilePlayer({
                 }}
               />
             ) : null}
-            <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm ${station.favicon ? 'hidden' : ''}`}>
+            <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm ${getFaviconUrl(station) ? 'hidden' : ''}`}>
               <FaMusic />
             </div>
           </div>
@@ -68,8 +77,9 @@ export default function MobilePlayer({
           {onStationInfo && (
             <button
               onClick={() => onStationInfo(station)}
-              className="w-8 h-8 bg-white text-black hover:text-gray-700 flex items-center justify-center transition-all duration-200 rounded-full shadow-sm font-bold text-sm border border-gray-200"
+              className="w-8 h-8 bg-white text-black hover:text-gray-700 flex items-center justify-center transition-all duration-200 rounded-full shadow-sm text-sm"
               title="Station Info"
+              style={{ fontFamily: 'Times, serif', fontStyle: 'italic', fontWeight: 'bold' }}
             >
               i
             </button>

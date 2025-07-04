@@ -61,3 +61,27 @@ export const apiRequest = async (endpoint: string, options?: RequestInit) => {
     throw error;
   }
 };
+
+// Helper function to get safe favicon URL - tries HTTPS first, falls back to proxy
+export const getFaviconUrl = (station: { id: number; favicon?: string }) => {
+  if (!station.favicon || station.favicon.trim() === '') {
+    return null;
+  }
+  
+  // If favicon is already HTTPS, use it directly
+  if (station.favicon.startsWith('https://')) {
+    return station.favicon;
+  }
+  
+  // For HTTP favicons, try HTTPS version first
+  if (station.favicon.startsWith('http://')) {
+    return station.favicon.replace('http://', 'https://');
+  }
+  
+  return station.favicon;
+};
+
+// Helper function to get proxy favicon URL as fallback
+export const getProxyFaviconUrl = (stationId: number) => {
+  return `${API_CONFIG.BASE_URL}/favicon/${stationId}`;
+};

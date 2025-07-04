@@ -25,6 +25,8 @@ import type { Station } from "./types/Station";
 function App() {
   const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [volume, setVolume] = useState(80);
+  const [isMuted, setIsMuted] = useState(false);
   
   const [currentStation, setCurrentStation] = useState<Station | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -76,21 +78,55 @@ function App() {
   useEffect(() => {
     if (audioRef.current && currentStation) {
       setIsLoading(true);
-      audioRef.current.src = currentStation.streamUrl;
-      audioRef.current.addEventListener('loadstart', () => setIsLoading(true));
-      audioRef.current.addEventListener('canplay', () => setIsLoading(false));
-      audioRef.current.addEventListener('error', () => setIsLoading(false));
+      const audio = audioRef.current;
+      
+      // Clear previous event listeners
+      audio.removeEventListener('loadstart', () => setIsLoading(true));
+      audio.removeEventListener('canplay', () => setIsLoading(false));
+      audio.removeEventListener('error', () => setIsLoading(false));
+      
+      console.log('Setting up stream:', currentStation.streamUrl);
+      audio.src = currentStation.streamUrl;
+      audio.volume = isMuted ? 0 : volume / 100;
+      
+      const handleLoadStart = () => {
+        console.log('Stream loading started');
+        setIsLoading(true);
+      };
+      const handleCanPlay = () => {
+        console.log('Stream can play');
+        setIsLoading(false);
+      };
+      const handleError = (e: Event) => {
+        const error = (e.target as HTMLAudioElement).error;
+        console.error('Stream error:', error?.message, 'Code:', error?.code);
+        setIsLoading(false);
+      };
+      
+      audio.addEventListener('loadstart', handleLoadStart);
+      audio.addEventListener('canplay', handleCanPlay);
+      audio.addEventListener('error', handleError);
       
       if (isPlaying) {
-        audioRef.current.play()
-          .then(() => setIsLoading(false))
+        audio.play()
+          .then(() => {
+            console.log('Stream playing successfully');
+            setIsLoading(false);
+          })
           .catch(err => {
-            console.error('Failed to play:', err);
+            console.error('Failed to play stream:', err);
             setIsLoading(false);
           });
       }
     }
   }, [currentStation, isPlaying]);
+
+  // Update audio volume when volume state changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume / 100;
+    }
+  }, [volume, isMuted]);
 
 
 
@@ -160,6 +196,15 @@ function App() {
     console.log('Toggle result:', result);
     setFavorites(result.favorites);
   }, [user]);
+
+  const handleVolumeChange = useCallback((newVolume: number) => {
+    setVolume(newVolume);
+    setIsMuted(newVolume === 0);
+  }, []);
+
+  const handleToggleMute = useCallback(() => {
+    setIsMuted(!isMuted);
+  }, [isMuted]);
 
 
   const handleStationInfo = useCallback((station: Station) => {
@@ -281,7 +326,11 @@ function App() {
         element={
           <div className="flex flex-col h-screen bg-gray-50">
             {/* Shared Audio Element */}
-            <audio ref={audioRef} />
+            <audio 
+              ref={audioRef} 
+              preload="none"
+              crossOrigin="anonymous"
+            />
             
             {/* Top Navigation (Desktop) */}
             <TopNavigation
@@ -356,6 +405,10 @@ function App() {
                 isPlaying={isPlaying}
                 isLoading={isLoading}
                 onPlayPause={handlePlayPause}
+                volume={volume}
+                isMuted={isMuted}
+                onVolumeChange={handleVolumeChange}
+                onToggleMute={handleToggleMute}
               />
             )}
 
@@ -422,7 +475,11 @@ function App() {
         element={
           <div className="flex flex-col h-screen bg-gray-50">
             {/* Shared Audio Element */}
-            <audio ref={audioRef} />
+            <audio 
+              ref={audioRef} 
+              preload="none"
+              crossOrigin="anonymous"
+            />
             
             {/* Top Navigation (Desktop) */}
             <TopNavigation
@@ -482,6 +539,10 @@ function App() {
                 isPlaying={isPlaying}
                 isLoading={isLoading}
                 onPlayPause={handlePlayPause}
+                volume={volume}
+                isMuted={isMuted}
+                onVolumeChange={handleVolumeChange}
+                onToggleMute={handleToggleMute}
               />
             )}
 

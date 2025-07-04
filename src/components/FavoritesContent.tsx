@@ -1,4 +1,5 @@
 import { FaHeart, FaMusic, FaInfoCircle, FaUser } from 'react-icons/fa';
+import { getFaviconUrl, getProxyFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
 interface FavoritesContentProps {
@@ -120,9 +121,9 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
     >
       {/* Icon */}
       <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-        {station.favicon && station.favicon.trim() !== '' ? (
+        {getFaviconUrl(station) ? (
           <img
-            src={station.favicon}
+            src={getFaviconUrl(station)!}
             alt={station.name}
             className="w-full h-full object-cover"
             onLoad={(e) => {
@@ -139,6 +140,14 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
             }}
             onError={(e) => {
               const target = e.currentTarget;
+              
+              // If this was the HTTPS attempt, try the proxy
+              if (station.favicon?.startsWith('http://') && target.src === station.favicon.replace('http://', 'https://')) {
+                target.src = getProxyFaviconUrl(station.id);
+                return;
+              }
+              
+              // Otherwise, show fallback
               target.style.display = 'none';
               const fallback = target.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
               if (fallback) {
@@ -147,7 +156,7 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
             }}
           />
         ) : null}
-        <div className={`favicon-fallback flex items-center justify-center text-gray-500 text-2xl ${station.favicon && station.favicon.trim() !== '' ? 'hidden' : ''}`}>
+        <div className={`favicon-fallback flex items-center justify-center text-gray-500 text-2xl ${getFaviconUrl(station) ? 'hidden' : ''}`}>
           <FaMusic />
         </div>
         
@@ -163,10 +172,11 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
         {/* Info button */}
         <button
           onClick={handleInfoClick}
-          className="absolute top-2 right-2 w-8 h-8 text-gray-600 hover:text-gray-800 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
+          className="absolute top-2 right-2 w-7 h-7 bg-white text-black hover:text-gray-700 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm text-xs"
           title="Station Info"
+          style={{ fontFamily: 'Times, serif', fontStyle: 'italic', fontWeight: 'bold' }}
         >
-          <FaInfoCircle className="text-sm" />
+          i
         </button>
       </div>
       
