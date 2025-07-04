@@ -1,4 +1,4 @@
-import { FaPlay, FaPause, FaExpand, FaMusic, FaSpinner } from 'react-icons/fa';
+import { FaPlay, FaPause, FaMusic, FaSpinner } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface MobilePlayerProps {

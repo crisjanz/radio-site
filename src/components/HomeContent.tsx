@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaFire, FaMusic, FaInfoCircle, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaFire, FaMusic, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { apiRequest, API_CONFIG, buildApiUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
