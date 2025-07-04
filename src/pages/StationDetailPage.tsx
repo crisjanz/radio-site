@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Station } from '../types/Station';
-import { API_CONFIG } from '../config/api';
+import { API_CONFIG, getFaviconUrl } from '../config/api';
 import { 
   FaPlay, 
   FaPause, 
@@ -131,9 +131,9 @@ const StationDetailPage: React.FC<StationDetailPageProps> = ({
           <div className="flex items-start gap-6">
             {/* Station Logo */}
             <div className="w-24 h-24 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0 bg-white">
-              {station.favicon || station.logo ? (
+              {getFaviconUrl(station) ? (
                 <img
-                  src={station.favicon || station.logo}
+                  src={getFaviconUrl(station)}
                   alt={station.name}
                   className="w-full h-full object-fill"
                   style={{ width: '100%', height: '100%' }}
