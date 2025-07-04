@@ -6,7 +6,7 @@ interface MobilePlayerProps {
   isPlaying: boolean;
   isLoading?: boolean;
   onPlayPause: () => void;
-  onExpand: () => void;
+  onStationInfo?: (station: Station) => void;
 }
 
 export default function MobilePlayer({ 
@@ -14,7 +14,7 @@ export default function MobilePlayer({
   isPlaying, 
   isLoading = false,
   onPlayPause, 
-  onExpand 
+  onStationInfo 
 }: MobilePlayerProps) {
   return (
     <div className="lg:hidden fixed left-0 right-0 bg-white z-30" style={{ bottom: '3.25rem' }}>
@@ -43,7 +43,7 @@ export default function MobilePlayer({
           </div>
 
         {/* Station Info */}
-        <div className="flex-1 min-w-0 mr-3" onClick={onExpand}>
+        <div className="flex-1 min-w-0 mr-3" onClick={() => onStationInfo?.(station)}>
           <h3 className="text-sm font-medium text-gray-900 truncate">{station.name}</h3>
           <p className="text-xs text-gray-600 truncate">
             {station.city ? `${station.city}, ${station.country}` : station.country}
@@ -65,12 +65,15 @@ export default function MobilePlayer({
             )}
           </button>
           
-          <button
-            onClick={onExpand}
-            className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <FaExpand className="text-sm" />
-          </button>
+          {onStationInfo && (
+            <button
+              onClick={() => onStationInfo(station)}
+              className="w-8 h-8 bg-white text-black hover:text-gray-700 flex items-center justify-center transition-all duration-200 rounded-full shadow-sm font-bold text-sm border border-gray-200"
+              title="Station Info"
+            >
+              i
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -110,12 +110,13 @@ function App() {
   }, [isPlaying]);
 
   const handleTabChange = useCallback((tab: string) => {
+    console.log('Tab changing to:', tab, 'Current station playing:', !!currentStation, 'isPlaying:', isPlaying);
     setActiveTab(tab);
     // Navigate to home if we're currently on a station detail page
     if (window.location.pathname.startsWith('/station/')) {
       navigate('/');
     }
-  }, [navigate]);
+  }, [navigate, currentStation, isPlaying]);
 
   const handleLogin = useCallback(() => {
     if (user) {
@@ -342,8 +343,8 @@ function App() {
             {/* Main Content */}
             <main className={`flex-1 overflow-y-auto p-4 lg:p-6 ${
               currentStation 
-                ? 'pb-32 lg:pb-6' // Bottom padding when player + nav are visible (mobile)
-                : 'pb-20 lg:pb-6' // Bottom padding when only nav is visible (mobile)
+                ? 'pb-40 lg:pb-6' // Bottom padding when player + nav are visible (mobile)
+                : 'pb-24 lg:pb-6' // Bottom padding when only nav is visible (mobile)
             }`}>
               {renderTabContent()}
             </main>
@@ -365,7 +366,7 @@ function App() {
                 isPlaying={isPlaying}
                 isLoading={isLoading}
                 onPlayPause={handlePlayPause}
-onExpand={() => console.log('Expand player')}
+                onStationInfo={handleStationInfo}
               />
             )}
 
@@ -403,7 +404,7 @@ onExpand={() => console.log('Expand player')}
                 isPlaying={isPlaying}
                 isLoading={isLoading}
                 onPlayPause={handlePlayPause}
-                onExpand={() => console.log('Expand player')}
+                onStationInfo={handleStationInfo}
               />
             )}
 
@@ -491,7 +492,7 @@ onExpand={() => console.log('Expand player')}
                 isPlaying={isPlaying}
                 isLoading={isLoading}
                 onPlayPause={handlePlayPause}
-                onExpand={() => console.log('Expand player')}
+                onStationInfo={handleStationInfo}
               />
             )}
 

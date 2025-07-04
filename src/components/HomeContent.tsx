@@ -388,10 +388,10 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
         {/* Info button - always visible on mobile, hover on desktop */}
         <button
           onClick={handleInfoClick}
-          className="absolute top-2 right-2 w-7 h-7 bg-white/80 text-gray-600 hover:text-gray-800 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm"
+          className="absolute top-2 right-2 w-7 h-7 bg-white/80 text-black hover:text-gray-700 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm font-bold text-sm"
           title="Station Info"
         >
-          <FaInfoCircle className="text-xs" />
+          i
         </button>
       </div>
       
