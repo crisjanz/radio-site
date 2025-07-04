@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaPlay, FaGlobe, FaMusic, FaInfoCircle } from "react-icons/fa";
-import { apiRequest, API_CONFIG } from "../config/api";
+import { apiRequest, API_CONFIG, getFaviconUrl } from "../config/api";
 import type { Station } from "../types/Station";
 
 interface StationGridProps {
@@ -152,9 +152,9 @@ const StationLogo: React.FC<{ station: Station }> = ({ station }) => {
 
   return (
     <div className="w-12 h-12 rounded-xl ml-3 flex-shrink-0 overflow-hidden border border-gray-200">
-      {station.favicon && !logoError ? (
+      {getFaviconUrl(station) && !logoError ? (
         <img
-          src={station.favicon}
+          src={getFaviconUrl(station)!}
           alt={`${station.name} logo`}
           className="w-full h-full object-fill"
           style={{ width: '100%', height: '100%' }}
