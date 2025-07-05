@@ -613,7 +613,7 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
           <img
             src={getFaviconUrl(station)!}
             alt={station.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             onError={(e) => {
               const target = e.currentTarget;
               target.style.display = 'none';
