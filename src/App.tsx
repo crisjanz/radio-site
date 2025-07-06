@@ -78,43 +78,17 @@ function App() {
   useEffect(() => {
     if (audioRef.current && currentStation) {
       setIsLoading(true);
-      const audio = audioRef.current;
-      
-      // Clear previous event listeners
-      audio.removeEventListener('loadstart', () => setIsLoading(true));
-      audio.removeEventListener('canplay', () => setIsLoading(false));
-      audio.removeEventListener('error', () => setIsLoading(false));
-      
-      console.log('Setting up stream:', currentStation.streamUrl);
-      audio.src = currentStation.streamUrl;
-      audio.volume = isMuted ? 0 : volume / 100;
-      
-      const handleLoadStart = () => {
-        console.log('Stream loading started');
-        setIsLoading(true);
-      };
-      const handleCanPlay = () => {
-        console.log('Stream can play');
-        setIsLoading(false);
-      };
-      const handleError = (e: Event) => {
-        const error = (e.target as HTMLAudioElement).error;
-        console.error('Stream error:', error?.message, 'Code:', error?.code);
-        setIsLoading(false);
-      };
-      
-      audio.addEventListener('loadstart', handleLoadStart);
-      audio.addEventListener('canplay', handleCanPlay);
-      audio.addEventListener('error', handleError);
+      audioRef.current.src = currentStation.streamUrl;
+      audioRef.current.volume = isMuted ? 0 : volume / 100;
+      audioRef.current.addEventListener('loadstart', () => setIsLoading(true));
+      audioRef.current.addEventListener('canplay', () => setIsLoading(false));
+      audioRef.current.addEventListener('error', () => setIsLoading(false));
       
       if (isPlaying) {
-        audio.play()
-          .then(() => {
-            console.log('Stream playing successfully');
-            setIsLoading(false);
-          })
+        audioRef.current.play()
+          .then(() => setIsLoading(false))
           .catch(err => {
-            console.error('Failed to play stream:', err);
+            console.error('Failed to play:', err);
             setIsLoading(false);
           });
       }
