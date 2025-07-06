@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaGlobe, FaArrowUpRightFromSquare } from "react-icons/fa";
+import { FaGlobe } from "react-icons/fa";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import RadioPlayer from "./RadioPlayer";
 import { fetchStreamMetadata } from "../utils/streamMetadata";
 

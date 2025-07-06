@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaInfoCircle, FaArrowLeft, FaGlobe } from 'react-icons/fa6';
+import { FaCircleInfo, FaArrowLeft, FaGlobe } from 'react-icons/fa6';
 import type { Station } from '../types/Station';
 import { API_CONFIG } from '../config/api';
 
@@ -217,7 +217,7 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
             className="absolute top-2 right-2 w-8 h-8 text-gray-600 hover:text-gray-800 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
             title="Station Info"
           >
-            <FaInfoCircle className="text-sm" />
+            <FaCircleInfo className="text-sm" />
           </button>
         )}
       </div>
