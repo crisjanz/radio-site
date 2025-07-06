@@ -29,7 +29,8 @@ export default function FavoritesContent({
   };
   if (!isLoggedIn) {
     return (
-      <div className="text-center py-12">
+      <div className="p-6">
+        <div className="text-center py-12">
         <div className="text-6xl mb-4 text-red-500"><FaHeart /></div>
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
           Your Favorites
@@ -43,13 +44,15 @@ export default function FavoritesContent({
         >
           Sign In
         </button>
+        </div>
       </div>
     );
   }
 
   if (favorites.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="p-6">
+        <div className="text-center py-12">
         <div className="text-6xl mb-4 text-red-500"><FaHeart /></div>
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
           No Favorites Yet
@@ -57,12 +60,13 @@ export default function FavoritesContent({
         <p className="text-gray-600">
           Start adding stations to your favorites by clicking the heart icon on any station.
         </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <FaHeart className="text-red-500" />

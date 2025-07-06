@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { API_CONFIG } from '../config/api';
 import AdBanner from '../components/AdBanner';
 import { 
-  FaArrowLeft, 
   FaPlay, 
   FaPause, 
   FaMusic, 
@@ -94,26 +93,7 @@ export default function StationInfoPage({
   const isCurrentlyPlaying = currentStation?.id === station.id && isPlaying;
 
   return (
-    <>
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 flex-shrink-0">
-        <div className="flex items-center justify-between p-4">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <FaArrowLeft />
-            <span>Back</span>
-          </button>
-          <h1 className="font-semibold text-gray-900">Station Details</h1>
-          <div className="w-16"></div> {/* Spacer for center alignment */}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6" style={{ 
-        paddingBottom: currentStation ? '8.5rem' : '4rem' 
-      }}>
+    <div className="p-6">
         <div className="max-w-4xl mx-auto">
           {/* Ad Banner - Top of page */}
           <div className="mb-6">
@@ -488,7 +468,6 @@ export default function StationInfoPage({
             )}
           </div>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

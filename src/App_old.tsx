@@ -7,15 +7,17 @@ import { favoritesService } from './services/favorites';
 import { analytics } from './utils/analytics';
 import AdBanner from './components/AdBanner';
 import CookieNotice from './components/CookieNotice';
-import Layout from './components/Layout';
 import AdminPage from "./pages/AdminPage";
 import StationInfoPage from "./pages/StationInfoPage";
 import StationScrapePage from "./pages/StationScrapePage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import SubmitStationPage from "./pages/SubmitStationPage";
+import Layout from "./components/Layout";
 import HomeContent from "./components/HomeContent";
+//import PopularContent from "./components/PopularContent";
 import StationMap from "./components/StationMap";
+//import BrowseContent from "./components/BrowseContent";
 import BrowseAllContent from "./components/BrowseAllContent";
 import FavoritesContent from "./components/FavoritesContent";
 import StationNormalizationPage from "./pages/StationNormalizationPage";
@@ -56,6 +58,8 @@ function App() {
     initAuth();
   }, []);
 
+  // No longer need to save to localStorage - favorites are now stored in database
+
   // Handle audio playback
   useEffect(() => {
     if (audioRef.current && currentStation) {
@@ -78,9 +82,11 @@ function App() {
     if (audioRef.current && currentStation) {
       setIsLoading(true);
       
+      // For HTTP streams on HTTPS sites, try to bypass automatic upgrade
       let streamUrl = currentStation.streamUrl;
       if (streamUrl.startsWith('http://') && window.location.protocol === 'https:') {
         console.log('⚠️ HTTP stream on HTTPS site, attempting workaround');
+        // Try setting the source in a way that might bypass auto-upgrade
         audioRef.current.setAttribute('src', streamUrl);
       } else {
         audioRef.current.src = streamUrl;
@@ -100,21 +106,27 @@ function App() {
           });
       }
     }
-  }, [currentStation]);
+  }, [currentStation, isPlaying]);
 
+  // Update audio volume when volume state changes
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume / 100;
     }
   }, [volume, isMuted]);
 
+
+
   const handlePlayStation = useCallback((station: Station) => {
+    // If it's the same station, just toggle play/pause
     if (currentStation && currentStation.id === station.id) {
       setIsPlaying(!isPlaying);
     } else {
+      // Different station - set it and start playing
       setCurrentStation(station);
       setIsPlaying(true);
       
+      // Track station play (only when actually starting a new station)
       analytics.trackStationPlay(station.name, station.country || 'unknown', station.genre || 'unknown');
     }
   }, [currentStation, isPlaying]);
@@ -124,23 +136,28 @@ function App() {
   }, [isPlaying]);
 
   const handleTabChange = useCallback((tab: string) => {
+    console.log('Tab changing to:', tab, 'Current station playing:', !!currentStation, 'isPlaying:', isPlaying);
     setActiveTab(tab);
-    // Navigate to home if we're on any page other than home
-    if (window.location.pathname !== '/') {
+    // Navigate to home if we're currently on a station detail page
+    if (window.location.pathname.startsWith('/station/')) {
       navigate('/');
     }
     
+    // Track page view
     analytics.trackPageView(tab);
   }, [navigate, currentStation, isPlaying]);
 
   const handleLogin = useCallback(() => {
     if (user) {
+      // User is logged in, so log them out
       authService.logout();
       setUser(null);
-      setFavorites([]);
+      setFavorites([]); // Clear favorites on logout
       
+      // Track logout
       analytics.trackAuth('logout');
     } else {
+      // User is not logged in, show login modal
       setShowLoginModal(true);
     }
   }, [user]);
@@ -148,17 +165,21 @@ function App() {
   const handleLoginSubmit = useCallback(async (email: string, password: string) => {
     const response = await authService.login(email, password);
     setUser(response.user);
+    // Load user's favorites after login
     const userFavorites = await favoritesService.getFavorites();
     setFavorites(userFavorites);
     
+    // Track login
     analytics.trackAuth('login');
   }, []);
 
   const handleSignupSubmit = useCallback(async (email: string, password: string) => {
     const response = await authService.signup(email, password);
     setUser(response.user);
+    // New users start with empty favorites
     setFavorites([]);
     
+    // Track signup
     analytics.trackAuth('register');
   }, []);
 
@@ -168,12 +189,16 @@ function App() {
 
   const handleToggleFavorite = useCallback(async (station: Station) => {
     if (!user) {
+      console.log('No user logged in');
       return;
     }
     
+    console.log('Toggling favorite for station:', station.name, station.id);
     const result = await favoritesService.toggleFavorite(station);
+    console.log('Toggle result:', result);
     setFavorites(result.favorites);
     
+    // Track favorite action
     const action = result.favorites.some(f => f.id === station.id) ? 'add' : 'remove';
     analytics.trackStationFavorite(station.name, station.country || 'unknown', action);
   }, [user]);
@@ -186,6 +211,7 @@ function App() {
   const handleToggleMute = useCallback(() => {
     setIsMuted(!isMuted);
   }, [isMuted]);
+
 
   const handleStationInfo = useCallback((station: Station) => {
     navigate(`/station/${station.id}/info`);
@@ -211,7 +237,7 @@ function App() {
             searchTerm={searchTerm}
             onPlayStation={handlePlayStation}
             onStationInfo={handleStationInfo}
-            onBack={() => {}}
+            onBack={() => {}} // No back button needed since this is the main Browse page
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
             isLoggedIn={!!user}
@@ -260,7 +286,7 @@ function App() {
         );
       case 'more':
         return (
-          <div className="p-6 space-y-6">
+          <div className="space-y-6">
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="p-6 border-b border-gray-100">
                 <h3 className="text-lg font-semibold text-gray-900">Settings</h3>
@@ -293,6 +319,7 @@ function App() {
               </div>
             </div>
             
+            {/* Mobile Ad Space */}
             <div className="lg:hidden bg-white rounded-xl border border-gray-200 p-6">
               <AdBanner 
                 adSlot="2719177382"
@@ -322,191 +349,255 @@ function App() {
       <Route 
         path="/" 
         element={
-          <Layout
-            activeTab={activeTab}
-            searchTerm={searchTerm}
-            onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
-            onLogin={handleLogin}
-            isLoggedIn={!!user}
-            user={user}
-            currentStation={currentStation}
-            isPlaying={isPlaying}
-            isLoading={isLoading}
-            onPlayPause={handlePlayPause}
-            onStationInfo={handleStationInfo}
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={handleVolumeChange}
-            onToggleMute={handleToggleMute}
-            mobileSearchOpen={mobileSearchOpen}
-            setMobileSearchOpen={setMobileSearchOpen}
-          >
-            {renderTabContent()}
-          </Layout>
+          <div className="flex flex-col h-screen bg-gray-50">
+            {/* Shared Audio Element */}
+            <audio 
+              ref={audioRef} 
+              preload="none"
+              crossOrigin="anonymous"
+              controls={false}
+            />
+            
+            {/* Top Navigation (Desktop) */}
+            <TopNavigation
+              activeTab={activeTab}
+              searchTerm={searchTerm}
+              onTabChange={handleTabChange}
+              onSearchChange={setSearchTerm}
+              onLogin={handleLogin}
+              isLoggedIn={!!user}
+            />
+
+            {/* Mobile Header with Branding */}
+            <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <img src="/streemr-main.png" alt="Streemr" className="w-35 h-10" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveTab('favorites')}
+                    className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <FaUser className="text-lg" />
+                  </button>
+                  <button
+                    onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                    className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <FaSearch className="text-lg" />
+                  </button>
+                </div>
+              </div>
+              
+              {mobileSearchOpen && (
+                <div className="mt-3">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search stations..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-4 pr-10 py-2 w-full text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                      style={{ fontSize: '16px' }}
+                      autoFocus
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <FaX className="text-sm" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Main Content */}
+            <main className={`flex-1 overflow-y-auto p-4 lg:p-6 ${
+              currentStation 
+                ? 'pb-40 lg:pb-6' // Bottom padding when player + nav are visible (mobile)
+                : 'pb-24 lg:pb-6' // Bottom padding when only nav is visible (mobile)
+            }`}>
+              {renderTabContent()}
+            </main>
+
+            {/* Desktop Player */}
+            {currentStation && (
+              <DesktopPlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+                volume={volume}
+                isMuted={isMuted}
+                onVolumeChange={handleVolumeChange}
+                onToggleMute={handleToggleMute}
+              />
+            )}
+
+            {/* Mobile Player */}
+            {currentStation && (
+              <MobilePlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+                onStationInfo={handleStationInfo}
+              />
+            )}
+
+            {/* Bottom Navigation (Mobile) */}
+            <BottomNavigation
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+
+          </div>
         } 
       />
-      <Route 
-        path="/admin" 
-        element={<AdminPage />} 
-      />
-      <Route 
-        path="/admin/normalize" 
-        element={<StationNormalizationPage />} 
-      />
-      <Route 
-        path="/admin/health" 
-        element={<HealthCheckPage />} 
-      />
-      <Route 
-        path="/scrape" 
-        element={<StationScrapePage />} 
-      />
-      <Route 
-        path="/privacy-policy" 
-        element={
-          <Layout
-            activeTab="more"
-            searchTerm={searchTerm}
-            onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
-            onLogin={handleLogin}
-            isLoggedIn={!!user}
-            user={user}
-            currentStation={currentStation}
-            isPlaying={isPlaying}
-            isLoading={isLoading}
-            onPlayPause={handlePlayPause}
-            onStationInfo={handleStationInfo}
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={handleVolumeChange}
-            onToggleMute={handleToggleMute}
-            mobileSearchOpen={mobileSearchOpen}
-            setMobileSearchOpen={setMobileSearchOpen}
-          >
-            <PrivacyPolicyPage />
-          </Layout>
-        } 
-      />
-      <Route 
-        path="/terms-of-service" 
-        element={
-          <Layout
-            activeTab="more"
-            searchTerm={searchTerm}
-            onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
-            onLogin={handleLogin}
-            isLoggedIn={!!user}
-            user={user}
-            currentStation={currentStation}
-            isPlaying={isPlaying}
-            isLoading={isLoading}
-            onPlayPause={handlePlayPause}
-            onStationInfo={handleStationInfo}
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={handleVolumeChange}
-            onToggleMute={handleToggleMute}
-            mobileSearchOpen={mobileSearchOpen}
-            setMobileSearchOpen={setMobileSearchOpen}
-          >
-            <TermsOfServicePage />
-          </Layout>
-        } 
-      />
-      <Route 
-        path="/submit-station" 
-        element={
-          <Layout
-            activeTab="more"
-            searchTerm={searchTerm}
-            onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
-            onLogin={handleLogin}
-            isLoggedIn={!!user}
-            user={user}
-            currentStation={currentStation}
-            isPlaying={isPlaying}
-            isLoading={isLoading}
-            onPlayPause={handlePlayPause}
-            onStationInfo={handleStationInfo}
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={handleVolumeChange}
-            onToggleMute={handleToggleMute}
-            mobileSearchOpen={mobileSearchOpen}
-            setMobileSearchOpen={setMobileSearchOpen}
-          >
-            <SubmitStationPage />
-          </Layout>
-        } 
-      />
+      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/admin/normalize" element={<StationNormalizationPage />} />
+      <Route path="/admin/health" element={<HealthCheckPage />} />
+      <Route path="/scrape" element={<StationScrapePage />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+      <Route path="/submit-station" element={<SubmitStationPage />} />
       <Route 
         path="/station/:id" 
         element={
-          <Layout
-            activeTab="home"
-            searchTerm={searchTerm}
-            onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
-            onLogin={handleLogin}
-            isLoggedIn={!!user}
-            user={user}
-            currentStation={currentStation}
-            isPlaying={isPlaying}
-            isLoading={isLoading}
-            onPlayPause={handlePlayPause}
-            onStationInfo={handleStationInfo}
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={handleVolumeChange}
-            onToggleMute={handleToggleMute}
-            mobileSearchOpen={mobileSearchOpen}
-            setMobileSearchOpen={setMobileSearchOpen}
-          >
+          <div className={`min-h-screen bg-gray-50 ${
+            currentStation 
+              ? 'pb-32 lg:pb-0' // Bottom padding when player + nav are visible (mobile)
+              : 'pb-20 lg:pb-0' // Bottom padding when only nav is visible (mobile)
+          }`}>
             <StationInfoPage 
               currentStation={currentStation}
               onPlayStation={handlePlayStation}
               isPlaying={isPlaying}
             />
-          </Layout>
+            
+            {/* Mobile Player (when playing) */}
+            {currentStation && (
+              <MobilePlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+                onStationInfo={handleStationInfo}
+              />
+            )}
+
+            {/* Bottom Navigation (Mobile) */}
+            <BottomNavigation
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+
+          </div>
         } 
       />
       <Route 
         path="/station/:id/info" 
         element={
-          <Layout
-            activeTab="home"
-            searchTerm={searchTerm}
-            onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
-            onLogin={handleLogin}
-            isLoggedIn={!!user}
-            user={user}
-            currentStation={currentStation}
-            isPlaying={isPlaying}
-            isLoading={isLoading}
-            onPlayPause={handlePlayPause}
-            onStationInfo={handleStationInfo}
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={handleVolumeChange}
-            onToggleMute={handleToggleMute}
-            mobileSearchOpen={mobileSearchOpen}
-            setMobileSearchOpen={setMobileSearchOpen}
-          >
+          <div className="flex flex-col h-screen bg-gray-50">
+            {/* Shared Audio Element */}
+            <audio 
+              ref={audioRef} 
+              preload="none"
+              crossOrigin="anonymous"
+              controls={false}
+            />
+            
+            {/* Top Navigation (Desktop) */}
+            <TopNavigation
+              activeTab={activeTab}
+              searchTerm={searchTerm}
+              onTabChange={handleTabChange}
+              onSearchChange={setSearchTerm}
+              onLogin={handleLogin}
+              isLoggedIn={!!user}
+            />
+
+ {/* Mobile Header with Branding */}
+            <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <img src="/streemr-main.png" alt="Streemr" className="w-35 h-10" />
+
+                </div>
+                <button
+                  onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                  className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <FaSearch className="text-lg" />
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search stations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-4 pr-10 py-2 w-full text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  style={{ fontSize: '16px' }}
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <FaX className="text-sm" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Station Info Page Content */}
             <StationInfoPage 
               currentStation={currentStation}
               onPlayStation={handlePlayStation}
               isPlaying={isPlaying}
             />
-          </Layout>
+
+            {/* Desktop Player */}
+            {currentStation && (
+              <DesktopPlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+                volume={volume}
+                isMuted={isMuted}
+                onVolumeChange={handleVolumeChange}
+                onToggleMute={handleToggleMute}
+              />
+            )}
+
+            {/* Mobile Player */}
+            {currentStation && (
+              <MobilePlayer
+                station={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPause={handlePlayPause}
+                onStationInfo={handleStationInfo}
+              />
+            )}
+
+            {/* Bottom Navigation (Mobile) */}
+            <BottomNavigation
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+          </div>
         } 
       />
     </Routes>
 
+    {/* Login Modal */}
     <LoginModal
       isOpen={showLoginModal}
       onClose={() => setShowLoginModal(false)}
@@ -515,6 +606,7 @@ function App() {
       onPasswordReset={handlePasswordReset}
     />
 
+    {/* Cookie Notice */}
     <CookieNotice />
     </>
   );

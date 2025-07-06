@@ -144,10 +144,12 @@ const StationMap: React.FC<StationMapProps> = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-lg">
+      <div className="p-6">
+        <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-lg">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading map...</p>
+        </div>
         </div>
       </div>
     );
@@ -155,11 +157,13 @@ const StationMap: React.FC<StationMapProps> = ({
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-lg">
+      <div className="p-6">
+        <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-lg">
         <div className="text-center">
           <FaGlobe className="text-4xl text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600 font-medium">Failed to load map</p>
           <p className="text-sm text-gray-500 mt-1">{error}</p>
+        </div>
         </div>
       </div>
     );
@@ -167,7 +171,8 @@ const StationMap: React.FC<StationMapProps> = ({
 
   if (filteredStations.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-lg">
+      <div className="p-6">
+        <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-lg">
         <div className="text-center">
           <FaMusic className="text-4xl text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600 font-medium">No stations with coordinates found</p>
@@ -178,12 +183,14 @@ const StationMap: React.FC<StationMapProps> = ({
             }
           </p>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-[600px] w-full rounded-lg overflow-hidden border border-gray-200 bg-white">
+    <div className="p-6">
+      <div className="h-[600px] w-full rounded-lg overflow-hidden border border-gray-200 bg-white">
       <div className="h-full relative">
         <MapContainer
           center={[40.7128, -74.0060]} // Default to NYC
@@ -305,6 +312,7 @@ const StationMap: React.FC<StationMapProps> = ({
           </p>
         </div>
       </div>
+    </div>
     </div>
   );
 };

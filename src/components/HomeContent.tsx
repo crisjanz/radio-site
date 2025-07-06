@@ -131,7 +131,7 @@ export default function HomeContent({
           }
         `}
       </style>
-      <div className="space-y-8">
+      <div className="p-6 space-y-8">
       {/* Hero Section - Desktop Only */}
       {!searchTerm && (
         <div className="hidden lg:block text-center py-4 lg:py-8">
