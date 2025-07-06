@@ -78,7 +78,17 @@ function App() {
   useEffect(() => {
     if (audioRef.current && currentStation) {
       setIsLoading(true);
-      audioRef.current.src = currentStation.streamUrl;
+      
+      // For HTTP streams on HTTPS sites, try to bypass automatic upgrade
+      let streamUrl = currentStation.streamUrl;
+      if (streamUrl.startsWith('http://') && window.location.protocol === 'https:') {
+        console.log('⚠️ HTTP stream on HTTPS site, attempting workaround');
+        // Try setting the source in a way that might bypass auto-upgrade
+        audioRef.current.setAttribute('src', streamUrl);
+      } else {
+        audioRef.current.src = streamUrl;
+      }
+      
       audioRef.current.volume = isMuted ? 0 : volume / 100;
       audioRef.current.addEventListener('loadstart', () => setIsLoading(true));
       audioRef.current.addEventListener('canplay', () => setIsLoading(false));
