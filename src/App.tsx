@@ -304,6 +304,7 @@ function App() {
               ref={audioRef} 
               preload="none"
               crossOrigin="anonymous"
+              controls={false}
             />
             
             {/* Top Navigation (Desktop) */}
@@ -453,6 +454,7 @@ function App() {
               ref={audioRef} 
               preload="none"
               crossOrigin="anonymous"
+              controls={false}
             />
             
             {/* Top Navigation (Desktop) */}
