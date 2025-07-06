@@ -4,6 +4,7 @@ import { FaX, FaUser, FaHeart } from 'react-icons/fa6';
 import { FaSearch } from 'react-icons/fa';
 import { authService, type User } from './services/auth';
 import { favoritesService } from './services/favorites';
+import { analytics } from './utils/analytics';
 import AdminPage from "./pages/AdminPage";
 import StationInfoPage from "./pages/StationInfoPage";
 import StationScrapePage from "./pages/StationScrapePage";
@@ -122,6 +123,9 @@ function App() {
       // Different station - set it and start playing
       setCurrentStation(station);
       setIsPlaying(true);
+      
+      // Track station play (only when actually starting a new station)
+      analytics.trackStationPlay(station.name, station.country || 'unknown', station.genre || 'unknown');
     }
   }, [currentStation, isPlaying]);
 
@@ -136,6 +140,9 @@ function App() {
     if (window.location.pathname.startsWith('/station/')) {
       navigate('/');
     }
+    
+    // Track page view
+    analytics.trackPageView(tab);
   }, [navigate, currentStation, isPlaying]);
 
   const handleLogin = useCallback(() => {
@@ -144,6 +151,9 @@ function App() {
       authService.logout();
       setUser(null);
       setFavorites([]); // Clear favorites on logout
+      
+      // Track logout
+      analytics.trackAuth('logout');
     } else {
       // User is not logged in, show login modal
       setShowLoginModal(true);
@@ -156,6 +166,9 @@ function App() {
     // Load user's favorites after login
     const userFavorites = await favoritesService.getFavorites();
     setFavorites(userFavorites);
+    
+    // Track login
+    analytics.trackAuth('login');
   }, []);
 
   const handleSignupSubmit = useCallback(async (email: string, password: string) => {
@@ -163,6 +176,9 @@ function App() {
     setUser(response.user);
     // New users start with empty favorites
     setFavorites([]);
+    
+    // Track signup
+    analytics.trackAuth('register');
   }, []);
 
   const handlePasswordReset = useCallback(async (email: string) => {
@@ -179,6 +195,10 @@ function App() {
     const result = await favoritesService.toggleFavorite(station);
     console.log('Toggle result:', result);
     setFavorites(result.favorites);
+    
+    // Track favorite action
+    const action = result.favorites.some(f => f.id === station.id) ? 'add' : 'remove';
+    analytics.trackStationFavorite(station.name, station.country || 'unknown', action);
   }, [user]);
 
   const handleVolumeChange = useCallback((newVolume: number) => {

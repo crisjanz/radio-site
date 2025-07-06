@@ -2,16 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 import { FaPlay, FaPause } from 'react-icons/fa6';
 import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { analytics } from '../utils/analytics';
 
 interface RadioPlayerProps {
   streamUrl: string;
   name: string;
   genre?: string;
   type?: string;
+  country?: string;
   onMetadataUpdate?: (metadata: { title?: string; artist?: string; song?: string }) => void;
 }
 
-const RadioPlayer: React.FC<RadioPlayerProps> = ({ streamUrl, name }) => {
+const RadioPlayer: React.FC<RadioPlayerProps> = ({ streamUrl, name, genre, country }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
@@ -51,6 +53,9 @@ const RadioPlayer: React.FC<RadioPlayerProps> = ({ streamUrl, name }) => {
         setIsPlaying(true);
         setLoading(false);
         setError(null);
+        
+        // Track station play
+        analytics.trackStationPlay(name, country || 'unknown', genre || 'unknown');
       },
       onpause: () => {
         console.log('⏸️ Stream paused:', name);
