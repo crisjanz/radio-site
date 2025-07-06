@@ -181,7 +181,7 @@ export default function DesktopPlayer({
       {/* Ad Banner - Desktop Player */}
       <div className="ml-6 flex-shrink-0">
         <AdBanner 
-          adSlot="DESKTOP_PLAYER_BANNER"
+          adSlot="7491355430"
           className="w-60 h-12"
           style={{ minWidth: '240px', minHeight: '48px' }}
         />

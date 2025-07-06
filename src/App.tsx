@@ -303,7 +303,7 @@ function App() {
             {/* Mobile Ad Space */}
             <div className="lg:hidden bg-white rounded-xl border border-gray-200 p-6">
               <AdBanner 
-                adSlot="MOBILE_MORE_TAB"
+                adSlot="2719177382"
                 style={{ minHeight: '96px' }}
               />
             </div>

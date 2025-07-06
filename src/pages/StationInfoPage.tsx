@@ -118,12 +118,12 @@ export default function StationInfoPage({
           {/* Ad Banner - Top of page */}
           <div className="mb-6">
             <AdBanner 
-              adSlot="STATION_INFO_TOP"
+              adSlot="3254364003"
               className="block md:hidden"
               style={{ minHeight: '50px' }}
             />
             <AdBanner 
-              adSlot="STATION_INFO_TOP_DESKTOP"
+              adSlot="8751632067"
               className="hidden md:block"
               style={{ minHeight: '90px' }}
             />
