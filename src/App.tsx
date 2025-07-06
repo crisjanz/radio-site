@@ -5,6 +5,7 @@ import { FaSearch } from 'react-icons/fa';
 import { authService, type User } from './services/auth';
 import { favoritesService } from './services/favorites';
 import { analytics } from './utils/analytics';
+import AdBanner from './components/AdBanner';
 import AdminPage from "./pages/AdminPage";
 import StationInfoPage from "./pages/StationInfoPage";
 import StationScrapePage from "./pages/StationScrapePage";
@@ -301,9 +302,10 @@ function App() {
             
             {/* Mobile Ad Space */}
             <div className="lg:hidden bg-white rounded-xl border border-gray-200 p-6">
-              <div className="h-24 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center text-sm text-gray-500">
-                Advertisement Space
-              </div>
+              <AdBanner 
+                adSlot="MOBILE_MORE_TAB"
+                style={{ minHeight: '96px' }}
+              />
             </div>
           </div>
         );

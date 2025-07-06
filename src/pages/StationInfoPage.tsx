@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { API_CONFIG } from '../config/api';
+import AdBanner from '../components/AdBanner';
 import { 
   FaArrowLeft, 
   FaPlay, 
@@ -114,6 +115,20 @@ export default function StationInfoPage({
         paddingBottom: currentStation ? '8.5rem' : '4rem' 
       }}>
         <div className="max-w-4xl mx-auto">
+          {/* Ad Banner - Top of page */}
+          <div className="mb-6">
+            <AdBanner 
+              adSlot="STATION_INFO_TOP"
+              className="block md:hidden"
+              style={{ minHeight: '50px' }}
+            />
+            <AdBanner 
+              adSlot="STATION_INFO_TOP_DESKTOP"
+              className="hidden md:block"
+              style={{ minHeight: '90px' }}
+            />
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Left Column - Station Header */}
             <div className="bg-white rounded-xl p-6 text-center">

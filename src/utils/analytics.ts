@@ -6,6 +6,22 @@ declare global {
 }
 
 export const analytics = {
+  // Check if Google Analytics is connected
+  isConnected: () => {
+    return typeof window !== 'undefined' && 
+           window.gtag && 
+           window.dataLayer && 
+           window.dataLayer.length > 0;
+  },
+
+  // Get connection status with details
+  getConnectionStatus: () => {
+    if (typeof window === 'undefined') return { connected: false, reason: 'Not in browser' };
+    if (!window.gtag) return { connected: false, reason: 'gtag not loaded' };
+    if (!window.dataLayer) return { connected: false, reason: 'dataLayer not initialized' };
+    return { connected: true, reason: 'Google Analytics connected' };
+  },
+
   // Track page views
   trackPageView: (pageName: string) => {
     if (typeof window !== 'undefined' && window.gtag) {

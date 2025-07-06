@@ -3,6 +3,7 @@ import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio } from 'react-icons/fa6';
 import { FaVolumeUp, FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 import { fetchStreamMetadata } from '../utils/streamMetadata';
+import AdBanner from './AdBanner';
 
 interface DesktopPlayerProps {
   station: Station;
@@ -177,12 +178,13 @@ export default function DesktopPlayer({
         </div>
       </div>
 
-      {/* Streemr Branding */}
+      {/* Ad Banner - Desktop Player */}
       <div className="ml-6 flex-shrink-0">
-        <div className="w-60 h-12 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg flex items-center justify-center gap-2">
-          <img src="/streemr-play.png" alt="Streemr" className="w-6 h-6" />
-          <span className="text-xs font-medium text-gray-700">Powered by Streemr</span>
-        </div>
+        <AdBanner 
+          adSlot="DESKTOP_PLAYER_BANNER"
+          className="w-60 h-12"
+          style={{ minWidth: '240px', minHeight: '48px' }}
+        />
       </div>
     </div>
   );
