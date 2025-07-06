@@ -38,7 +38,6 @@ export default function Layout({
   onSearchChange,
   onLogin,
   isLoggedIn,
-  user,
   currentStation,
   isPlaying = false,
   isLoading = false,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FaX } from 'react-icons/fa6';
 
 export default function CookieNotice() {

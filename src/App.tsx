@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { FaX, FaUser, FaHeart } from 'react-icons/fa6';
-import { FaSearch } from 'react-icons/fa';
+import { FaHeart } from 'react-icons/fa6';
 import { authService, type User } from './services/auth';
 import { favoritesService } from './services/favorites';
 import { analytics } from './utils/analytics';
