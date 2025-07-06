@@ -5,6 +5,8 @@ interface StreamMetadata {
   title?: string;
   artist?: string;
   song?: string;
+  hasMetadataSupport?: boolean;
+  message?: string;
 }
 
 // Try to fetch metadata from backend proxy endpoint
@@ -25,16 +27,24 @@ export const fetchStreamMetadata = async (streamUrl: string): Promise<StreamMeta
       const data = await response.json();
       console.log('📡 Backend response data:', data);
       
-      if (data.title || data.song || data.artist) {
-        console.log('✅ Found metadata:', { title: data.title, song: data.song, artist: data.artist });
-        return {
-          title: data.title,
-          artist: data.artist,
-          song: data.song || data.title,
-        };
-      } else {
-        console.log('❌ No title/song/artist in response');
+      if (data.success) {
+        if (data.title || data.song || data.artist) {
+          console.log('✅ Found metadata:', { title: data.title, song: data.song, artist: data.artist });
+          return {
+            title: data.title,
+            artist: data.artist,
+            song: data.song || data.title,
+          };
+        } else if (data.hasMetadataSupport) {
+          console.log('📻 Stream supports metadata but no current song');
+          return {
+            hasMetadataSupport: true,
+            message: data.message
+          };
+        }
       }
+      
+      console.log('❌ No metadata available:', data.message || 'Unknown error');
     } else {
       console.log('❌ Backend response not OK:', response.status);
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaDownload, FaGlobe, FaFilter, FaCheck, FaTimes, FaEye, FaSpinner } from 'react-icons/fa';
+import { FaDownload, FaGlobe, FaFilter, FaCheck, FaX, FaEye, FaSpinner } from 'react-icons/fa6';
 import { API_CONFIG } from '../config/api';
 
 interface ImportFilters {
@@ -214,7 +214,7 @@ const ImportWizard: React.FC<ImportWizardProps> = ({ onClose, onImportComplete }
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
             >
-              <FaTimes />
+              <FaX />
             </button>
           </div>
           

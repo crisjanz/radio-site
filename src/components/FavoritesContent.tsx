@@ -1,4 +1,4 @@
-import { FaHeart, FaUser } from 'react-icons/fa';
+import { FaHeart, FaUser } from 'react-icons/fa6';
 import { getFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
@@ -21,10 +21,16 @@ export default function FavoritesContent({
   onLogin,
   user
 }: FavoritesContentProps) {
+  
+  // Combined function to both play station and navigate to info page
+  const handleStationClick = (station: Station) => {
+    onPlayStation(station);
+    onStationInfo(station);
+  };
   if (!isLoggedIn) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">❤️</div>
+        <div className="text-6xl mb-4 text-red-500"><FaHeart /></div>
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
           Your Favorites
         </h3>
@@ -44,7 +50,7 @@ export default function FavoritesContent({
   if (favorites.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">❤️</div>
+        <div className="text-6xl mb-4 text-red-500"><FaHeart /></div>
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
           No Favorites Yet
         </h3>
@@ -85,7 +91,7 @@ export default function FavoritesContent({
           <StationCard 
             key={station.id} 
             station={station} 
-            onPlay={() => onPlayStation(station)}
+            onPlay={() => handleStationClick(station)}
             onInfo={onStationInfo}
             onToggleFavorite={onToggleFavorite}
           />

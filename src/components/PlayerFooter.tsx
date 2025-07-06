@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaGlobe, FaExternalLinkAlt } from "react-icons/fa";
+import { FaGlobe, FaArrowUpRightFromSquare } from "react-icons/fa";
 import RadioPlayer from "./RadioPlayer";
 import { fetchStreamMetadata } from "../utils/streamMetadata";
 
@@ -113,7 +113,7 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-blue-600 transition-colors hidden sm:block"
                 >
-                  <FaExternalLinkAlt className="text-xs" />
+                  <FaArrowUpRightFromSquare className="text-xs" />
                 </a>
               )}
             </div>

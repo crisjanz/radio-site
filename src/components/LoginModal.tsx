@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaTimes, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaX, FaEye, FaEyeSlash } from 'react-icons/fa6';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -71,7 +71,7 @@ export default function LoginModal({ isOpen, onClose, onLogin, onSignup, onPassw
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <FaTimes />
+            <FaX />
           </button>
         </div>
 

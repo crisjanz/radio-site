@@ -1,4 +1,4 @@
-import { FaHome, FaList, FaGlobe, FaHeart, FaEllipsisH } from 'react-icons/fa';
+import { FaHouse, FaList, FaGlobe, FaHeart, FaEllipsis } from 'react-icons/fa6';
 
 interface BottomNavigationProps {
   activeTab: string;
@@ -7,11 +7,11 @@ interface BottomNavigationProps {
 
 export default function BottomNavigation({ activeTab, onTabChange }: BottomNavigationProps) {
   const tabs = [
-    { id: 'home', label: 'Home', icon: FaHome },
+    { id: 'home', label: 'Home', icon: FaHouse },
     { id: 'browse', label: 'Browse', icon: FaList },
     { id: 'discover', label: 'Discover', icon: FaGlobe },
     { id: 'favorites', label: 'Favorites', icon: FaHeart },
-    { id: 'more', label: 'More', icon: FaEllipsisH },
+    { id: 'more', label: 'More', icon: FaEllipsis },
   ];
 
   return (

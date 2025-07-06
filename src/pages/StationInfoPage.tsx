@@ -7,18 +7,24 @@ import {
   FaPause, 
   FaMusic, 
   FaGlobe, 
+  FaTags,
   FaEnvelope, 
   FaPhone, 
-  FaMapMarkerAlt,
   FaFacebook,
   FaTwitter,
   FaInstagram,
   FaYoutube,
   FaClock,
   FaBuilding,
-  FaCalendarAlt,
-  FaTags,
-  FaSignal
+  FaSignal,
+  FaLanguage,
+  FaRadio,
+  FaGaugeHigh,
+  FaGear
+} from 'react-icons/fa6';
+import { 
+  FaMapMarkerAlt,
+  FaCalendarAlt
 } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
@@ -145,6 +151,14 @@ export default function StationInfoPage({
                 {isCurrentlyPlaying ? <FaPause /> : <FaPlay />}
                 {isCurrentlyPlaying ? 'Pause Station' : 'Play Station'}
               </button>
+              
+              {/* About Content */}
+              {station.description && (
+                <div className="mt-6 bg-white rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">About</h3>
+                  <p className="text-gray-600 leading-relaxed">{station.description}</p>
+                </div>
+              )}
             </div>
 
             {/* Right Column - Station Info, Technical Details, Contact */}
@@ -173,7 +187,7 @@ export default function StationInfoPage({
                   )}
                   {station.frequency && (
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 text-gray-400 flex items-center justify-center text-xs font-bold">📻</div>
+                      <FaRadio className="text-gray-400" />
                       <div>
                         <p className="font-medium text-gray-900">Frequency</p>
                         <p className="text-gray-600">{station.frequency}</p>
@@ -182,7 +196,7 @@ export default function StationInfoPage({
                   )}
                   {station.language && (
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 text-gray-400 flex items-center justify-center text-xs font-bold">🗣</div>
+                      <FaLanguage className="text-gray-400" />
                       <div>
                         <p className="font-medium text-gray-900">Language</p>
                         <p className="text-gray-600">{station.language}</p>
@@ -225,12 +239,6 @@ export default function StationInfoPage({
                       </div>
                     </div>
                   )}
-                  {station.description && (
-                    <div>
-                      <p className="font-medium text-gray-900 mb-2">About</p>
-                      <p className="text-gray-600 leading-relaxed">{station.description}</p>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -241,7 +249,7 @@ export default function StationInfoPage({
                   <div className="space-y-4">
                     {station.bitrate && (
                       <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 text-gray-400 flex items-center justify-center text-xs font-bold">🎵</div>
+                        <FaGaugeHigh className="text-gray-400" />
                         <div>
                           <p className="font-medium text-gray-900">Bitrate</p>
                           <p className="text-gray-600">{station.bitrate} kbps</p>
@@ -250,7 +258,7 @@ export default function StationInfoPage({
                     )}
                     {station.codec && (
                       <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 text-gray-400 flex items-center justify-center text-xs font-bold">🔧</div>
+                        <FaGear className="text-gray-400" />
                         <div>
                           <p className="font-medium text-gray-900">Codec</p>
                           <p className="text-gray-600">{station.codec}</p>
@@ -322,83 +330,84 @@ export default function StationInfoPage({
                   </div>
                 </div>
               )}
+
+              {/* Social Media */}
+              {(station.facebookUrl || station.twitterUrl || station.instagramUrl || station.youtubeUrl) && (
+                <div className="bg-white rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Social Media</h3>
+                  <div className="space-y-4">
+                    {station.facebookUrl && (
+                      <div className="flex items-center gap-3">
+                        <FaFacebook className="text-blue-600" />
+                        <div>
+                          <p className="font-medium text-gray-900">Facebook</p>
+                          <a 
+                            href={station.facebookUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-700 underline"
+                          >
+                            {station.facebookUrl}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    {station.twitterUrl && (
+                      <div className="flex items-center gap-3">
+                        <FaTwitter className="text-blue-400" />
+                        <div>
+                          <p className="font-medium text-gray-900">Twitter</p>
+                          <a 
+                            href={station.twitterUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-700 underline"
+                          >
+                            {station.twitterUrl}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    {station.instagramUrl && (
+                      <div className="flex items-center gap-3">
+                        <FaInstagram className="text-pink-500" />
+                        <div>
+                          <p className="font-medium text-gray-900">Instagram</p>
+                          <a 
+                            href={station.instagramUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-700 underline"
+                          >
+                            {station.instagramUrl}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    {station.youtubeUrl && (
+                      <div className="flex items-center gap-3">
+                        <FaYoutube className="text-red-500" />
+                        <div>
+                          <p className="font-medium text-gray-900">YouTube</p>
+                          <a 
+                            href={station.youtubeUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-700 underline"
+                          >
+                            {station.youtubeUrl}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Additional Content - Full Width */}
           <div className="space-y-6">
-            {/* Social Media */}
-            {(station.facebookUrl || station.twitterUrl || station.instagramUrl || station.youtubeUrl) && (
-              <div className="bg-white rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Social Media</h3>
-                <div className="space-y-4">
-                  {station.facebookUrl && (
-                    <div className="flex items-center gap-3">
-                      <FaFacebook className="text-blue-600" />
-                      <div>
-                        <p className="font-medium text-gray-900">Facebook</p>
-                        <a 
-                          href={station.facebookUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700 underline"
-                        >
-                          {station.facebookUrl}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {station.twitterUrl && (
-                    <div className="flex items-center gap-3">
-                      <FaTwitter className="text-blue-400" />
-                      <div>
-                        <p className="font-medium text-gray-900">Twitter</p>
-                        <a 
-                          href={station.twitterUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700 underline"
-                        >
-                          {station.twitterUrl}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {station.instagramUrl && (
-                    <div className="flex items-center gap-3">
-                      <FaInstagram className="text-pink-500" />
-                      <div>
-                        <p className="font-medium text-gray-900">Instagram</p>
-                        <a 
-                          href={station.instagramUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700 underline"
-                        >
-                          {station.instagramUrl}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {station.youtubeUrl && (
-                    <div className="flex items-center gap-3">
-                      <FaYoutube className="text-red-500" />
-                      <div>
-                        <p className="font-medium text-gray-900">YouTube</p>
-                        <a 
-                          href={station.youtubeUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700 underline"
-                        >
-                          {station.youtubeUrl}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
 
             {/* Programs & Schedule */}
             {(station.programs || station.schedule) && (

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaFire, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaFire, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
 import { apiRequest, API_CONFIG, buildApiUrl, getFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
@@ -21,6 +21,12 @@ export default function HomeContent({
   favorites = [],
   onToggleFavorite
 }: HomeContentProps) {
+  
+  // Combined function to both play station and navigate to info page
+  const handleStationClick = (station: Station) => {
+    onPlayStation(station);
+    onStationInfo?.(station);
+  };
   const [trendingStations, setTrendingStations] = useState<Station[]>([]);
   const [recentStations, setRecentStations] = useState<Station[]>([]);
   const [searchResults, setSearchResults] = useState<Station[]>([]);
@@ -165,7 +171,7 @@ export default function HomeContent({
                 <StationCard 
                   key={station.id} 
                   station={station} 
-                  onPlay={() => onPlayStation(station)}
+                  onPlay={() => handleStationClick(station)}
                   onInfo={onStationInfo}
                   isFavorite={isFavorite(station.id)}
                   onToggleFavorite={isLoggedIn ? onToggleFavorite : undefined}
@@ -191,7 +197,7 @@ export default function HomeContent({
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl lg:text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <span className="text-2xl">❤️</span>
+              <FaHeart className="text-2xl text-red-500" />
               Your Favorites
             </h2>
             <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
@@ -228,7 +234,7 @@ export default function HomeContent({
                 <div key={station.id} className="flex-shrink-0 w-32">
                   <StationCard 
                     station={station} 
-                    onPlay={() => onPlayStation(station)}
+                    onPlay={() => handleStationClick(station)}
                     onInfo={onStationInfo}
                     isFavorite={true}
                     onToggleFavorite={onToggleFavorite}
@@ -258,7 +264,7 @@ export default function HomeContent({
               <StationCard 
                 key={station.id} 
                 station={station} 
-                onPlay={() => onPlayStation(station)}
+                onPlay={() => handleStationClick(station)}
                 onInfo={onStationInfo}
                 isFavorite={isFavorite(station.id)}
                 onToggleFavorite={isLoggedIn ? onToggleFavorite : undefined}
@@ -285,7 +291,7 @@ export default function HomeContent({
               <StationCard 
                 key={station.id} 
                 station={station} 
-                onPlay={() => onPlayStation(station)}
+                onPlay={() => handleStationClick(station)}
                 onInfo={onStationInfo}
                 isFavorite={isFavorite(station.id)}
                 onToggleFavorite={isLoggedIn ? onToggleFavorite : undefined}

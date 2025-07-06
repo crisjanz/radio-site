@@ -1,4 +1,4 @@
-import { FaSpinner, FaSave, FaEye, FaFacebook, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa';
+import { FaSpinner, FaFloppyDisk, FaEye, FaFacebook, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa6';
 import type { Station } from '../types/Station';
 
 interface StationPreviewProps {
@@ -33,7 +33,7 @@ export default function StationPreview({
               disabled={saving}
               className="flex items-center gap-1 px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
             >
-              {saving ? <FaSpinner className="animate-spin" /> : <FaSave />}
+              {saving ? <FaSpinner className="animate-spin" /> : <FaFloppyDisk />}
               Save Changes
             </button>
           </div>

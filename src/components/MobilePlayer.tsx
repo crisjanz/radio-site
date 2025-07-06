@@ -1,5 +1,7 @@
-import { FaPlay, FaPause, FaSpinner } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio } from 'react-icons/fa6';
 import { getFaviconUrl } from '../config/api';
+import { fetchStreamMetadata } from '../utils/streamMetadata';
 import type { Station } from '../types/Station';
 
 interface MobilePlayerProps {
@@ -17,6 +19,54 @@ export default function MobilePlayer({
   onPlayPause, 
   onStationInfo 
 }: MobilePlayerProps) {
+  const [currentSong, setCurrentSong] = useState<string | null>(null);
+  const [metadataChecked, setMetadataChecked] = useState(false);
+
+  // Fetch metadata when station changes or starts playing
+  useEffect(() => {
+    if (!station || !isPlaying) {
+      setCurrentSong(null);
+      setMetadataChecked(false);
+      return;
+    }
+
+    // Reset metadata state for new station
+    setCurrentSong(null);
+    setMetadataChecked(false);
+
+    // Fetch metadata
+    const fetchMetadata = async () => {
+      try {
+        const metadata = await fetchStreamMetadata(station.streamUrl);
+        
+        setMetadataChecked(true);
+        
+        if (metadata?.song || metadata?.title) {
+          setCurrentSong(metadata.song || metadata.title || null);
+        } else if (metadata?.hasMetadataSupport) {
+          setCurrentSong('METADATA_SUPPORTED');
+        } else {
+          setCurrentSong(null);
+        }
+      } catch (error) {
+        setMetadataChecked(true);
+        setCurrentSong(null);
+      }
+    };
+
+    fetchMetadata();
+
+    // Poll for metadata updates every 30 seconds while playing
+    const metadataInterval = setInterval(() => {
+      if (isPlaying) {
+        fetchMetadata();
+      }
+    }, 30000);
+
+    return () => {
+      clearInterval(metadataInterval);
+    };
+  }, [station, isPlaying]);
   return (
     <div className="lg:hidden fixed left-0 right-0 bg-white z-30" style={{ bottom: '3.25rem' }}>
         <div className="flex items-center px-4 py-3">
@@ -46,9 +96,23 @@ export default function MobilePlayer({
         {/* Station Info */}
         <div className="flex-1 min-w-0 mr-3" onClick={() => onStationInfo?.(station)}>
           <h3 className="text-sm font-medium text-gray-900 truncate">{station.name}</h3>
-          <p className="text-xs text-gray-600 truncate">
-            {station.city ? `${station.city}, ${station.country}` : station.country}
-          </p>
+          
+          {/* Current song/metadata info */}
+          {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
+            <div className="text-xs font-medium text-blue-600 truncate flex items-center gap-1">
+              <FaMusic className="text-xs" />
+              {currentSong}
+            </div>
+          ) : (isPlaying && (metadataChecked || currentSong === 'METADATA_SUPPORTED')) ? (
+            <div className="text-xs text-gray-500 italic flex items-center gap-1">
+              <FaRadio className="text-xs" />
+              Live Radio
+            </div>
+          ) : (
+            <p className="text-xs text-gray-600 truncate">
+              {station.city ? `${station.city}, ${station.country}` : station.country}
+            </p>
+          )}
         </div>
 
         {/* Controls */}
@@ -57,10 +121,10 @@ export default function MobilePlayer({
             onClick={onPlayPause}
             className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
           >
-            {isLoading ? (
+            {isLoading && isPlaying ? (
               <FaSpinner className="text-sm animate-spin" />
             ) : isPlaying ? (
-              <FaPause className="text-sm" />
+              <FaStop className="text-sm" />
             ) : (
               <FaPlay className="text-sm ml-0.5" />
             )}

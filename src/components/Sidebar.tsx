@@ -1,5 +1,5 @@
 import React from "react";
-import { FaGlobe, FaMusic, FaTags, FaFilter, FaTimes } from "react-icons/fa";
+import { FaGlobe, FaMusic, FaTags, FaFilter, FaX } from "react-icons/fa6";
 
 interface SidebarProps {
   countries: string[];
@@ -66,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               onClick={onClose}
               className="lg:hidden p-2 text-gray-400 hover:text-gray-600"
             >
-              <FaTimes />
+              <FaX />
             </button>
           </div>
         </div>
@@ -83,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               onClick={onClearFilters}
               className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
-              <FaTimes className="text-xs" />
+              <FaX className="text-xs" />
               Clear
             </button>
           )}

@@ -1,4 +1,5 @@
-import { FaSearch, FaSpinner } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa6';
+import { FaSearch } from 'react-icons/fa';
 
 interface ScrapingInputProps {
   scrapeUrl: string;

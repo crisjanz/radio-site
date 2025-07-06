@@ -1,10 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { FaTimes, FaSearch, FaUser } from 'react-icons/fa';
+import { FaX, FaUser, FaHeart } from 'react-icons/fa6';
+import { FaSearch } from 'react-icons/fa';
 import { authService, type User } from './services/auth';
 import { favoritesService } from './services/favorites';
 import AdminPage from "./pages/AdminPage";
-import StationDetailPage from "./pages/StationDetailPage";
+import StationInfoPage from "./pages/StationInfoPage";
 import StationScrapePage from "./pages/StationScrapePage";
 import TopNavigation from "./components/TopNavigation";
 import BottomNavigation from "./components/BottomNavigation";
@@ -13,7 +14,6 @@ import DesktopPlayer from "./components/DesktopPlayer";
 import HomeContent from "./components/HomeContent";
 //import PopularContent from "./components/PopularContent";
 import StationMap from "./components/StationMap";
-import StationInfoPage from "./pages/StationInfoPage";
 //import BrowseContent from "./components/BrowseContent";
 import BrowseAllContent from "./components/BrowseAllContent";
 import FavoritesContent from "./components/FavoritesContent";
@@ -251,7 +251,7 @@ function App() {
         if (!user) {
           return (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">❤️</div>
+              <div className="text-6xl mb-4 text-red-500"><FaHeart /></div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Your Favorites
               </h3>
@@ -381,7 +381,7 @@ function App() {
                         onClick={() => setSearchTerm('')}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       >
-                        <FaTimes className="text-sm" />
+                        <FaX className="text-sm" />
                       </button>
                     )}
                   </div>
@@ -444,7 +444,7 @@ function App() {
               ? 'pb-32 lg:pb-0' // Bottom padding when player + nav are visible (mobile)
               : 'pb-20 lg:pb-0' // Bottom padding when only nav is visible (mobile)
           }`}>
-            <StationDetailPage 
+            <StationInfoPage 
               currentStation={currentStation}
               onPlayStation={handlePlayStation}
               isPlaying={isPlaying}
@@ -519,7 +519,7 @@ function App() {
                     onClick={() => setSearchTerm('')}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    <FaTimes className="text-sm" />
+                    <FaX className="text-sm" />
                   </button>
                 )}
               </div>

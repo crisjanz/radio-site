@@ -1,4 +1,5 @@
-import { FaMusic, FaGlobe, FaTags, FaMapMarkerAlt, FaPlay, FaEdit, FaTrash, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaMusic, FaGlobe, FaTags, FaPlay, FaPenToSquare, FaTrash, FaArrowUpRightFromSquare } from 'react-icons/fa6';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 
 interface StationListProps {
@@ -93,7 +94,7 @@ export default function StationList({
                           rel="noopener noreferrer"
                           className="text-gray-400 hover:text-blue-600 transition-colors"
                         >
-                          <FaExternalLinkAlt className="text-xs" />
+                          <FaArrowUpRightFromSquare className="text-xs" />
                         </a>
                       )}
                     </div>
@@ -137,7 +138,7 @@ export default function StationList({
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     title="Edit station"
                   >
-                    <FaEdit className="text-sm" />
+                    <FaPenToSquare className="text-sm" />
                   </button>
                   
                   <button

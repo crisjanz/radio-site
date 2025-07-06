@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaCheck, FaTimes, FaSpinner, FaEye, FaSave, FaUndo } from 'react-icons/fa';
+import { FaCheck, FaX, FaSpinner, FaEye, FaFloppyDisk, FaArrowRotateLeft } from 'react-icons/fa6';
 import { API_CONFIG } from '../config/api';
 
 interface Station {
@@ -226,7 +226,7 @@ const handleApproval = (changeId: number, status: 'approved' | 'rejected' | 'pen
               disabled={processing || stats.approved === 0}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
             >
-              {processing ? <FaSpinner className="animate-spin" /> : <FaSave />}
+              {processing ? <FaSpinner className="animate-spin" /> : <FaFloppyDisk />}
               Apply Changes ({stats.approved})
             </button>
           </div>
@@ -374,7 +374,7 @@ function ChangeCard({ change, station, onApprove, onReject, onReset, genres, typ
                 onClick={onReject}
                 className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                <FaTimes className="text-sm" />
+                <FaX className="text-sm" />
                 Reject
               </button>
             </>
@@ -385,7 +385,7 @@ function ChangeCard({ change, station, onApprove, onReject, onReset, genres, typ
               onClick={onReset}
               className="flex items-center gap-1 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
-              <FaUndo className="text-sm" />
+              <FaArrowRotateLeft className="text-sm" />
               Reset
             </button>
           )}

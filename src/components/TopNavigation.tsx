@@ -1,4 +1,5 @@
-import { FaHome, FaList, FaGlobe, FaHeart, FaEllipsisH, FaSearch, FaUser, FaTimes } from 'react-icons/fa';
+import { FaHouse, FaList, FaGlobe, FaHeart, FaEllipsis, FaUser, FaX } from 'react-icons/fa6';
+import { FaSearch } from 'react-icons/fa';
 
 interface TopNavigationProps {
   activeTab: string;
@@ -18,11 +19,11 @@ export default function TopNavigation({
   isLoggedIn = false
 }: TopNavigationProps) {
   const tabs = [
-    { id: 'home', label: 'Home', icon: FaHome },
+    { id: 'home', label: 'Home', icon: FaHouse },
     { id: 'browse', label: 'Browse', icon: FaList },
     { id: 'discover', label: 'Discover', icon: FaGlobe },
     { id: 'favorites', label: 'Favorites', icon: FaHeart },
-    { id: 'more', label: 'More', icon: FaEllipsisH },
+    { id: 'more', label: 'More', icon: FaEllipsis },
   ];
 
   return (
@@ -53,7 +54,7 @@ export default function TopNavigation({
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   title="Clear search"
                 >
-                  <FaTimes className="text-sm" />
+                  <FaX className="text-sm" />
                 </button>
               )}
             </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaHeartbeat, FaPlay, FaCheck, FaTimes, FaExclamationTriangle, FaClock, FaSpinner, FaArrowLeft, FaCog } from 'react-icons/fa';
+import { FaHeartPulse, FaPlay, FaCheck, FaX, FaTriangleExclamation, FaClock, FaSpinner, FaArrowLeft, FaGear } from 'react-icons/fa6';
 import { API_CONFIG } from '../config/api';
 
 
@@ -177,7 +177,7 @@ export default function HealthCheckPage() {
               </a>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <FaHeartbeat className="text-red-600" />
+                  <FaHeartPulse className="text-red-600" />
                   Stream Health Check
                 </h1>
                 <p className="text-gray-600 mt-1">Monitor and manage station stream health</p>
@@ -281,11 +281,11 @@ export default function HealthCheckPage() {
                     )}
                     <div className="flex items-center gap-1">
                       {result.error ? (
-                        <FaExclamationTriangle className="text-yellow-500" />
+                        <FaTriangleExclamation className="text-yellow-500" />
                       ) : result.isWorking ? (
                         <FaCheck className="text-green-500" />
                       ) : (
-                        <FaTimes className="text-red-500" />
+                        <FaX className="text-red-500" />
                       )}
                     </div>
                   </div>
@@ -347,14 +347,14 @@ export default function HealthCheckPage() {
                       <div className="flex items-center gap-4 text-sm">
                         {station.consecutiveFailures > 0 && (
                           <div className="flex items-center gap-1 text-red-600">
-                            <FaTimes />
+                            <FaX />
                             {station.consecutiveFailures} failures
                           </div>
                         )}
                         
                         {station.userReports > 0 && (
                           <div className="flex items-center gap-1 text-orange-600">
-                            <FaExclamationTriangle />
+                            <FaTriangleExclamation />
                             {station.userReports} user reports
                           </div>
                         )}
@@ -383,7 +383,7 @@ export default function HealthCheckPage() {
                         {retesting.has(station.id) ? (
                           <FaSpinner className="animate-spin" />
                         ) : (
-                          <FaHeartbeat />
+                          <FaHeartPulse />
                         )}
                         {retesting.has(station.id) ? 'Testing...' : 'Re-test'}
                       </button>
@@ -396,7 +396,7 @@ export default function HealthCheckPage() {
                             : 'bg-green-100 text-green-700 hover:bg-green-200'
                         }`}
                       >
-                        <FaCog />
+                        <FaGear />
                         {station.isActive ? 'Disable' : 'Enable'}
                       </button>
                     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaArrowLeft, FaArrowRight, FaFilter, FaTimes, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaFilter, FaX, FaHeart, FaRegHeart, FaGlobe, FaRadio, FaMusic, FaSignal } from 'react-icons/fa6';
 import { API_CONFIG, getFaviconUrl } from '../config/api';
 import type { Station } from '../types/Station';
 
@@ -56,6 +56,12 @@ export default function BrowseAllContent({
   onToggleFavorite,
   isLoggedIn = false
 }: BrowseAllContentProps) {
+  
+  // Combined function to both play station and navigate to info page
+  const handleStationClick = (station: Station) => {
+    onPlayStation(station);
+    onStationInfo?.(station);
+  };
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -368,33 +374,33 @@ export default function BrowseAllContent({
               <div className="flex flex-wrap gap-2">
                 {filters.country && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                    🌍 {filters.country}
+                    <FaGlobe className="text-xs" /> {filters.country}
                     <button onClick={() => setFilters(prev => ({ ...prev, country: '' }))}>
-                      <FaTimes className="text-xs" />
+                      <FaX className="text-xs" />
                     </button>
                   </span>
                 )}
                 {filters.type && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
-                    📻 {STATION_TYPES.find(t => t.value === filters.type)?.label || filters.type}
+                    <FaRadio className="text-xs" /> {STATION_TYPES.find(t => t.value === filters.type)?.label || filters.type}
                     <button onClick={() => setFilters(prev => ({ ...prev, type: '' }))}>
-                      <FaTimes className="text-xs" />
+                      <FaX className="text-xs" />
                     </button>
                   </span>
                 )}
                 {filters.genre && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                    🎵 {MUSIC_GENRES.find(g => g.value === filters.genre)?.label || filters.genre}
+                    <FaMusic className="text-xs" /> {MUSIC_GENRES.find(g => g.value === filters.genre)?.label || filters.genre}
                     <button onClick={() => setFilters(prev => ({ ...prev, genre: '' }))}>
-                      <FaTimes className="text-xs" />
+                      <FaX className="text-xs" />
                     </button>
                   </span>
                 )}
                 {filters.quality && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                    📶 {filters.quality === '128' ? 'High Quality' : 'Premium'}
+                    <FaSignal className="text-xs" /> {filters.quality === '128' ? 'High Quality' : 'Premium'}
                     <button onClick={() => setFilters(prev => ({ ...prev, quality: '' }))}>
-                      <FaTimes className="text-xs" />
+                      <FaX className="text-xs" />
                     </button>
                   </span>
                 )}
@@ -436,7 +442,7 @@ export default function BrowseAllContent({
           <StationCard 
             key={station.id} 
             station={station} 
-            onPlay={() => onPlayStation(station)}
+            onPlay={() => handleStationClick(station)}
             onInfo={onStationInfo ? (e) => handleInfoClick(e, station) : undefined}
             isFavorite={isFavorite(station.id)}
             onToggleFavorite={isLoggedIn ? onToggleFavorite : undefined}
@@ -500,7 +506,7 @@ export default function BrowseAllContent({
                 onClick={() => setShowFilters(false)}
                 className="p-2 text-gray-600 hover:text-gray-900"
               >
-                <FaTimes />
+                <FaX />
               </button>
             </div>
             

@@ -1,4 +1,4 @@
-import { FaSave, FaTimes } from 'react-icons/fa';
+import { FaFloppyDisk, FaX } from 'react-icons/fa6';
 import type { Station } from '../types/Station';
 
 interface StationFormModalProps {
@@ -35,7 +35,7 @@ export default function StationFormModal({
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
           >
-            <FaTimes />
+            <FaX />
           </button>
         </div>
 
@@ -279,7 +279,7 @@ export default function StationFormModal({
               </>
             ) : (
               <>
-                <FaSave />
+                <FaFloppyDisk />
                 {editingStation ? 'Update Station' : 'Add Station'}
               </>
             )}

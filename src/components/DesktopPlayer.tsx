@@ -1,5 +1,8 @@
-import { FaPlay, FaPause, FaVolumeUp, FaVolumeDown, FaVolumeMute, FaSpinner } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio } from 'react-icons/fa6';
+import { FaVolumeUp, FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
 import type { Station } from '../types/Station';
+import { fetchStreamMetadata } from '../utils/streamMetadata';
 
 interface DesktopPlayerProps {
   station: Station;
@@ -22,6 +25,61 @@ export default function DesktopPlayer({
   onVolumeChange,
   onToggleMute
 }: DesktopPlayerProps) {
+  const [currentSong, setCurrentSong] = useState<string | null>(null);
+  const [metadataChecked, setMetadataChecked] = useState(false);
+
+  // Fetch metadata when station changes or starts playing
+  useEffect(() => {
+    if (!station || !isPlaying) {
+      setCurrentSong(null);
+      setMetadataChecked(false);
+      return;
+    }
+
+    // Reset metadata state for new station
+    setCurrentSong(null);
+    setMetadataChecked(false);
+
+    // Fetch metadata
+    const fetchMetadata = async () => {
+      try {
+        console.log('🎵 Fetching metadata for:', station.name);
+        const metadata = await fetchStreamMetadata(station.streamUrl);
+        console.log('🎵 Metadata response:', metadata);
+        
+        setMetadataChecked(true);
+        
+        if (metadata?.song || metadata?.title) {
+          console.log('🎵 Setting current song:', metadata.song || metadata.title);
+          setCurrentSong(metadata.song || metadata.title || null);
+        } else if (metadata?.hasMetadataSupport) {
+          console.log('🎵 Stream supports metadata but no current song');
+          setCurrentSong('METADATA_SUPPORTED'); // Special marker for metadata support
+        } else {
+          console.log('🎵 No song data in metadata response');
+          setCurrentSong(null);
+        }
+      } catch (error) {
+        console.debug('Failed to fetch metadata:', error);
+        setMetadataChecked(true);
+        setCurrentSong(null);
+      }
+    };
+
+    fetchMetadata();
+
+    // Poll for metadata updates every 30 seconds while playing
+    const metadataInterval = setInterval(() => {
+      if (isPlaying) {
+        fetchMetadata();
+      }
+    }, 30000);
+
+    return () => {
+      clearInterval(metadataInterval);
+    };
+  }, [station, isPlaying]);
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseInt(e.target.value);
     onVolumeChange(newVolume);
@@ -67,10 +125,10 @@ export default function DesktopPlayer({
           onClick={onPlayPause}
           className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
         >
-          {isLoading ? (
+          {isLoading && isPlaying ? (
             <FaSpinner className="text-lg animate-spin" />
           ) : isPlaying ? (
-            <FaPause className="text-lg" />
+            <FaStop className="text-lg" />
           ) : (
             <FaPlay className="text-lg ml-0.5" />
           )}
@@ -79,6 +137,20 @@ export default function DesktopPlayer({
         {/* Station Info */}
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-gray-900 truncate">{station.name}</h3>
+          
+          {/* Current song/metadata info */}
+          {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
+            <div className="text-xs font-medium text-blue-600 mb-1 truncate flex items-center gap-1">
+              <FaMusic className="text-xs" />
+              {currentSong}
+            </div>
+          ) : (isPlaying && (metadataChecked || currentSong === 'METADATA_SUPPORTED')) ? (
+            <div className="text-xs text-gray-500 mb-1 italic flex items-center gap-1">
+              <FaRadio className="text-xs" />
+              Live Radio
+            </div>
+          ) : null}
+          
           <p className="text-xs text-gray-600 truncate">
             {station.city ? `${station.city}, ${station.country}` : station.country}
             {station.genre && ` • ${station.genre}`}

@@ -195,6 +195,7 @@ UserFavorites Model:
 - [x] **Admin tools**: Complete station management system
 - [x] **Data quality**: Automated scraping and validation
 - [x] **Performance**: Optimized loading and smooth playback
+- [x] **Real-time metadata**: "Now Playing" song detection and display
 
 ### 🎯 **Future Enhancements (Optional)**
 - [ ] **Play count tracking** for better trending calculations
@@ -390,4 +391,253 @@ This approach gives you full control over favicon images with professional editi
   - Automated quality scoring
   - Duplicate detection and merging
 
- 
+---
+
+## 🔧 **Admin System Architecture (MAJOR SHIFT)**
+
+### Overview
+Moving from React-based admin (in frontend) to HTML-based admin (in backend) for better simplicity, direct database access, and elimination of CORS issues with file uploads and image management.
+
+### 🏗️ **New Architecture Decision**
+
+#### **From: React Admin (Being Phased Out)**
+- **Location**: `/Users/cristianjanz/streemr/radio-site/src/pages/AdminPage.tsx`
+- **Issues**: 
+  - CORS complications with file uploads
+  - Complex API calls for image management
+  - Separation of concerns between frontend/backend
+  - Additional authentication/authorization complexity
+
+#### **To: HTML Admin (Current Focus)**
+- **Location**: `/Users/cristianjanz/streemr/radio-back/public/*.html`
+- **Benefits**:
+  - No CORS issues - direct backend access
+  - Simpler file upload handling
+  - Direct database operations
+  - Cleaner separation: backend handles admin, frontend handles users
+  - Easier image processing and storage
+
+### ✅ **HTML Admin Pages (Current Status)**
+
+#### **Completed HTML Admin Tools**
+1. **Metadata Scraper** - `http://localhost:3001/admin/metadata-scraper`
+   - Comprehensive "Now Playing" detection and configuration
+   - Multiple detection methods (Icecast, HLS, JSON APIs, website scraping)
+   - Database integration for saving working configurations
+   - Live testing and validation tools
+   - Statistics dashboard showing metadata coverage
+
+2. **Station Editor** - `http://localhost:3001/admin/stations`
+   - Full CRUD operations for station management
+   - Advanced filtering and search capabilities
+   - Business data scraping integration
+   - Image download and editing tools
+   - Conflict resolution for scraped data
+
+3. **Image Management** - `http://localhost:3001/admin/images`
+   - Station favicon/logo downloading and processing
+   - Fabric.js-based image editor
+   - Multiple size options and optimization
+   - Batch processing capabilities
+
+#### **Features of HTML Admin System**
+- **Direct Backend Integration**: No API calls - direct database access
+- **File Upload Handling**: Native multipart form support
+- **Image Processing**: Server-side image manipulation with Sharp
+- **Real-time Updates**: Live testing and immediate feedback
+- **Professional UI**: Clean Tailwind CSS interfaces
+
+### 🚧 **Migration Plan**
+
+#### **Phase 1: Complete HTML Admin (In Progress)**
+- [x] Metadata scraper - ✅ Fully functional
+- [x] Station editor - ✅ Core functionality complete
+- [x] Image management - ✅ Basic editor working
+- [ ] Import/export wizard - 🚧 Needs migration from React
+- [ ] Batch operations - 🚧 Needs implementation
+- [ ] User management - 🚧 If needed for admin functions
+
+#### **Phase 2: Remove React Admin (Future)**
+- [ ] Delete `/Users/cristianjanz/streemr/radio-site/src/pages/AdminPage.tsx`
+- [ ] Remove admin routes from React router
+- [ ] Clean up admin-related React components
+- [ ] Update navigation to remove admin links from frontend
+
+#### **Phase 3: Frontend Cleanup (Future)**
+- [ ] Keep frontend focused purely on user experience
+- [ ] Remove any admin-specific dependencies
+- [ ] Simplify authentication (no admin role checking in frontend)
+
+### 🎯 **Benefits of New Admin Architecture**
+
+#### **Technical Benefits**
+- **No CORS Issues**: Admin runs on same origin as backend
+- **Simplified File Handling**: Direct multipart upload processing
+- **Better Performance**: No API serialization/deserialization overhead
+- **Easier Debugging**: All admin logic in one place
+
+#### **Development Benefits**
+- **Faster Development**: HTML forms and direct backend logic
+- **Less Code Complexity**: No need for React state management for admin
+- **Easier Maintenance**: Single codebase for all admin functionality
+- **Better Security**: Admin access controlled at backend level
+
+#### **User Experience Benefits**
+- **Faster Admin Operations**: Direct database access, no network overhead
+- **More Reliable**: No frontend/backend coordination issues
+- **Professional Tools**: Dedicated admin interface with advanced features
+
+### 📂 **Current Admin URLs**
+- **Main Admin Dashboard**: `http://localhost:3001/admin/` (if implemented)
+- **Metadata Scraper**: `http://localhost:3001/admin/metadata-scraper`
+- **Station Management**: `http://localhost:3001/admin/stations`
+- **Image Editor**: `http://localhost:3001/admin/images`
+
+This architectural shift represents a move toward simpler, more maintainable admin tooling while keeping the user-facing frontend clean and focused on the radio streaming experience.
+
+---
+
+## 🎵 **Real-Time Metadata System (COMPLETED)**
+
+### Overview
+Comprehensive "Now Playing" metadata detection and display system that automatically identifies current songs, artists, and track information for radio streams in real-time.
+
+### ✅ **Frontend Metadata Implementation**
+
+#### **Core Components**
+- **PlayerFooter.tsx**: Main metadata display with real-time updates
+- **streamMetadata.ts**: Utility for fetching metadata from backend
+- **Station.ts**: TypeScript interfaces with metadata API fields
+- **RadioPlayer.tsx & MobilePlayer.tsx**: Integrated metadata callbacks
+
+#### **Real-Time Display Features**
+- **"Now Playing" text** with musical note icons (♪, 🎵)
+- **Automatic polling** every 60 seconds for fresh song info
+- **Loading states**: "🎵 Detecting song info..." while fetching
+- **Fallbacks**: "🎵 Live radio stream" when no metadata available
+- **Station branding**: Logo/favicon display with metadata
+
+#### **User Experience**
+- **Non-blocking loading**: Metadata fetches don't interfere with playback
+- **Visual feedback**: Clear loading and success states
+- **Mobile optimized**: Responsive design for all screen sizes
+- **Graceful degradation**: Works seamlessly when metadata unavailable
+
+### ✅ **Backend Metadata Detection System**
+
+#### **Multi-Method Detection Engine**
+1. **Existing Configuration Priority**: Tests saved metadata configs first (fastest)
+2. **Icecast/Shoutcast**: Stream metadata extraction from headers
+3. **HLS Metadata**: Timed metadata from HLS playlists  
+4. **HTTP Headers**: Custom metadata headers analysis
+5. **JSON Endpoints**: API discovery with pattern recognition
+6. **Website Scraping**: "Now playing" text extraction from station websites
+
+#### **API Type Support**
+- **laut.fm**: Dedicated handler for laut.fm streaming platform
+- **Custom APIs**: Generic JSON/text endpoint support
+- **Website scraping**: Configured pattern matching
+- **Unknown types**: Auto-detection with smart field extraction
+
+#### **Database Integration**
+- **Persistent configurations**: Saves working metadata setups
+- **Performance optimization**: Uses saved configs to avoid re-detection
+- **Statistics tracking**: Monitors metadata coverage across stations
+- **Quality assurance**: Excludes empty strings, validates data integrity
+
+### ✅ **Admin Metadata Management**
+
+#### **Metadata Scraper Interface** (`/admin/metadata-scraper`)
+- **Comprehensive testing**: Single station or batch testing capabilities
+- **Live configuration**: Real-time metadata testing and validation
+- **Multiple detection methods**: Tests all available sources simultaneously
+- **Database management**: View, save, and clear metadata configurations
+- **Statistics dashboard**: Coverage metrics and type breakdowns
+
+#### **Detection Methods Dashboard**
+- **Priority-based testing**: Optimized order for best results
+- **Method comparison**: Side-by-side results from different sources
+- **Configuration saving**: One-click save of working methods
+- **Live updates**: Test real-time metadata streams
+- **Conflict resolution**: Choose best method when multiple work
+
+#### **Batch Operations**
+- **Random station testing**: Test multiple stations for coverage analysis
+- **Configuration management**: Bulk view and edit saved metadata setups
+- **Performance monitoring**: Track success rates and response times
+- **Database cleanup**: Remove invalid or empty configurations
+
+### ✅ **Enhanced Detection Algorithms** 
+
+#### **Pattern Recognition**
+- **Known platform detection**: Recognizes laut.fm, Vista Radio, Golden West, etc.
+- **URL pattern matching**: Smart endpoint discovery based on domain
+- **Content validation**: Filters out HTML fragments and invalid data
+- **Field extraction**: Intelligent parsing of artist/title information
+
+#### **Performance Optimizations**
+- **Early return**: Stops testing when working method found
+- **Timeout handling**: 30-second limits prevent hanging requests
+- **Caching**: Stores working configurations for fast future access
+- **Error handling**: Graceful failures with helpful diagnostics
+
+### 📊 **Current Metadata Coverage**
+- **Total stations in database**: 582
+- **Stations with working metadata**: 6 confirmed working configurations
+- **Coverage rate**: ~1% (room for significant improvement)
+- **Supported types**: laut.fm, custom APIs, website scraping, generic JSON
+
+### 🎯 **Metadata System Status**
+
+#### ✅ **What's Working Perfectly**
+- **Real-time display**: Songs appear automatically in player footer
+- **Multiple detection methods**: Comprehensive coverage of metadata sources
+- **Admin tools**: Full testing and configuration management
+- **Database integration**: Persistent storage of working configurations
+- **API type support**: Specific handlers for known platforms
+- **Performance**: Fast detection using saved configurations
+
+#### ⚡ **What Could Be Enhanced**
+- **Coverage expansion**: Test and configure more stations (currently only 6/582)
+- **Pattern library**: Add more platform-specific detection patterns
+- **Auto-discovery**: Bulk testing to find working metadata for all stations
+- **Metadata enrichment**: Add support for album art, genre, duration
+- **User features**: Song history, notifications, sharing capabilities
+
+### 🛠️ **Implementation Architecture**
+
+#### **Frontend Flow**
+```
+Station Selection → Metadata API Call → Real-time Display → Periodic Updates
+```
+
+#### **Backend Detection Flow**
+```
+Test Existing Config → Try Multiple Methods → Save Working Config → Return Results
+```
+
+#### **Database Schema**
+```sql
+Station Model (Extended):
+- metadataApiUrl: String?     -- API endpoint URL
+- metadataApiType: String?    -- Type (laut.fm, custom, website, etc.)
+- metadataFormat: String?     -- Response format (json, text)
+- metadataFields: String?     -- JSON field mappings
+```
+
+#### **API Endpoints**
+- `GET /metadata/database-stats` - Coverage statistics
+- `POST /metadata/test-station` - Test single station
+- `POST /metadata/save-config` - Save working configuration
+- `GET /metadata/stations-with-metadata` - List configured stations
+
+### 💡 **Next Steps for Metadata Expansion**
+1. **Bulk testing**: Run batch tests on all 582 stations to find working sources
+2. **Pattern enhancement**: Add more platform-specific detection patterns
+3. **User experience**: Add song change notifications and listening history
+4. **Rich metadata**: Integrate album artwork and additional track information
+5. **Performance**: Optimize polling intervals based on station update frequency
+
+The metadata system is fully functional and ready for expansion to provide "Now Playing" information across your entire station catalog!
+
+---

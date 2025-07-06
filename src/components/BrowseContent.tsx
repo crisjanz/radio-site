@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaList, FaGlobe, FaMusic, FaSignal } from 'react-icons/fa';
+import { FaList, FaGlobe, FaMusic, FaSignal } from 'react-icons/fa6';
 import type { Station } from '../types/Station';
 import BrowseAllContent from './BrowseAllContent';
 import CountryContent from './CountryContent';

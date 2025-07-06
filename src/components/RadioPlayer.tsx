@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
-import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { FaPlay, FaPause } from 'react-icons/fa6';
+import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
 
 interface RadioPlayerProps {
   streamUrl: string;
