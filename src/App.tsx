@@ -5,7 +5,6 @@ import { authService, type User } from './services/auth';
 import { favoritesService } from './services/favorites';
 import { analytics } from './utils/analytics';
 import AdBanner from './components/AdBanner';
-import CookieNotice from './components/CookieNotice';
 import Layout from './components/Layout';
 import AdminPage from "./pages/AdminPage";
 import StationInfoPage from "./pages/StationInfoPage";
@@ -514,7 +513,6 @@ function App() {
       onPasswordReset={handlePasswordReset}
     />
 
-    <CookieNotice />
     </>
   );
 }
