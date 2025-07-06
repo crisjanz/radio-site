@@ -12,6 +12,7 @@ import StationScrapePage from "./pages/StationScrapePage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import SubmitStationPage from "./pages/SubmitStationPage";
+import AboutPage from "./pages/AboutPage";
 import HomeContent from "./components/HomeContent";
 import StationMap from "./components/StationMap";
 import BrowseAllContent from "./components/BrowseAllContent";
@@ -282,7 +283,10 @@ function App() {
                 >
                   Terms of Service
                 </button>
-                <button className="w-full text-left p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                <button 
+                  onClick={() => navigate('/about')}
+                  className="w-full text-left p-4 hover:bg-gray-50 rounded-lg transition-colors"
+                >
                   About
                 </button>
                 <button className="w-full text-left p-4 hover:bg-gray-50 rounded-lg transition-colors">
@@ -500,6 +504,33 @@ function App() {
               onPlayStation={handlePlayStation}
               isPlaying={isPlaying}
             />
+          </Layout>
+        } 
+      />
+      <Route 
+        path="/about" 
+        element={
+          <Layout
+            activeTab="more"
+            searchTerm={searchTerm}
+            onTabChange={handleTabChange}
+            onSearchChange={setSearchTerm}
+            onLogin={handleLogin}
+            isLoggedIn={!!user}
+            user={user}
+            currentStation={currentStation}
+            isPlaying={isPlaying}
+            isLoading={isLoading}
+            onPlayPause={handlePlayPause}
+            onStationInfo={handleStationInfo}
+            volume={volume}
+            isMuted={isMuted}
+            onVolumeChange={handleVolumeChange}
+            onToggleMute={handleToggleMute}
+            mobileSearchOpen={mobileSearchOpen}
+            setMobileSearchOpen={setMobileSearchOpen}
+          >
+            <AboutPage />
           </Layout>
         } 
       />
