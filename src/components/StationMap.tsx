@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { FaPlay, FaGlobe, FaMusic, FaInfoCircle } from 'react-icons/fa';
+import { FaGlobe as FaGlobe6 } from 'react-icons/fa6';
 import type { Station } from '../types/Station';
 import { API_CONFIG } from '../config/api';
 
@@ -23,31 +24,59 @@ interface StationMapProps {
   selectedType: string;
 }
 
-// Custom radio station icon
-const createRadioIcon = (color: string = '#3b82f6', count: number = 1) => {
+// Custom radio station icon with Streemr play logo
+const createRadioIcon = (count: number = 1) => {
+  const size = count > 1 ? 20 : 20;
+  const logoSize = count > 1 ? 14 : 14;
+  
   return L.divIcon({
     className: 'custom-radio-marker',
     html: `
       <div style="
-        background-color: ${color};
-        width: ${count > 1 ? '32px' : '24px'};
-        height: ${count > 1 ? '32px' : '24px'};
+
+        width: ${size}px;
+        height: ${size}px;
         border-radius: 50%;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+ 
+
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: ${count > 1 ? '12px' : '10px'};
-        font-weight: bold;
+        position: relative;
       ">
-        ${count > 1 ? count : '📻'}
+        ${count > 1 ? `
+          <div style="
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ffffff;
+            color: black;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 0.25px solid #494949;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+          ">${count}</div>
+        ` : ''}
+        <img 
+          src="/streemr-play.png" 
+          alt="Streemr" 
+          style="
+            width: ${logoSize}px;
+            height: ${logoSize}px;
+            object-fit: contain;
+          "
+        />
       </div>
     `,
-    iconSize: [count > 1 ? 32 : 24, count > 1 ? 32 : 24],
-    iconAnchor: [count > 1 ? 16 : 12, count > 1 ? 16 : 12],
-    popupAnchor: [0, count > 1 ? -16 : -12]
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -size / 2]
   });
 };
 
@@ -200,7 +229,7 @@ const StationMap: React.FC<StationMapProps> = ({
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
           
           <FitBounds stations={filteredStations} />
@@ -213,7 +242,7 @@ const StationMap: React.FC<StationMapProps> = ({
               <Marker
                 key={key}
                 position={[lat, lng]}
-                icon={createRadioIcon('#3b82f6', stationCount)}
+                icon={createRadioIcon(stationCount)}
               >
                 <Popup className="station-popup" maxWidth={400}>
                   <div className="p-2 min-w-[300px] max-w-[380px]">
@@ -291,7 +320,7 @@ const StationMap: React.FC<StationMapProps> = ({
                                 className="flex items-center justify-center px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                                 title="Visit Website"
                               >
-                                🌐
+                                <FaGlobe6 className="text-xs" />
                               </a>
                             )}
                           </div>

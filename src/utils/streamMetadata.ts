@@ -9,8 +9,35 @@ interface StreamMetadata {
   message?: string;
 }
 
+// Frontend request deduplication - prevent multiple components from requesting same stream
+const activeMetadataRequests = new Map<string, Promise<StreamMetadata | null>>();
+const REQUEST_DEDUPE_DURATION = 30000; // 30 seconds
+
 // Try to fetch metadata from backend proxy endpoint
 export const fetchStreamMetadata = async (streamUrl: string): Promise<StreamMetadata | null> => {
+  // Check if we already have an active request for this stream
+  const existingRequest = activeMetadataRequests.get(streamUrl);
+  if (existingRequest) {
+    console.log('🔄 Reusing active frontend metadata request for stream');
+    return existingRequest;
+  }
+  
+  // Create new request and track it
+  const requestPromise = performMetadataRequest(streamUrl);
+  activeMetadataRequests.set(streamUrl, requestPromise);
+  
+  // Clean up tracking after completion
+  requestPromise.finally(() => {
+    setTimeout(() => {
+      activeMetadataRequests.delete(streamUrl);
+    }, REQUEST_DEDUPE_DURATION);
+  });
+  
+  return requestPromise;
+};
+
+// Actual metadata request implementation
+const performMetadataRequest = async (streamUrl: string): Promise<StreamMetadata | null> => {
   try {
     console.log('📡 Calling backend metadata API for:', streamUrl);
     

@@ -4,7 +4,7 @@ import { FaHeart } from 'react-icons/fa6';
 import { authService, type User } from './services/auth';
 import { favoritesService } from './services/favorites';
 import { analytics } from './utils/analytics';
-import AdBanner from './components/AdBanner';
+// import AdBanner from './components/AdBanner';
 import Layout from './components/Layout';
 import AdminPage from "./pages/AdminPage";
 import StationInfoPage from "./pages/StationInfoPage";
@@ -296,10 +296,20 @@ function App() {
             </div>
             
             <div className="lg:hidden bg-white rounded-xl border border-gray-200 p-6">
-              <AdBanner 
-                adSlot="2719177382"
-                style={{ minHeight: '96px' }}
-              />
+              <div 
+                style={{
+                  height: '96px',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px dashed #e9ecef',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  color: '#6c757d'
+                }}
+              >
+                Mobile Ad Space
+              </div>
             </div>
           </div>
         );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaFire, FaPlay, FaChartLine } from 'react-icons/fa6';
 import type { Station } from '../types/Station';
-import { API_CONFIG } from '../config/api';
+import { API_CONFIG, getFaviconUrl } from '../config/api';
 
 interface PopularContentProps {
   searchTerm: string;
@@ -110,9 +110,9 @@ export default function PopularContent({
 
                 {/* Station Logo */}
                 <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-                  {station.favicon ? (
+                  {getFaviconUrl(station, { width: 48, height: 48, quality: 90 }) ? (
                     <img
-                      src={station.favicon}
+                      src={getFaviconUrl(station, { width: 48, height: 48, quality: 90 })!}
                       alt={station.name}
                       className="w-full h-full object-fill"
                       style={{ width: '100%', height: '100%' }}
@@ -126,7 +126,7 @@ export default function PopularContent({
                       }}
                     />
                   ) : null}
-                  <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
+                  <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${getFaviconUrl(station, { width: 48, height: 48, quality: 90 }) ? 'hidden' : ''}`}>
                     <img src="/streemr-play.png" alt="Streemr" className="w-8 h-8 object-contain" />
                   </div>
                 </div>

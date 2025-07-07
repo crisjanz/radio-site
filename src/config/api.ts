@@ -63,9 +63,10 @@ export const apiRequest = async (endpoint: string, options?: RequestInit) => {
 };
 
 // Helper function to get favicon URL - handle both local and external URLs
-export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: string }) => {
-  // Use favicon first, fallback to logo
-  const imageUrl = station.favicon || station.logo;
+// Priority: local_image_url -> logo -> favicon
+export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: string; local_image_url?: string }, options?: { width?: number; height?: number; quality?: number }) => {
+  // Use priority: local_image_url -> logo -> favicon
+  const imageUrl = station.local_image_url || station.logo || station.favicon;
   
   if (!imageUrl || imageUrl.trim() === '') {
     return null;
@@ -76,7 +77,38 @@ export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: st
     return `${API_CONFIG.BASE_URL}${imageUrl}`;
   }
   
-  // Otherwise return as-is (external URL)
-  return imageUrl;
+  // If it's a Supabase URL, return as-is (no proxy needed - already fast)
+  if (imageUrl.includes('supabase.co')) {
+    return imageUrl;
+  }
+  
+  // For external URLs, use image proxy for better performance
+  const proxyUrl = new URL('/image-proxy/proxy', API_CONFIG.BASE_URL);
+  proxyUrl.searchParams.append('url', imageUrl);
+  
+  // Add optimization parameters
+  if (options?.width) proxyUrl.searchParams.append('w', options.width.toString());
+  if (options?.height) proxyUrl.searchParams.append('h', options.height.toString());
+  if (options?.quality) proxyUrl.searchParams.append('q', options.quality.toString());
+  
+  // Default optimization for thumbnails if no options provided
+  if (!options) {
+    proxyUrl.searchParams.append('w', '64');
+    proxyUrl.searchParams.append('h', '64');
+    proxyUrl.searchParams.append('q', '85');
+  }
+  
+  return proxyUrl.toString();
+};
+
+// Preload critical images for performance
+export const preloadStationImages = (stations: { id: number; favicon?: string; logo?: string; local_image_url?: string }[]) => {
+  stations.slice(0, 10).forEach(station => { // Preload first 10 images
+    const imageUrl = getFaviconUrl(station);
+    if (imageUrl) {
+      const img = new Image();
+      img.src = imageUrl;
+    }
+  });
 };
 

@@ -152,9 +152,9 @@ const StationLogo: React.FC<{ station: Station }> = ({ station }) => {
 
   return (
     <div className="w-12 h-12 rounded-xl ml-3 flex-shrink-0 overflow-hidden border border-gray-200">
-      {getFaviconUrl(station) && !logoError ? (
+      {getFaviconUrl(station, { width: 48, height: 48, quality: 90 }) && !logoError ? (
         <img
-          src={getFaviconUrl(station)!}
+          src={getFaviconUrl(station, { width: 48, height: 48, quality: 90 })!}
           alt={`${station.name} logo`}
           className="w-full h-full object-fill"
           style={{ width: '100%', height: '100%' }}

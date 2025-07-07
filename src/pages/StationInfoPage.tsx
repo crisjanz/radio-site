@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { API_CONFIG } from '../config/api';
-import AdBanner from '../components/AdBanner';
+// import AdBanner from '../components/AdBanner';
 import { 
   FaPlay, 
   FaPause, 
@@ -97,16 +97,41 @@ export default function StationInfoPage({
         <div className="max-w-4xl mx-auto">
           {/* Ad Banner - Top of page */}
           <div className="mb-6">
-            <AdBanner 
-              adSlot="3254364003"
-              className="block md:hidden"
-              style={{ minHeight: '50px' }}
-            />
-            <AdBanner 
-              adSlot="8751632067"
-              className="hidden md:block"
-              style={{ minHeight: '90px' }}
-            />
+            {/* Mobile Ad */}
+            <div className="block md:hidden">
+              <div 
+                style={{
+                  height: '50px',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px dashed #e9ecef',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  color: '#6c757d'
+                }}
+              >
+                Mobile Station Ad
+              </div>
+            </div>
+            
+            {/* Desktop Ad */}
+            <div className="hidden md:block">
+              <div 
+                style={{
+                  height: '90px',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px dashed #e9ecef',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  color: '#6c757d'
+                }}
+              >
+                Desktop Station Ad
+              </div>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

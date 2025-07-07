@@ -21,6 +21,7 @@ export default function MobilePlayer({
 }: MobilePlayerProps) {
   const [currentSong, setCurrentSong] = useState<string | null>(null);
   const [metadataChecked, setMetadataChecked] = useState(false);
+  const [isRequestingMetadata, setIsRequestingMetadata] = useState(false);
 
   // Fetch metadata when station changes or starts playing
   useEffect(() => {
@@ -36,7 +37,12 @@ export default function MobilePlayer({
 
     // Fetch metadata
     const fetchMetadata = async () => {
+      if (isRequestingMetadata) {
+        return;
+      }
+      
       try {
+        setIsRequestingMetadata(true);
         const metadata = await fetchStreamMetadata(station.streamUrl);
         
         setMetadataChecked(true);
@@ -51,6 +57,8 @@ export default function MobilePlayer({
       } catch (error) {
         setMetadataChecked(true);
         setCurrentSong(null);
+      } finally {
+        setIsRequestingMetadata(false);
       }
     };
 
@@ -72,9 +80,9 @@ export default function MobilePlayer({
         <div className="flex items-center px-4 py-3">
           {/* Station Logo */}
           <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 mr-3">
-            {getFaviconUrl(station) ? (
+            {getFaviconUrl(station, { width: 40, height: 40, quality: 90 }) ? (
               <img
-                src={getFaviconUrl(station)!}
+                src={getFaviconUrl(station, { width: 40, height: 40, quality: 90 })!}
                 alt={`${station.name} logo`}
                 className="w-full h-full object-fill"
                 style={{ width: '100%', height: '100%' }}
@@ -88,7 +96,7 @@ export default function MobilePlayer({
                 }}
               />
             ) : null}
-            <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${getFaviconUrl(station) ? 'hidden' : ''}`}>
+            <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${getFaviconUrl(station, { width: 40, height: 40, quality: 90 }) ? 'hidden' : ''}`}>
               <img src="/streemr-play.png" alt="Streemr" className="w-16 h-16 object-contain" />
             </div>
           </div>

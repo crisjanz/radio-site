@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaCircleInfo, FaArrowLeft, FaGlobe } from 'react-icons/fa6';
 import type { Station } from '../types/Station';
-import { API_CONFIG } from '../config/api';
+import { API_CONFIG, getFaviconUrl } from '../config/api';
 
 
 
@@ -191,9 +191,9 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
     >
       {/* Icon */}
       <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-        {station.favicon ? (
+        {getFaviconUrl(station, { width: 128, height: 128, quality: 85 }) ? (
           <img
-            src={station.favicon}
+            src={getFaviconUrl(station, { width: 128, height: 128, quality: 85 })!}
             alt={station.name}
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -206,7 +206,7 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
             }}
           />
         ) : null}
-        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
+        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station, { width: 128, height: 128, quality: 85 }) ? 'hidden' : ''}`}>
           <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
         </div>
         

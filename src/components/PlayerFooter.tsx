@@ -3,6 +3,7 @@ import { FaGlobe } from "react-icons/fa";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import RadioPlayer from "./RadioPlayer";
 import { fetchStreamMetadata } from "../utils/streamMetadata";
+import { getFaviconUrl } from "../config/api";
 
 interface Station {
   id: number;
@@ -13,6 +14,7 @@ interface Station {
   streamUrl: string;
   favicon?: string;
   logo?: string;
+  local_image_url?: string;
   homepage?: string;
 }
 
@@ -25,12 +27,13 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
   const [stationLogo, setStationLogo] = useState<string | null>(null);
   const [logoError, setLogoError] = useState(false);
   const [metadataChecked, setMetadataChecked] = useState(false);
+  const [isRequestingMetadata, setIsRequestingMetadata] = useState(false);
 
   useEffect(() => {
     if (!currentStation) return;
 
-    // Set station logo
-    setStationLogo(currentStation.favicon || null);
+    // Set station logo using priority logic with optimization
+    setStationLogo(getFaviconUrl(currentStation, { width: 48, height: 48, quality: 90 }));
     setLogoError(false);
     
     // Reset metadata state
@@ -39,7 +42,13 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
 
     // Try to fetch stream metadata
     const fetchMetadata = async () => {
+      if (isRequestingMetadata) {
+        console.log('🔄 Metadata request already in progress, skipping');
+        return;
+      }
+      
       try {
+        setIsRequestingMetadata(true);
         console.log('🎵 Fetching metadata for:', currentStation.name);
         const metadata = await fetchStreamMetadata(currentStation.streamUrl);
         console.log('🎵 Metadata response:', metadata);
@@ -57,6 +66,8 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
         console.debug('Failed to fetch metadata:', error);
         setMetadataChecked(true);
         setCurrentSong(null);
+      } finally {
+        setIsRequestingMetadata(false);
       }
     };
 

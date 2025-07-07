@@ -3,7 +3,7 @@ import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio } from 'react-icons/fa6';
 import { FaVolumeUp, FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
 import type { Station } from '../types/Station';
 import { fetchStreamMetadata } from '../utils/streamMetadata';
-import AdBanner from './AdBanner';
+// import AdBanner from './AdBanner';
 
 interface DesktopPlayerProps {
   station: Station;
@@ -179,17 +179,21 @@ export default function DesktopPlayer({
       </div>
 
       {/* Ad Banner - Desktop Player */}
-      <div className="ml-6 flex-shrink-0">
-        <AdBanner 
-          adSlot="7491355430"
-          className="w-60"
-          style={{ 
-            width: '240px', 
-            height: '48px',
-            minHeight: '48px',
-            maxHeight: '48px'
-          }}
-        />
+      <div 
+        className="ml-6 flex-shrink-0"
+        style={{
+          width: '240px',
+          height: '40px',
+          backgroundColor: '#f8f9fa',
+          border: '1px dashed #e9ecef',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '10px',
+          color: '#6c757d'
+        }}
+      >
+        Desktop Ad Space
       </div>
     </div>
   );

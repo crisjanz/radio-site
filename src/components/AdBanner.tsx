@@ -23,12 +23,13 @@ const AdBanner: React.FC<AdBannerProps> = ({
 }) => {
   useEffect(() => {
     try {
-      // Initialize AdSense ad
+      // Only initialize if AdSense is loaded and approved
       if (window.adsbygoogle && window.adsbygoogle.push) {
         window.adsbygoogle.push({});
       }
     } catch (error) {
-      console.warn('AdSense initialization failed:', error);
+      // Silently handle errors during development/before approval
+      console.debug('AdSense not ready:', error instanceof Error ? error.message : 'Unknown error');
     }
   }, []);
 
@@ -36,9 +37,19 @@ const AdBanner: React.FC<AdBannerProps> = ({
     <div 
       className={`ad-container ${className}`} 
       style={{
-        minHeight: '50px',
+        // Default styles
+        height: '60px',
+        minHeight: '60px', 
         maxHeight: '100px',
         overflow: 'hidden',
+        backgroundColor: '#f8f9fa',
+        border: '1px dashed #e9ecef',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '12px',
+        color: '#6c757d',
+        // Override with passed styles
         ...style
       }}
     >
@@ -46,15 +57,16 @@ const AdBanner: React.FC<AdBannerProps> = ({
         className="adsbygoogle"
         style={{
           display: 'block',
-          minHeight: '50px',
-          maxHeight: '100px',
-          ...style
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'transparent',
         }}
         data-ad-client="ca-pub-2704220713309204"
         data-ad-slot={adSlot}
         data-ad-format={adFormat}
         data-full-width-responsive={responsive.toString()}
       />
+      <span style={{ position: 'absolute', opacity: 0.3 }}>Ad Space</span>
     </div>
   );
 };

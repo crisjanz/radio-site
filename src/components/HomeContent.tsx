@@ -345,9 +345,9 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
     >
       {/* Icon */}
       <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-        {getFaviconUrl(station) ? (
+        {getFaviconUrl(station, { width: 128, height: 128, quality: 85 }) ? (
           <img
-            src={getFaviconUrl(station)!}
+            src={getFaviconUrl(station, { width: 128, height: 128, quality: 85 })!}
             alt={station.name}
             className="w-full h-full object-contain"
             onError={(e) => {
@@ -360,7 +360,7 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
             }}
           />
         ) : null}
-        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station) ? 'hidden' : ''}`}>
+        <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station, { width: 128, height: 128, quality: 85 }) ? 'hidden' : ''}`}>
           <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
         </div>
         

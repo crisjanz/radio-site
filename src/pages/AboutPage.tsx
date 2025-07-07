@@ -1,5 +1,5 @@
 import { FaHeart, FaGlobe } from 'react-icons/fa6';
-import AdBanner from '../components/AdBanner';
+// import AdBanner from '../components/AdBanner';
 
 export default function AboutPage() {
   return (
@@ -38,14 +38,22 @@ export default function AboutPage() {
 
         {/* Ad Banner - Responsive */}
         <div className="flex justify-center">
-          <AdBanner 
-            adSlot="2719177382" 
+          <div 
             style={{ 
               width: '100%',
               maxWidth: '728px',
-              minHeight: '90px'
+              height: '90px',
+              backgroundColor: '#f8f9fa',
+              border: '1px dashed #e9ecef',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              color: '#6c757d'
             }}
-          />
+          >
+            About Page Ad Space
+          </div>
         </div>
 
         {/* What Makes Streemr Different */}

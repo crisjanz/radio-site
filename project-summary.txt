@@ -641,3 +641,195 @@ Station Model (Extended):
 The metadata system is fully functional and ready for expansion to provide "Now Playing" information across your entire station catalog!
 
 ---
+
+## 💰 **AdSense Integration & Site Monetization (LATEST SESSION)**
+
+### Overview
+Complete implementation of Google AdSense integration, legal compliance framework, professional email setup, and layout consistency improvements for production-ready monetization.
+
+### ✅ **Google Analytics Implementation (COMPLETED)**
+
+#### **Analytics Integration**
+- **Google Analytics 4 (GA4)**: Tracking ID `G-JQGKMR2WET`
+- **Comprehensive event tracking**: Station plays, favorites, authentication, page views
+- **Custom parameters**: Station name, country, genre for detailed analytics
+- **Real-time monitoring**: Track user engagement and listening patterns
+
+#### **Analytics Utility** (`/src/utils/analytics.ts`)
+```typescript
+export const analytics = {
+  trackStationPlay: (stationName, country, genre) => { ... },
+  trackStationFavorite: (stationName, country, action) => { ... },
+  trackAuth: (action) => { ... },
+  trackPageView: (tab) => { ... }
+};
+```
+
+### ✅ **Google AdSense Integration (COMPLETED)**
+
+#### **AdSense Setup**
+- **Publisher ID**: `ca-pub-2704220713309204`
+- **Auto ads disabled**: Using manual ad placement for better control
+- **Responsive ad units**: Automatic sizing based on screen dimensions
+- **Strategic placement**: Desktop player, mobile more tab, station info pages, about page
+
+#### **Ad Banner Component** (`/src/components/AdBanner.tsx`)
+- **Responsive design**: Adapts to mobile and desktop layouts
+- **Size constraints**: Prevents oversized ad spaces during development
+- **Placeholder system**: Shows "Ad Space" text before AdSense approval
+- **Error handling**: Graceful failures with debug logging
+
+#### **Ad Placement Strategy**
+1. **Desktop Player**: 240px × 40px banner (replacing "Powered by Streemr")
+2. **Mobile More Tab**: 96px height ad space
+3. **Station Info Pages**: Responsive banners (50px mobile, 90px desktop)
+4. **About Page**: Centered responsive banner (90px height)
+
+### ✅ **Legal Compliance Framework (COMPLETED)**
+
+#### **Privacy Policy Page** (`/src/pages/PrivacyPolicyPage.tsx`)
+- **GDPR compliant**: Comprehensive privacy protection coverage
+- **Google services disclosure**: Analytics, AdSense, Maps integration
+- **User rights**: Data access, deletion, portability, correction
+- **Contact information**: `privacy@streemr.app` for privacy inquiries
+- **Cookie policy**: Detailed explanation of tracking and consent
+
+#### **Terms of Service Page** (`/src/pages/TermsOfServicePage.tsx`)
+- **Copyright protection**: Radio streaming specific legal protections
+- **DMCA compliance**: Takedown procedures (`dmca@streemr.app`)
+- **User responsibilities**: Acceptable use policies
+- **Service limitations**: Liability disclaimers and service availability
+- **Contact information**: `legal@streemr.app` for legal matters
+
+#### **Google's Consent Management Platform (CMP)**
+- **3-choice popup**: Consent, do not consent, manage options
+- **EU/EEA/UK targeting**: Automatic geolocation-based consent
+- **Global compliance**: Meets GDPR, ePrivacy, CCPA requirements
+- **Integration**: Automatic AdSense consent signal handling
+
+### ✅ **Professional Email Setup (COMPLETED)**
+
+#### **Domain Email Configuration**
+- **Email service**: ImprovMX (free email forwarding)
+- **Domain**: `streemr.app` with proper DNS configuration
+- **MX Records**: Configured for email delivery
+- **SPF Record**: Anti-spam authentication setup
+
+#### **Professional Email Addresses**
+- **Primary contact**: `hello@streemr.app`
+- **User support**: `support@streemr.app`
+- **Privacy inquiries**: `privacy@streemr.app`
+- **Legal matters**: `legal@streemr.app`
+- **DMCA takedowns**: `dmca@streemr.app`
+
+#### **DNS Configuration** (Namecheap)
+```dns
+MX Records:
+@ mx1.improvmx.com 10
+@ mx2.improvmx.com 20
+
+TXT Record:
+@ v=spf1 include:spf.improvmx.com ~all
+```
+
+### ✅ **About Page Development (COMPLETED)**
+
+#### **Personal Story Integration** (`/src/pages/AboutPage.tsx`)
+- **Founder narrative**: Personal journey from South America to Canada (2007)
+- **Problem statement**: TuneIn audio ads motivation for creating Streemr
+- **Vision**: Solo project with growth ambitions ("I" to "We")
+- **Value proposition**: Discreet ads, app-like experience, always free core features
+
+#### **Feature Highlights**
+- **No audio ads**: Visual advertising only, never interrupts music
+- **Always free**: Save stations, create favorites, access all features
+- **App-like experience**: Clean, intuitive navigation
+- **Global discovery**: Explore stations from every corner of the world
+
+#### **Community Elements**
+- **Station submission**: Link to submit new stations
+- **Contact information**: `hello@streemr.app` for feedback
+- **Growth narrative**: Transparent about solo development with team aspirations
+
+### ✅ **Navigation & Layout Consistency (COMPLETED)**
+
+#### **Unified Layout System** (`/src/components/Layout.tsx`)
+- **Consistent navigation**: Same menu structure across all pages
+- **Responsive design**: Mobile/desktop navigation patterns
+- **Player integration**: Consistent player placement on all pages
+- **Search functionality**: Mobile search with smart clear/close behavior
+
+#### **Mobile Search Enhancement**
+- **Smart X button**: Clear text if present, close search if empty
+- **Touch-friendly**: Larger tap area for mobile interaction
+- **Double-tap behavior**: Clear then close for intuitive UX
+- **Visual feedback**: Proper centering and responsive design
+
+#### **Page Integration**
+- **Privacy Policy**: Accessible via navigation, uses Layout wrapper
+- **Terms of Service**: Integrated navigation, consistent experience
+- **About Page**: Professional layout with responsive ad placement
+- **Submit Station**: Community contribution page with form validation
+
+### ✅ **Audio Player System Fixes (COMPLETED)**
+
+#### **Player Architecture Issues Resolved**
+- **Duplicate audio elements**: Removed conflicting audio components
+- **Desktop player positioning**: Fixed floating player at bottom of screen
+- **Audio playback**: Connected UI controls to actual audio element
+- **Responsive sizing**: Proper mobile/desktop player dimensions
+
+#### **Ad Space Size Control**
+- **Physical constraints**: 240px × 40px desktop player ad space
+- **Overflow prevention**: Wrapper containers prevent ad expansion
+- **Placeholder system**: Consistent "Ad Space" indicators
+- **Responsive breakpoints**: Different sizes for mobile/desktop
+
+### 🎯 **AdSense Approval Status**
+
+#### **Submission Ready Checklist** ✅
+- [x] **Substantial content**: About page with founder story
+- [x] **Legal compliance**: Privacy policy and terms of service
+- [x] **Professional contact**: Domain email addresses
+- [x] **Clean navigation**: Consistent site structure
+- [x] **Ad placements**: Strategic, non-intrusive ad spaces
+- [x] **Consent management**: Google's 3-choice CMP configured
+- [x] **Analytics integration**: User behavior tracking active
+
+#### **Post-Approval Tasks** 🚧
+- [ ] **Replace ad placeholders**: Implement actual AdBanner components
+- [ ] **Size constraints**: Force ad dimensions with CSS `!important`
+- [ ] **Revenue optimization**: Monitor performance and adjust placement
+- [ ] **User experience**: Balance monetization with usability
+
+### 💡 **Monetization Strategy**
+
+#### **Discreet Advertising Approach**
+- **Visual only**: No audio ads that interrupt radio streams
+- **Strategic placement**: Complement content without dominating layout
+- **User-first design**: Maintain excellent user experience while monetizing
+- **Global compliance**: Legal framework supports worldwide operation
+
+#### **Revenue Projections**
+- **Initial focus**: AdSense approval and basic revenue generation
+- **Growth path**: Scale ad optimization as user base grows
+- **Future options**: Premium features, partnerships, affiliate programs
+
+### 📊 **Current Implementation Status**
+
+#### ✅ **Fully Operational**
+- **Google Analytics**: Real-time user tracking and engagement metrics
+- **Legal framework**: Complete privacy and terms documentation
+- **Email system**: Professional communication channels
+- **Ad placeholders**: Consistent, appropriately sized ad spaces
+- **Navigation**: Unified experience across all pages
+
+#### 🎯 **Next Steps After AdSense Approval**
+1. **Implement real ads**: Replace placeholders with AdBanner components
+2. **Optimize placement**: A/B test ad positions for revenue/UX balance
+3. **Performance monitoring**: Track revenue and user engagement metrics
+4. **Compliance verification**: Ensure consent management working properly
+
+The monetization foundation is complete and ready for AdSense review. The combination of legal compliance, professional presentation, and strategic ad placement provides an excellent foundation for sustainable revenue generation while maintaining the core user experience that makes Streemr special.
+
+---

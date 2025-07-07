@@ -7,6 +7,7 @@ export interface Station {
   streamUrl: string;
   favicon?: string;
   logo?: string;
+  local_image_url?: string; // Our processed/managed image URL
   homepage?: string;
   
   // Geographic coordinates
