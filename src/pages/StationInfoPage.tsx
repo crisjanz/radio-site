@@ -138,9 +138,9 @@ export default function StationInfoPage({
             {/* Left Column - Station Header */}
             <div className="bg-white rounded-xl p-6 text-center">
               <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
-                {getFaviconUrl(station, { width: 128, height: 128, quality: 90, cacheBust: true }) ? (
+                {getFaviconUrl(station, { width: 512, height: 512, quality: 90, cacheBust: true }) ? (
                   <img
-                    src={getFaviconUrl(station, { width: 128, height: 128, quality: 90, cacheBust: true })!}
+                    src={getFaviconUrl(station, { width: 512, height: 512, quality: 90, cacheBust: true })!}
                     alt={station.name}
                     className="max-w-full max-h-full object-contain"
                   />
