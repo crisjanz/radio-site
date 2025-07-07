@@ -95,10 +95,10 @@ export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: st
   if (options?.height) proxyUrl.searchParams.append('h', options.height.toString());
   if (options?.quality) proxyUrl.searchParams.append('q', options.quality.toString());
   
-  // Default optimization for thumbnails if no options provided
+  // Default optimization for images if no options provided
   if (!options) {
-    proxyUrl.searchParams.append('w', '64');
-    proxyUrl.searchParams.append('h', '64');
+    proxyUrl.searchParams.append('w', '512');
+    proxyUrl.searchParams.append('h', '512');
     proxyUrl.searchParams.append('q', '85');
   }
   
