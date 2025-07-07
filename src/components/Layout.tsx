@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { FaX } from 'react-icons/fa6';
 import TopNavigation from './TopNavigation';
@@ -50,17 +50,9 @@ export default function Layout({
   mobileSearchOpen,
   setMobileSearchOpen
 }: LayoutProps) {
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      {/* Shared Audio Element */}
-      <audio 
-        ref={audioRef} 
-        preload="none"
-        crossOrigin="anonymous"
-        controls={false}
-      />
       
       {/* Top Navigation (Desktop) */}
       <TopNavigation
@@ -124,9 +116,12 @@ export default function Layout({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto" style={{ 
-        paddingBottom: currentStation ? '8.5rem' : '4rem' 
-      }}>
+      <div 
+        className="flex-1 overflow-y-auto" 
+        style={{ 
+          paddingBottom: currentStation ? (window.innerWidth >= 1024 ? '5rem' : '8.5rem') : '4rem'
+        }}
+      >
         {children}
       </div>
 

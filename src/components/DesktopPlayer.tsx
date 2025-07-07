@@ -95,7 +95,7 @@ export default function DesktopPlayer({
   const VolumeIcon = getVolumeIcon();
 
   return (
-    <div className="hidden lg:flex items-center justify-between bg-white border-t border-gray-200 px-6 py-3">
+    <div className="hidden lg:flex fixed bottom-0 left-0 right-0 items-center justify-between bg-white border-t border-gray-200 px-6 py-3 z-30">
       {/* Station Info & Controls */}
       <div className="flex items-center gap-4 flex-1">
         {/* Station Logo */}
@@ -182,8 +182,13 @@ export default function DesktopPlayer({
       <div className="ml-6 flex-shrink-0">
         <AdBanner 
           adSlot="7491355430"
-          className="w-60 h-12"
-          style={{ minWidth: '240px', minHeight: '48px' }}
+          className="w-60"
+          style={{ 
+            width: '240px', 
+            height: '48px',
+            minHeight: '48px',
+            maxHeight: '48px'
+          }}
         />
       </div>
     </div>

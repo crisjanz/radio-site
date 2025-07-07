@@ -320,6 +320,14 @@ function App() {
 
   return (
     <>
+    {/* Audio Element */}
+    <audio 
+      ref={audioRef} 
+      preload="none"
+      crossOrigin="anonymous"
+      controls={false}
+    />
+    
     <Routes>
       <Route 
         path="/" 

@@ -33,11 +33,21 @@ const AdBanner: React.FC<AdBannerProps> = ({
   }, []);
 
   return (
-    <div className={`ad-container ${className}`} style={style}>
+    <div 
+      className={`ad-container ${className}`} 
+      style={{
+        minHeight: '50px',
+        maxHeight: '100px',
+        overflow: 'hidden',
+        ...style
+      }}
+    >
       <ins
         className="adsbygoogle"
         style={{
           display: 'block',
+          minHeight: '50px',
+          maxHeight: '100px',
           ...style
         }}
         data-ad-client="ca-pub-2704220713309204"
