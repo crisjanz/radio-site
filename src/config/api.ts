@@ -64,7 +64,7 @@ export const apiRequest = async (endpoint: string, options?: RequestInit) => {
 
 // Helper function to get favicon URL - handle both local and external URLs
 // Priority: local_image_url -> logo -> favicon
-export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: string; local_image_url?: string }, options?: { width?: number; height?: number; quality?: number }) => {
+export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: string; local_image_url?: string }, options?: { width?: number; height?: number; quality?: number; cacheBust?: boolean }) => {
   // Use priority: local_image_url -> logo -> favicon
   const imageUrl = station.local_image_url || station.logo || station.favicon;
   
@@ -79,6 +79,10 @@ export const getFaviconUrl = (station: { id: number; favicon?: string; logo?: st
   
   // If it's a Supabase URL, return as-is (no proxy needed - already fast)
   if (imageUrl.includes('supabase.co')) {
+    // Add cache busting if requested (for when images are updated)
+    if (options?.cacheBust) {
+      return `${imageUrl}?t=${Date.now()}`;
+    }
     return imageUrl;
   }
   

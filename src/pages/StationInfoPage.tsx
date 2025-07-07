@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { API_CONFIG } from '../config/api';
+import { API_CONFIG, getFaviconUrl } from '../config/api';
 // import AdBanner from '../components/AdBanner';
 import { 
   FaPlay, 
@@ -138,9 +138,9 @@ export default function StationInfoPage({
             {/* Left Column - Station Header */}
             <div className="bg-white rounded-xl p-6 text-center">
               <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
-                {station.favicon && station.favicon.trim() !== '' ? (
+                {getFaviconUrl(station, { width: 128, height: 128, quality: 90, cacheBust: true }) ? (
                   <img
-                    src={station.favicon}
+                    src={getFaviconUrl(station, { width: 128, height: 128, quality: 90, cacheBust: true })!}
                     alt={station.name}
                     className="max-w-full max-h-full object-contain"
                   />

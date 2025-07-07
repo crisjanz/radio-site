@@ -80,9 +80,9 @@ export default function MobilePlayer({
         <div className="flex items-center px-4 py-3">
           {/* Station Logo */}
           <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 mr-3">
-            {getFaviconUrl(station, { width: 40, height: 40, quality: 90 }) ? (
+            {getFaviconUrl(station, { width: 40, height: 40, quality: 90, cacheBust: true }) ? (
               <img
-                src={getFaviconUrl(station, { width: 40, height: 40, quality: 90 })!}
+                src={getFaviconUrl(station, { width: 40, height: 40, quality: 90, cacheBust: true })!}
                 alt={`${station.name} logo`}
                 className="w-full h-full object-fill"
                 style={{ width: '100%', height: '100%' }}
@@ -96,7 +96,7 @@ export default function MobilePlayer({
                 }}
               />
             ) : null}
-            <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${getFaviconUrl(station, { width: 40, height: 40, quality: 90 }) ? 'hidden' : ''}`}>
+            <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${getFaviconUrl(station, { width: 40, height: 40, quality: 90, cacheBust: true }) ? 'hidden' : ''}`}>
               <img src="/streemr-play.png" alt="Streemr" className="w-16 h-16 object-contain" />
             </div>
           </div>

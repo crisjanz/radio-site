@@ -32,8 +32,8 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
   useEffect(() => {
     if (!currentStation) return;
 
-    // Set station logo using priority logic with optimization
-    setStationLogo(getFaviconUrl(currentStation, { width: 48, height: 48, quality: 90 }));
+    // Set station logo using priority logic with optimization and cache busting
+    setStationLogo(getFaviconUrl(currentStation, { width: 48, height: 48, quality: 90, cacheBust: true }));
     setLogoError(false);
     
     // Reset metadata state
