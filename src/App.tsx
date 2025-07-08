@@ -6,9 +6,7 @@ import { favoritesService } from './services/favorites';
 import { analytics } from './utils/analytics';
 // import AdBanner from './components/AdBanner';
 import Layout from './components/Layout';
-import AdminPage from "./pages/AdminPage";
 import StationInfoPage from "./pages/StationInfoPage";
-import StationScrapePage from "./pages/StationScrapePage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import SubmitStationPage from "./pages/SubmitStationPage";
@@ -17,8 +15,6 @@ import HomeContent from "./components/HomeContent";
 import StationMap from "./components/StationMap";
 import BrowseAllContent from "./components/BrowseAllContent";
 import FavoritesContent from "./components/FavoritesContent";
-import StationNormalizationPage from "./pages/StationNormalizationPage";
-import HealthCheckPage from "./pages/HealthCheckPage";
 import LoginModal from "./components/LoginModal";
 import type { Station } from "./types/Station";
 
@@ -365,22 +361,6 @@ function App() {
             {renderTabContent()}
           </Layout>
         } 
-      />
-      <Route 
-        path="/admin" 
-        element={<AdminPage />} 
-      />
-      <Route 
-        path="/admin/normalize" 
-        element={<StationNormalizationPage />} 
-      />
-      <Route 
-        path="/admin/health" 
-        element={<HealthCheckPage />} 
-      />
-      <Route 
-        path="/scrape" 
-        element={<StationScrapePage />} 
       />
       <Route 
         path="/privacy-policy" 

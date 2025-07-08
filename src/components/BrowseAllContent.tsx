@@ -437,7 +437,7 @@ export default function BrowseAllContent({
       </div>
 
       {/* Stations Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:flex md:flex-wrap md:gap-4">
         {displayStations.map((station) => (
           <StationCard 
             key={station.id} 
@@ -610,11 +610,11 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
   };
   return (
     <div 
-      className="group cursor-pointer"
+      className="group cursor-pointer md:w-64"
       onClick={onPlay}
     >
       {/* Icon */}
-      <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+      <div className="aspect-square md:w-64 md:h-64 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
         {getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? (
           <img
             src={getFaviconUrl(station, { width: 256, height: 256, quality: 85 })!}
