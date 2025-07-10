@@ -43,7 +43,7 @@ export default function MobilePlayer({
       
       try {
         setIsRequestingMetadata(true);
-        const metadata = await fetchStreamMetadata(station.streamUrl);
+        const metadata = await fetchStreamMetadata(station.id);
         
         setMetadataChecked(true);
         

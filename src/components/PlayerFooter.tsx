@@ -50,7 +50,7 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
       try {
         setIsRequestingMetadata(true);
         console.log('🎵 Fetching metadata for:', currentStation.name);
-        const metadata = await fetchStreamMetadata(currentStation.streamUrl);
+        const metadata = await fetchStreamMetadata(currentStation.id);
         console.log('🎵 Metadata response:', metadata);
         
         setMetadataChecked(true);

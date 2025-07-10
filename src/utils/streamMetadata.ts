@@ -1,4 +1,4 @@
-import { buildApiUrl, API_CONFIG } from '../config/api';
+import { buildApiUrl } from '../config/api';
 
 // Utility to fetch stream metadata
 interface StreamMetadata {
@@ -13,36 +13,38 @@ interface StreamMetadata {
 const activeMetadataRequests = new Map<string, Promise<StreamMetadata | null>>();
 const REQUEST_DEDUPE_DURATION = 30000; // 30 seconds
 
-// Try to fetch metadata from backend proxy endpoint
-export const fetchStreamMetadata = async (streamUrl: string): Promise<StreamMetadata | null> => {
-  // Check if we already have an active request for this stream
-  const existingRequest = activeMetadataRequests.get(streamUrl);
+// Try to fetch metadata from backend using station ID
+export const fetchStreamMetadata = async (stationId: number): Promise<StreamMetadata | null> => {
+  const stationKey = `station-${stationId}`;
+  
+  // Check if we already have an active request for this station
+  const existingRequest = activeMetadataRequests.get(stationKey);
   if (existingRequest) {
-    console.log('🔄 Reusing active frontend metadata request for stream');
+    console.log('🔄 Reusing active frontend metadata request for station', stationId);
     return existingRequest;
   }
   
   // Create new request and track it
-  const requestPromise = performMetadataRequest(streamUrl);
-  activeMetadataRequests.set(streamUrl, requestPromise);
+  const requestPromise = performMetadataRequest(stationId);
+  activeMetadataRequests.set(stationKey, requestPromise);
   
   // Clean up tracking after completion
   requestPromise.finally(() => {
     setTimeout(() => {
-      activeMetadataRequests.delete(streamUrl);
+      activeMetadataRequests.delete(stationKey);
     }, REQUEST_DEDUPE_DURATION);
   });
   
   return requestPromise;
 };
 
-// Actual metadata request implementation
-const performMetadataRequest = async (streamUrl: string): Promise<StreamMetadata | null> => {
+// Actual metadata request implementation using station ID
+const performMetadataRequest = async (stationId: number): Promise<StreamMetadata | null> => {
   try {
-    console.log('📡 Calling backend metadata API for:', streamUrl);
+    console.log('📡 Calling backend metadata API for station:', stationId);
     
-    // First, try to get metadata from your backend if it provides it
-    const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.METADATA, { stream: streamUrl }), {
+    // Use station ID-based endpoint
+    const response = await fetch(buildApiUrl(`/metadata/${stationId}`), {
       headers: {
         'Accept': 'application/json',
       },

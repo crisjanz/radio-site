@@ -44,8 +44,8 @@ export default function DesktopPlayer({
     // Fetch metadata
     const fetchMetadata = async () => {
       try {
-        console.log('🎵 Fetching metadata for:', station.name);
-        const metadata = await fetchStreamMetadata(station.streamUrl);
+        console.log('🎵 Fetching metadata for station:', station.id, station.name);
+        const metadata = await fetchStreamMetadata(station.id);
         console.log('🎵 Metadata response:', metadata);
         
         setMetadataChecked(true);
