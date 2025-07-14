@@ -15,7 +15,7 @@ export const API_CONFIG = {
     const url = import.meta.env.VITE_METADATA_URL || (
       isLocalDevelopment 
         ? 'http://localhost:3002'           // Local development
-        : 'http://streemr.ddns.net:3002'    // Production
+        : 'https://streemr.ddns.net:3002'   // Production with HTTPS
     );
     console.log(`🔗 Metadata server URL: ${url} (${isLocalDevelopment ? 'local' : 'production'} mode)`);
     return url;
