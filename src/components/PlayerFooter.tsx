@@ -74,7 +74,7 @@ const PlayerFooter: React.FC<PlayerFooterProps> = ({ currentStation }) => {
     fetchMetadata();
 
     // Poll for metadata updates every 60 seconds (reduced to minimize backend calls)
-    const metadataInterval = setInterval(fetchMetadata, 60000);
+    const metadataInterval = setInterval(fetchMetadata, 10000); // 10 seconds for faster updates
 
     return () => {
       clearInterval(metadataInterval);

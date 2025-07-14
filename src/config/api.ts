@@ -1,7 +1,25 @@
+// Environment detection
+const isLocalDevelopment = 
+  import.meta.env.DEV || 
+  window.location.hostname === 'localhost' || 
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname.includes('local');
+
 // API Configuration
 export const API_CONFIG = {
-  // Use environment variable if available, otherwise use production URL
+  // Core API (stations, users, admin) - reliable Render server
   BASE_URL: import.meta.env.VITE_API_URL || 'https://streemr-back.onrender.com',
+  
+  // Enhanced metadata server - environment dependent
+  METADATA_URL: (() => {
+    const url = import.meta.env.VITE_METADATA_URL || (
+      isLocalDevelopment 
+        ? 'http://localhost:3002'           // Local development
+        : 'http://streemr.ddns.net:3002'    // Production
+    );
+    console.log(`🔗 Metadata server URL: ${url} (${isLocalDevelopment ? 'local' : 'production'} mode)`);
+    return url;
+  })(),
   
   // Timeout for API requests (in milliseconds)
   TIMEOUT: 10000,
@@ -22,13 +40,20 @@ export const API_CONFIG = {
 
 // Helper function to build full API URLs
 export const buildApiUrl = (endpoint: string, params?: Record<string, string>) => {
-  const url = new URL(endpoint, API_CONFIG.BASE_URL);
+  // Route metadata requests to local metadata server
+  const baseUrl = endpoint.startsWith('/metadata') ? API_CONFIG.METADATA_URL : API_CONFIG.BASE_URL;
+  const url = new URL(endpoint, baseUrl);
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       url.searchParams.append(key, value);
     });
   }
   return url.toString();
+};
+
+// Helper function specifically for metadata URLs with graceful fallback
+export const buildMetadataUrl = (stationId: string) => {
+  return `${API_CONFIG.METADATA_URL}/metadata/${stationId}`;
 };
 
 // Helper function for API requests with error handling

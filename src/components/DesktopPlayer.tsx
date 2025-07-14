@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio } from 'react-icons/fa6';
 import { FaVolumeUp, FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
 import type { Station } from '../types/Station';
-import { fetchStreamMetadata } from '../utils/streamMetadata';
+import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
 // import AdBanner from './AdBanner';
 
 interface DesktopPlayerProps {
@@ -27,18 +27,21 @@ export default function DesktopPlayer({
   onToggleMute
 }: DesktopPlayerProps) {
   const [currentSong, setCurrentSong] = useState<string | null>(null);
+  const [currentArtwork, setCurrentArtwork] = useState<string | null>(null);
   const [metadataChecked, setMetadataChecked] = useState(false);
 
   // Fetch metadata when station changes or starts playing
   useEffect(() => {
     if (!station || !isPlaying) {
       setCurrentSong(null);
+      setCurrentArtwork(null);
       setMetadataChecked(false);
       return;
     }
 
     // Reset metadata state for new station
     setCurrentSong(null);
+    setCurrentArtwork(null);
     setMetadataChecked(false);
 
     // Fetch metadata
@@ -53,17 +56,29 @@ export default function DesktopPlayer({
         if (metadata?.song || metadata?.title) {
           console.log('🎵 Setting current song:', metadata.song || metadata.title);
           setCurrentSong(metadata.song || metadata.title || null);
+          
+          // Set artwork if available
+          if (metadata.artwork) {
+            const artworkUrl = getBestArtwork(metadata.artwork, 'medium');
+            console.log('🎨 Setting current artwork:', artworkUrl);
+            setCurrentArtwork(artworkUrl);
+          } else {
+            setCurrentArtwork(null);
+          }
         } else if (metadata?.hasMetadataSupport) {
           console.log('🎵 Stream supports metadata but no current song');
           setCurrentSong('METADATA_SUPPORTED'); // Special marker for metadata support
+          setCurrentArtwork(null);
         } else {
           console.log('🎵 No song data in metadata response');
           setCurrentSong(null);
+          setCurrentArtwork(null);
         }
       } catch (error) {
         console.debug('Failed to fetch metadata:', error);
         setMetadataChecked(true);
         setCurrentSong(null);
+        setCurrentArtwork(null);
       }
     };
 
@@ -74,7 +89,7 @@ export default function DesktopPlayer({
       if (isPlaying) {
         fetchMetadata();
       }
-    }, 30000);
+    }, 10000); // 10 seconds for faster artwork updates
 
     return () => {
       clearInterval(metadataInterval);
@@ -98,25 +113,46 @@ export default function DesktopPlayer({
     <div className="hidden lg:flex fixed bottom-0 left-0 right-0 items-center justify-between bg-white border-t border-gray-200 px-6 py-3 z-30">
       {/* Station Info & Controls */}
       <div className="flex items-center gap-4 flex-1">
-        {/* Station Logo */}
-        <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+        {/* Station/Track Artwork */}
+        <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 relative">
+          {/* Track artwork (highest priority) */}
+          {currentArtwork ? (
+            <img
+              src={currentArtwork}
+              alt="Track artwork"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+                // Show station logo fallback
+                const stationLogo = target.parentElement?.querySelector('.station-logo') as HTMLElement;
+                if (stationLogo) {
+                  stationLogo.classList.remove('hidden');
+                }
+              }}
+            />
+          ) : null}
+          
+          {/* Station logo (medium priority) */}
           {station.favicon ? (
             <img
               src={station.favicon}
               alt={`${station.name} logo`}
-              className="w-full h-full object-fill"
+              className={`station-logo w-full h-full object-fill ${currentArtwork ? 'hidden' : ''}`}
               style={{ width: '100%', height: '100%' }}
               onError={(e) => {
                 const target = e.currentTarget;
                 target.style.display = 'none';
-                const fallback = target.parentElement?.querySelector('.favicon-fallback') as HTMLElement;
+                const fallback = target.parentElement?.querySelector('.streemr-fallback') as HTMLElement;
                 if (fallback) {
                   fallback.classList.remove('hidden');
                 }
               }}
             />
           ) : null}
-          <div className={`favicon-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${station.favicon ? 'hidden' : ''}`}>
+          
+          {/* Streemr logo fallback (lowest priority) */}
+          <div className={`streemr-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${(currentArtwork || station.favicon) ? 'hidden' : ''}`}>
             <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
           </div>
         </div>

@@ -454,43 +454,6 @@ export default function StationInfoPage({
               </div>
             )}
 
-            {/* Metadata API */}
-            {(station.metadataApiType || station.metadataFormat || station.metadataFields) && (
-              <div className="bg-white rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Metadata API</h3>
-                <div className="space-y-4">
-                  {station.metadataApiType && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 text-gray-400 flex items-center justify-center text-xs font-bold">🔗</div>
-                      <div>
-                        <p className="font-medium text-gray-900">API Type</p>
-                        <p className="text-gray-600">{station.metadataApiType}</p>
-                      </div>
-                    </div>
-                  )}
-                  {station.metadataFormat && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 text-gray-400 flex items-center justify-center text-xs font-bold">📄</div>
-                      <div>
-                        <p className="font-medium text-gray-900">Format</p>
-                        <p className="text-gray-600">{station.metadataFormat}</p>
-                      </div>
-                    </div>
-                  )}
-                  {station.metadataFields && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 text-gray-400 flex items-center justify-center text-xs font-bold">🏷</div>
-                      <div>
-                        <p className="font-medium text-gray-900">Field Mappings</p>
-                        <pre className="text-gray-600 text-xs bg-gray-50 p-3 rounded-lg overflow-x-auto mt-1">
-                          {station.metadataFields}
-                        </pre>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         </div>
     </div>
