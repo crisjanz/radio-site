@@ -85,10 +85,15 @@ export default function BrowseAllContent({
     const fetchStations = async () => {
       setLoading(true);
       try {
+        const hasFiltersApplied = filters.country || filters.genre || filters.type || filters.quality;
+        
         let url;
         if (searchTerm.trim()) {
           // Use search endpoint if there's a search term
           url = `${API_BASE}/stations/search?q=${encodeURIComponent(searchTerm)}`;
+        } else if (hasFiltersApplied) {
+          // Get all stations for client-side filtering
+          url = `${API_BASE}/stations?limit=1000`; // Get enough stations for filtering
         } else {
           // Use regular stations endpoint with pagination
           url = `${API_BASE}/stations?page=${currentPage}&limit=${STATIONS_PER_PAGE}`;
@@ -97,6 +102,18 @@ export default function BrowseAllContent({
         const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
+          
+          console.log('🔍 Browse Debug:', {
+            url,
+            hasFiltersApplied,
+            searchTerm: searchTerm.trim(),
+            currentPage,
+            dataType: Array.isArray(data) ? 'array' : 'object',
+            dataStations: data.stations?.length || 'no stations property',
+            dataTotal: data.total || 'no total property',
+            dataLength: data.length || 'no length property'
+          });
+          
           if (searchTerm.trim()) {
             // Search returns an array directly
             setStations(data);
@@ -114,13 +131,15 @@ export default function BrowseAllContent({
       }
     };
 
-    // Reset to page 1 when search term or filters change
-    if ((searchTerm.trim() && currentPage !== 1) || (filters && currentPage !== 1)) {
+    fetchStations();
+  }, [currentPage, searchTerm, filters.sortBy, filters.country, filters.genre, filters.type, filters.quality]);
+  
+  // Reset to page 1 when filters change (separate effect to avoid infinite loops)
+  useEffect(() => {
+    if (currentPage !== 1) {
       setCurrentPage(1);
-    } else {
-      fetchStations();
     }
-  }, [currentPage, searchTerm, filters]);
+  }, [filters.country, filters.genre, filters.type, filters.quality]);
 
   // Get unique countries from stations data
   const getUniqueCountries = (stations: Station[]) => {
@@ -206,10 +225,42 @@ export default function BrowseAllContent({
 
   // Get filtered and sorted stations
   const filteredStations = !searchTerm.trim() ? getFilteredAndSortedStations(stations) : stations;
-  const displayStations = filteredStations;
-  const actualTotal = searchTerm.trim() ? totalStations : filteredStations.length;
   
-  const totalPages = searchTerm.trim() ? 1 : Math.ceil(actualTotal / STATIONS_PER_PAGE);
+  // Handle pagination for filtered results vs server-side pagination
+  const hasFiltersApplied = filters.country || filters.genre || filters.type || filters.quality;
+  
+  let displayStations, actualTotal, totalPages;
+  
+  if (searchTerm.trim()) {
+    // Search results - no pagination
+    displayStations = filteredStations;
+    actualTotal = totalStations;
+    totalPages = 1;
+  } else if (hasFiltersApplied) {
+    // Client-side filtering - paginate the filtered results
+    const startIndex = (currentPage - 1) * STATIONS_PER_PAGE;
+    const endIndex = startIndex + STATIONS_PER_PAGE;
+    displayStations = filteredStations.slice(startIndex, endIndex);
+    actualTotal = filteredStations.length;
+    totalPages = Math.ceil(actualTotal / STATIONS_PER_PAGE);
+  } else {
+    // No filters - server-side pagination
+    displayStations = stations;
+    actualTotal = totalStations;
+    totalPages = Math.ceil(actualTotal / STATIONS_PER_PAGE);
+  }
+  
+  console.log('📄 Pagination Debug:', {
+    searchTerm: searchTerm.trim(),
+    hasFiltersApplied,
+    totalPages,
+    actualTotal,
+    currentPage,
+    showPagination: !searchTerm.trim() && totalPages > 1,
+    stationsLength: stations.length,
+    displayStationsLength: displayStations.length
+  });
+  
   const showPagination = !searchTerm.trim() && totalPages > 1;
 
   const handleInfoClick = (e: React.MouseEvent, station: Station) => {
