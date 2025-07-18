@@ -4,6 +4,7 @@ import { FaX } from 'react-icons/fa6';
 import TopNavigation from './TopNavigation';
 import BottomNavigation from './BottomNavigation';
 import MobilePlayer from './MobilePlayer';
+import FullScreenPlayer from './FullScreenPlayer';
 import DesktopPlayer from './DesktopPlayer';
 import type { Station } from '../types/Station';
 import type { User } from '../services/auth';
@@ -28,6 +29,11 @@ interface LayoutProps {
   onToggleMute?: () => void;
   mobileSearchOpen: boolean;
   setMobileSearchOpen: (open: boolean) => void;
+  showFullScreenPlayer?: boolean;
+  onMinimizePlayer?: () => void;
+  onExpandPlayer?: () => void;
+  favorites?: Station[];
+  onToggleFavorite?: (station: Station) => void;
 }
 
 export default function Layout({
@@ -48,7 +54,12 @@ export default function Layout({
   onVolumeChange,
   onToggleMute,
   mobileSearchOpen,
-  setMobileSearchOpen
+  setMobileSearchOpen,
+  showFullScreenPlayer = false,
+  onMinimizePlayer,
+  onExpandPlayer,
+  favorites = [],
+  onToggleFavorite
 }: LayoutProps) {
   const bottomNavRef = useRef<HTMLDivElement>(null);
   const mobilePlayerRef = useRef<HTMLDivElement>(null);
@@ -214,8 +225,27 @@ export default function Layout({
         />
       )}
 
-      {/* Mobile Player */}
-      {currentStation && onPlayPause && onStationInfo && (
+      {/* Full-Screen Player (Mobile) */}
+      {showFullScreenPlayer && currentStation && onPlayPause && onStationInfo && onVolumeChange && onToggleMute && onMinimizePlayer && (
+        <FullScreenPlayer
+          station={currentStation}
+          isPlaying={isPlaying}
+          isLoading={isLoading}
+          volume={volume}
+          isMuted={isMuted}
+          onPlayPause={onPlayPause}
+          onMinimize={onMinimizePlayer}
+          onStationInfo={onStationInfo}
+          onVolumeChange={onVolumeChange}
+          onToggleMute={onToggleMute}
+          isFavorite={favorites.some(fav => fav.id === currentStation.id)}
+          onToggleFavorite={onToggleFavorite}
+          isLoggedIn={isLoggedIn}
+        />
+      )}
+
+      {/* Mobile Player (only show when not in full-screen mode) */}
+      {!showFullScreenPlayer && currentStation && onPlayPause && onStationInfo && (
         <div ref={mobilePlayerRef}>
           <MobilePlayer
             station={currentStation}
@@ -223,6 +253,7 @@ export default function Layout({
             isLoading={isLoading}
             onPlayPause={onPlayPause}
             onStationInfo={onStationInfo}
+            onExpand={onExpandPlayer}
           />
         </div>
       )}

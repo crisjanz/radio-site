@@ -22,10 +22,13 @@ export default function HomeContent({
   onToggleFavorite
 }: HomeContentProps) {
   
-  // Combined function to both play station and navigate to info page
+  // Handle station click - on mobile just play, on desktop play and show info
   const handleStationClick = (station: Station) => {
     onPlayStation(station);
-    onStationInfo?.(station);
+    // Only navigate to info page on desktop
+    if (window.innerWidth >= 1024) {
+      onStationInfo?.(station);
+    }
   };
   const [trendingStations, setTrendingStations] = useState<Station[]>([]);
   const [recentStations, setRecentStations] = useState<Station[]>([]);

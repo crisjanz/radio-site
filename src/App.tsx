@@ -33,6 +33,7 @@ function App() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [favorites, setFavorites] = useState<Station[]>([]);
+  const [showFullScreenPlayer, setShowFullScreenPlayer] = useState(false);
 
   // Initialize authentication and favorites
   useEffect(() => {
@@ -106,13 +107,22 @@ function App() {
   const handlePlayStation = useCallback((station: Station) => {
     if (currentStation && currentStation.id === station.id) {
       setIsPlaying(!isPlaying);
+      // If on mobile and not already showing full-screen player, show it
+      if (window.innerWidth < 1024 && !showFullScreenPlayer) {
+        setShowFullScreenPlayer(true);
+      }
     } else {
       setCurrentStation(station);
       setIsPlaying(true);
       
+      // Show full-screen player on mobile when a new station starts
+      if (window.innerWidth < 1024) {
+        setShowFullScreenPlayer(true);
+      }
+      
       analytics.trackStationPlay(station.name, station.country || 'unknown', station.genre || 'unknown');
     }
-  }, [currentStation, isPlaying]);
+  }, [currentStation, isPlaying, showFullScreenPlayer]);
 
   const handlePlayPause = useCallback(() => {
     setIsPlaying(!isPlaying);
@@ -195,7 +205,17 @@ function App() {
     setIsMuted(!isMuted);
   }, [isMuted]);
 
+  const handleMinimizePlayer = useCallback(() => {
+    setShowFullScreenPlayer(false);
+  }, []);
+
+  const handleExpandPlayer = useCallback(() => {
+    setShowFullScreenPlayer(true);
+  }, []);
+
   const handleStationInfo = useCallback((station: Station) => {
+    // Hide full-screen player when navigating to station info
+    setShowFullScreenPlayer(false);
     navigate(`/station/${station.id}/info`);
   }, [navigate]);
 
@@ -370,6 +390,11 @@ function App() {
             onToggleMute={handleToggleMute}
             mobileSearchOpen={mobileSearchOpen}
             setMobileSearchOpen={setMobileSearchOpen}
+            showFullScreenPlayer={showFullScreenPlayer}
+            onMinimizePlayer={handleMinimizePlayer}
+            onExpandPlayer={handleExpandPlayer}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           >
             {renderTabContent()}
           </Layout>
@@ -397,6 +422,11 @@ function App() {
             onToggleMute={handleToggleMute}
             mobileSearchOpen={mobileSearchOpen}
             setMobileSearchOpen={setMobileSearchOpen}
+            showFullScreenPlayer={showFullScreenPlayer}
+            onMinimizePlayer={handleMinimizePlayer}
+            onExpandPlayer={handleExpandPlayer}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           >
             <PrivacyPolicyPage />
           </Layout>
@@ -424,6 +454,11 @@ function App() {
             onToggleMute={handleToggleMute}
             mobileSearchOpen={mobileSearchOpen}
             setMobileSearchOpen={setMobileSearchOpen}
+            showFullScreenPlayer={showFullScreenPlayer}
+            onMinimizePlayer={handleMinimizePlayer}
+            onExpandPlayer={handleExpandPlayer}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           >
             <TermsOfServicePage />
           </Layout>
@@ -451,6 +486,11 @@ function App() {
             onToggleMute={handleToggleMute}
             mobileSearchOpen={mobileSearchOpen}
             setMobileSearchOpen={setMobileSearchOpen}
+            showFullScreenPlayer={showFullScreenPlayer}
+            onMinimizePlayer={handleMinimizePlayer}
+            onExpandPlayer={handleExpandPlayer}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           >
             <SubmitStationPage />
           </Layout>
@@ -478,6 +518,11 @@ function App() {
             onToggleMute={handleToggleMute}
             mobileSearchOpen={mobileSearchOpen}
             setMobileSearchOpen={setMobileSearchOpen}
+            showFullScreenPlayer={showFullScreenPlayer}
+            onMinimizePlayer={handleMinimizePlayer}
+            onExpandPlayer={handleExpandPlayer}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           >
             <StationInfoPage 
               currentStation={currentStation}
@@ -509,6 +554,11 @@ function App() {
             onToggleMute={handleToggleMute}
             mobileSearchOpen={mobileSearchOpen}
             setMobileSearchOpen={setMobileSearchOpen}
+            showFullScreenPlayer={showFullScreenPlayer}
+            onMinimizePlayer={handleMinimizePlayer}
+            onExpandPlayer={handleExpandPlayer}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           >
             <StationInfoPage 
               currentStation={currentStation}
@@ -540,6 +590,11 @@ function App() {
             onToggleMute={handleToggleMute}
             mobileSearchOpen={mobileSearchOpen}
             setMobileSearchOpen={setMobileSearchOpen}
+            showFullScreenPlayer={showFullScreenPlayer}
+            onMinimizePlayer={handleMinimizePlayer}
+            onExpandPlayer={handleExpandPlayer}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           >
             <AboutPage />
           </Layout>

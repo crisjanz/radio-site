@@ -10,6 +10,7 @@ interface MobilePlayerProps {
   isLoading?: boolean;
   onPlayPause: () => void;
   onStationInfo?: (station: Station) => void;
+  onExpand?: () => void;
 }
 
 export default function MobilePlayer({ 
@@ -17,7 +18,8 @@ export default function MobilePlayer({
   isPlaying, 
   isLoading = false,
   onPlayPause, 
-  onStationInfo 
+  onStationInfo,
+  onExpand
 }: MobilePlayerProps) {
   const [currentSong, setCurrentSong] = useState<string | null>(null);
   const [currentArtwork, setCurrentArtwork] = useState<string | null>(null);
@@ -137,7 +139,10 @@ export default function MobilePlayer({
           </div>
 
         {/* Station Info */}
-        <div className="flex-1 min-w-0 mr-3" onClick={() => onStationInfo?.(station)}>
+        <div 
+          className="flex-1 min-w-0 mr-3 cursor-pointer" 
+          onClick={() => onExpand ? onExpand() : onStationInfo?.(station)}
+        >
           <h3 className="text-sm font-medium text-gray-900 truncate">{station.name}</h3>
           
           {/* Current song/metadata info */}

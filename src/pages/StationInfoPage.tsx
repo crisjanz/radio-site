@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { API_CONFIG, getFaviconUrl } from '../config/api';
 // import AdBanner from '../components/AdBanner';
 import { 
-  FaPlay, 
-  FaPause, 
   FaMusic, 
   FaGlobe, 
   FaTags,
@@ -90,7 +88,6 @@ export default function StationInfoPage({
     );
   }
 
-  const isCurrentlyPlaying = currentStation?.id === station.id && isPlaying;
 
   return (
     <div className="p-6 overflow-x-hidden">
@@ -142,7 +139,7 @@ export default function StationInfoPage({
                   <img
                     src={getFaviconUrl(station, { width: 512, height: 512, quality: 90, cacheBust: true })!}
                     alt={station.name}
-                    className="max-w-full max-h-full object-contain"
+                    className="max-w-full max-h-full object-contain rounded-xl"
                   />
                 ) : (
                   <img src="/streemr-play.png" alt="Streemr" className="w-16 h-16 object-contain" />
@@ -164,13 +161,6 @@ export default function StationInfoPage({
                 </button>
               )}
               
-              <button
-                onClick={() => onPlayStation(station)}
-                className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors mx-auto text-lg font-medium"
-              >
-                {isCurrentlyPlaying ? <FaPause /> : <FaPlay />}
-                {isCurrentlyPlaying ? 'Pause Station' : 'Play Station'}
-              </button>
               
               {/* About Content */}
               {station.description && (

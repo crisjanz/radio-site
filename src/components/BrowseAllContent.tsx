@@ -57,10 +57,13 @@ export default function BrowseAllContent({
   isLoggedIn = false
 }: BrowseAllContentProps) {
   
-  // Combined function to both play station and navigate to info page
+  // Handle station click - on mobile just play, on desktop play and show info
   const handleStationClick = (station: Station) => {
     onPlayStation(station);
-    onStationInfo?.(station);
+    // Only navigate to info page on desktop
+    if (window.innerWidth >= 1024) {
+      onStationInfo?.(station);
+    }
   };
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
