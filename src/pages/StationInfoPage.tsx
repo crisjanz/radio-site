@@ -33,9 +33,9 @@ interface StationInfoPageProps {
 }
 
 export default function StationInfoPage({ 
-  currentStation, 
-  isPlaying = false, 
-  onPlayStation 
+  currentStation: _currentStation, 
+  isPlaying: _isPlaying = false, 
+  onPlayStation: _onPlayStation 
 }: StationInfoPageProps) {
   const { id } = useParams();
   const navigate = useNavigate();
