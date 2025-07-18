@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { FaX } from 'react-icons/fa6';
 import TopNavigation from './TopNavigation';
@@ -50,6 +50,69 @@ export default function Layout({
   mobileSearchOpen,
   setMobileSearchOpen
 }: LayoutProps) {
+  const bottomNavRef = useRef<HTMLDivElement>(null);
+  const mobilePlayerRef = useRef<HTMLDivElement>(null);
+  const [bottomNavHeight, setBottomNavHeight] = useState(64); // Default fallback
+  const [mobilePlayerHeight, setMobilePlayerHeight] = useState(80); // Default fallback
+  const [isMobile, setIsMobile] = useState(true);
+
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Measure actual component heights
+  useEffect(() => {
+    const measureHeights = () => {
+      if (bottomNavRef.current) {
+        const height = bottomNavRef.current.getBoundingClientRect().height;
+        setBottomNavHeight(height);
+      }
+      if (mobilePlayerRef.current && currentStation) {
+        const height = mobilePlayerRef.current.getBoundingClientRect().height;
+        setMobilePlayerHeight(height);
+      }
+    };
+
+    // Initial measurement after a brief delay to ensure components are rendered
+    const timeoutId = setTimeout(measureHeights, 100);
+
+    // Create ResizeObserver to watch for size changes
+    const resizeObserver = new ResizeObserver(measureHeights);
+    
+    if (bottomNavRef.current) {
+      resizeObserver.observe(bottomNavRef.current);
+    }
+    if (mobilePlayerRef.current && currentStation) {
+      resizeObserver.observe(mobilePlayerRef.current);
+    }
+
+    // Also measure on window resize (fallback)
+    window.addEventListener('resize', measureHeights);
+
+    return () => {
+      clearTimeout(timeoutId);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', measureHeights);
+    };
+  }, [currentStation]); // Re-run when currentStation changes
+
+  // Calculate total bottom padding needed
+  const calculateBottomPadding = () => {
+    let totalPadding = bottomNavHeight;
+    if (currentStation) {
+      totalPadding += mobilePlayerHeight;
+    }
+    // Add 16px buffer for safety
+    return totalPadding + 16;
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
@@ -117,11 +180,12 @@ export default function Layout({
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className={`min-h-full ${
-          currentStation 
-            ? 'pb-[8rem] lg:pb-20' // Extra padding for mobile when player is active
-            : 'pb-20' // Standard padding for bottom nav + some extra
-        }`}>
+        <div 
+          className="min-h-full lg:pb-20"
+          style={{ 
+            paddingBottom: isMobile ? `${calculateBottomPadding()}px` : undefined 
+          }}
+        >
           {children}
         </div>
       </div>
@@ -142,20 +206,24 @@ export default function Layout({
 
       {/* Mobile Player */}
       {currentStation && onPlayPause && onStationInfo && (
-        <MobilePlayer
-          station={currentStation}
-          isPlaying={isPlaying}
-          isLoading={isLoading}
-          onPlayPause={onPlayPause}
-          onStationInfo={onStationInfo}
-        />
+        <div ref={mobilePlayerRef}>
+          <MobilePlayer
+            station={currentStation}
+            isPlaying={isPlaying}
+            isLoading={isLoading}
+            onPlayPause={onPlayPause}
+            onStationInfo={onStationInfo}
+          />
+        </div>
       )}
 
       {/* Bottom Navigation (Mobile) */}
-      <BottomNavigation
-        activeTab={activeTab}
-        onTabChange={onTabChange}
-      />
+      <div ref={bottomNavRef}>
+        <BottomNavigation
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+        />
+      </div>
     </div>
   );
 }
