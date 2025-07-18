@@ -505,7 +505,10 @@ export default function BrowseAllContent({
 
       {/* Mobile Filter Modal */}
       {showFilters && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-20 z-50 flex items-end">
+        <div 
+          className="lg:hidden fixed inset-0 z-50 flex items-end"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
+        >
           <div className="bg-white rounded-t-xl w-full max-h-[70vh] overflow-y-auto">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">Filters</h3>

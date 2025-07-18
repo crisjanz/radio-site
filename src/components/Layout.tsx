@@ -81,8 +81,8 @@ export default function Layout({
       }
     };
 
-    // Initial measurement after a brief delay to ensure components are rendered
-    const timeoutId = setTimeout(measureHeights, 100);
+    // Initial measurement immediately with fallbacks handling early renders
+    measureHeights();
 
     // Create ResizeObserver to watch for size changes
     const resizeObserver = new ResizeObserver(measureHeights);
@@ -98,7 +98,6 @@ export default function Layout({
     window.addEventListener('resize', measureHeights);
 
     return () => {
-      clearTimeout(timeoutId);
       resizeObserver.disconnect();
       window.removeEventListener('resize', measureHeights);
     };
@@ -106,16 +105,27 @@ export default function Layout({
 
   // Calculate total bottom padding needed
   const calculateBottomPadding = () => {
-    let totalPadding = bottomNavHeight;
+    let totalPadding = bottomNavHeight || 64; // Fallback for bottom nav
     if (currentStation) {
-      totalPadding += mobilePlayerHeight;
+      totalPadding += mobilePlayerHeight || 80; // Fallback for mobile player
     }
     // Add 16px buffer for safety
-    return totalPadding + 16;
+    const finalPadding = totalPadding + 16;
+    
+    // Debug logging to track what's happening
+    console.log('🔧 Layout Debug:', {
+      bottomNavHeight,
+      mobilePlayerHeight,
+      currentStation: !!currentStation,
+      finalPadding,
+      isMobile
+    });
+    
+    return finalPadding;
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-full bg-gray-50">
       
       {/* Top Navigation (Desktop) */}
       <TopNavigation
@@ -181,7 +191,7 @@ export default function Layout({
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
         <div 
-          className="min-h-full lg:pb-20"
+          className="lg:pb-20"
           style={{ 
             paddingBottom: isMobile ? `${calculateBottomPadding()}px` : undefined 
           }}
