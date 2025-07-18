@@ -122,6 +122,16 @@ export default function BrowseAllContent({
     }
   }, [currentPage, searchTerm, filters]);
 
+  // Get unique countries from stations data
+  const getUniqueCountries = (stations: Station[]) => {
+    const countries = [...new Set(stations.map(station => station.country))]
+      .filter(Boolean)
+      .sort();
+    return countries;
+  };
+
+  const uniqueCountries = getUniqueCountries(stations);
+
   // Apply client-side filtering and sorting
   const getFilteredAndSortedStations = (stations: Station[]) => {
     let filtered = [...stations];
@@ -200,7 +210,7 @@ export default function BrowseAllContent({
   const actualTotal = searchTerm.trim() ? totalStations : filteredStations.length;
   
   const totalPages = searchTerm.trim() ? 1 : Math.ceil(actualTotal / STATIONS_PER_PAGE);
-  const showPagination = !searchTerm.trim() && totalPages > 1 && !filters.country && !filters.genre && !filters.type && !filters.quality;
+  const showPagination = !searchTerm.trim() && totalPages > 1;
 
   const handleInfoClick = (e: React.MouseEvent, station: Station) => {
     e.stopPropagation();
@@ -283,12 +293,9 @@ export default function BrowseAllContent({
                   className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Countries</option>
-                  <option value="United States">United States</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                  <option value="Canada">Canada</option>
-                  <option value="Germany">Germany</option>
-                  <option value="France">France</option>
-                  <option value="Australia">Australia</option>
+                  {uniqueCountries.map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
                 </select>
               </div>
               
@@ -498,7 +505,7 @@ export default function BrowseAllContent({
 
       {/* Mobile Filter Modal */}
       {showFilters && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
+        <div className="lg:hidden fixed inset-0 bg-gray-500 bg-opacity-30 z-50 flex items-end">
           <div className="bg-white rounded-t-xl w-full max-h-[70vh] overflow-y-auto">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
@@ -519,12 +526,9 @@ export default function BrowseAllContent({
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Countries</option>
-                  <option value="United States">United States</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                  <option value="Canada">Canada</option>
-                  <option value="Germany">Germany</option>
-                  <option value="France">France</option>
-                  <option value="Australia">Australia</option>
+                  {uniqueCountries.map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
                 </select>
               </div>
               

@@ -93,7 +93,7 @@ export default function StationInfoPage({
   const isCurrentlyPlaying = currentStation?.id === station.id && isPlaying;
 
   return (
-    <div className="p-6">
+    <div className="p-6 overflow-x-hidden">
         <div className="max-w-4xl mx-auto">
           {/* Ad Banner - Top of page */}
           <div className="mb-6">
@@ -295,15 +295,15 @@ export default function StationInfoPage({
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact</h3>
                   <div className="space-y-4">
                     {station.homepage && (
-                      <div className="flex items-center gap-3">
-                        <FaGlobe className="text-gray-400" />
-                        <div>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FaGlobe className="text-gray-400 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="font-medium text-gray-900">Website</p>
                           <a 
                             href={station.homepage} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 underline"
+                            className="text-gray-600 hover:text-gray-800 break-all cursor-pointer transition-colors"
                           >
                             {station.homepage}
                           </a>
@@ -311,13 +311,13 @@ export default function StationInfoPage({
                       </div>
                     )}
                     {station.email && (
-                      <div className="flex items-center gap-3">
-                        <FaEnvelope className="text-gray-400" />
-                        <div>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FaEnvelope className="text-gray-400 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="font-medium text-gray-900">Email</p>
                           <a 
                             href={`mailto:${station.email}`}
-                            className="text-blue-600 hover:text-blue-700 underline"
+                            className="text-gray-600 hover:text-gray-800 break-all cursor-pointer transition-colors"
                           >
                             {station.email}
                           </a>
@@ -331,7 +331,7 @@ export default function StationInfoPage({
                           <p className="font-medium text-gray-900">Phone</p>
                           <a 
                             href={`tel:${station.phone}`}
-                            className="text-blue-600 hover:text-blue-700 underline"
+                            className="text-gray-600 hover:text-gray-800 cursor-pointer transition-colors"
                           >
                             {station.phone}
                           </a>
@@ -357,15 +357,15 @@ export default function StationInfoPage({
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Social Media</h3>
                   <div className="space-y-4">
                     {station.facebookUrl && (
-                      <div className="flex items-center gap-3">
-                        <FaFacebook className="text-blue-600" />
-                        <div>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FaFacebook className="text-blue-600 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="font-medium text-gray-900">Facebook</p>
                           <a 
                             href={station.facebookUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 underline"
+                            className="text-gray-600 hover:text-gray-800 break-all cursor-pointer transition-colors"
                           >
                             {station.facebookUrl}
                           </a>
@@ -373,15 +373,15 @@ export default function StationInfoPage({
                       </div>
                     )}
                     {station.twitterUrl && (
-                      <div className="flex items-center gap-3">
-                        <FaTwitter className="text-blue-400" />
-                        <div>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FaTwitter className="text-blue-400 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="font-medium text-gray-900">Twitter</p>
                           <a 
                             href={station.twitterUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 underline"
+                            className="text-gray-600 hover:text-gray-800 break-all cursor-pointer transition-colors"
                           >
                             {station.twitterUrl}
                           </a>
@@ -389,15 +389,15 @@ export default function StationInfoPage({
                       </div>
                     )}
                     {station.instagramUrl && (
-                      <div className="flex items-center gap-3">
-                        <FaInstagram className="text-pink-500" />
-                        <div>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FaInstagram className="text-pink-500 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="font-medium text-gray-900">Instagram</p>
                           <a 
                             href={station.instagramUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 underline"
+                            className="text-gray-600 hover:text-gray-800 break-all cursor-pointer transition-colors"
                           >
                             {station.instagramUrl}
                           </a>
@@ -405,15 +405,15 @@ export default function StationInfoPage({
                       </div>
                     )}
                     {station.youtubeUrl && (
-                      <div className="flex items-center gap-3">
-                        <FaYoutube className="text-red-500" />
-                        <div>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FaYoutube className="text-red-500 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="font-medium text-gray-900">YouTube</p>
                           <a 
                             href={station.youtubeUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 underline"
+                            className="text-gray-600 hover:text-gray-800 break-all cursor-pointer transition-colors"
                           >
                             {station.youtubeUrl}
                           </a>

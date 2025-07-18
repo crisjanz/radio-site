@@ -126,7 +126,20 @@ function App() {
     }
     
     analytics.trackPageView(tab);
-  }, [navigate, currentStation, isPlaying]);
+  }, [navigate]);
+
+  const handleSearchChange = useCallback((term: string) => {
+    setSearchTerm(term);
+    
+    // If user starts typing a search term, automatically switch to browse tab
+    if (term.trim() && activeTab !== 'browse') {
+      setActiveTab('browse');
+      // Navigate to home if we're on any page other than home
+      if (window.location.pathname !== '/') {
+        navigate('/');
+      }
+    }
+  }, [activeTab, navigate]);
 
   const handleLogin = useCallback(() => {
     if (user) {
@@ -225,12 +238,12 @@ function App() {
       case 'favorites':
         if (!user) {
           return (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4 text-red-500"><FaHeart /></div>
+            <div className="text-center py-12 px-6">
+              <div className="text-6xl mb-4 text-red-500 flex justify-center"><FaHeart /></div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Your Favorites
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
                 Sign in to save your favorite stations and sync them across devices.
               </p>
               <button 
@@ -342,7 +355,7 @@ function App() {
             activeTab={activeTab}
             searchTerm={searchTerm}
             onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             onLogin={handleLogin}
             isLoggedIn={!!user}
             user={user}
@@ -369,7 +382,7 @@ function App() {
             activeTab="more"
             searchTerm={searchTerm}
             onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             onLogin={handleLogin}
             isLoggedIn={!!user}
             user={user}
@@ -396,7 +409,7 @@ function App() {
             activeTab="more"
             searchTerm={searchTerm}
             onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             onLogin={handleLogin}
             isLoggedIn={!!user}
             user={user}
@@ -423,7 +436,7 @@ function App() {
             activeTab="more"
             searchTerm={searchTerm}
             onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             onLogin={handleLogin}
             isLoggedIn={!!user}
             user={user}
@@ -450,7 +463,7 @@ function App() {
             activeTab="home"
             searchTerm={searchTerm}
             onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             onLogin={handleLogin}
             isLoggedIn={!!user}
             user={user}
@@ -481,7 +494,7 @@ function App() {
             activeTab="home"
             searchTerm={searchTerm}
             onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             onLogin={handleLogin}
             isLoggedIn={!!user}
             user={user}
@@ -512,7 +525,7 @@ function App() {
             activeTab="more"
             searchTerm={searchTerm}
             onTabChange={handleTabChange}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             onLogin={handleLogin}
             isLoggedIn={!!user}
             user={user}

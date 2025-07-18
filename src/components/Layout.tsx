@@ -116,13 +116,14 @@ export default function Layout({
       </div>
 
       {/* Main Content */}
-      <div 
-        className="flex-1 overflow-y-auto" 
-        style={{ 
-          paddingBottom: currentStation ? (window.innerWidth >= 1024 ? '5rem' : '8.5rem') : '4rem'
-        }}
-      >
-        {children}
+      <div className="flex-1 overflow-y-auto">
+        <div className={`min-h-full ${
+          currentStation 
+            ? 'pb-[8rem] lg:pb-20' // Extra padding for mobile when player is active
+            : 'pb-20' // Standard padding for bottom nav + some extra
+        }`}>
+          {children}
+        </div>
       </div>
 
       {/* Desktop Player (when playing) */}
