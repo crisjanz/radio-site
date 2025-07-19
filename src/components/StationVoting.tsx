@@ -21,7 +21,6 @@ export default function StationVoting({
 }: StationVotingProps) {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   const handleThumbsUp = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -47,10 +46,8 @@ export default function StationVoting({
     setIsSubmitting(true);
     try {
       await submitFeedback(station.id, feedback);
-      setFeedbackSubmitted(true);
       setTimeout(() => {
         setShowFeedbackModal(false);
-        setFeedbackSubmitted(false);
       }, 1500);
     } catch (error) {
       console.error('Failed to submit feedback:', error);

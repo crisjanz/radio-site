@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaPlay, FaStop, FaSpinner, FaChevronDown, FaHeart, FaRegHeart, FaInfo, FaVolumeHigh, FaVolumeLow, FaVolumeOff, FaMusic, FaRadio, FaThumbsUp, FaThumbsDown } from 'react-icons/fa6';
+import { FaPlay, FaStop, FaSpinner, FaChevronDown, FaHeart, FaRegHeart, FaVolumeHigh, FaVolumeLow, FaVolumeOff, FaMusic, FaRadio, FaThumbsUp, FaThumbsDown } from 'react-icons/fa6';
 import FeedbackModal from './FeedbackModal';
-import { submitFeedback, submitFavoriteVote } from '../utils/feedbackApi';
+import { submitFeedback } from '../utils/feedbackApi';
 import { getFaviconUrl } from '../config/api';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
 import type { Station } from '../types/Station';
