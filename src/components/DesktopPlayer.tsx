@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio } from 'react-icons/fa6';
+import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio, FaThumbsUp, FaThumbsDown } from 'react-icons/fa6';
 import { FaVolumeUp, FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
+import FeedbackModal from './FeedbackModal';
+import { submitFeedback } from '../utils/feedbackApi';
 import type { Station } from '../types/Station';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
 // import AdBanner from './AdBanner';
@@ -29,6 +31,10 @@ export default function DesktopPlayer({
   const [currentSong, setCurrentSong] = useState<string | null>(null);
   const [currentArtwork, setCurrentArtwork] = useState<string | null>(null);
   const [metadataChecked, setMetadataChecked] = useState(false);
+  
+  // Feedback system state
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
   // Fetch metadata when station changes or starts playing
   useEffect(() => {
@@ -108,6 +114,34 @@ export default function DesktopPlayer({
   };
 
   const VolumeIcon = getVolumeIcon();
+
+  const handleThumbsUp = async () => {
+    try {
+      setIsSubmittingFeedback(true);
+      await submitFeedback(station.id, { type: 'great_station' });
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
+
+  const handleThumbsDown = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const handleFeedbackSubmit = async (feedback: { type: string; details?: string }) => {
+    setIsSubmittingFeedback(true);
+    try {
+      await submitFeedback(station.id, feedback);
+      setShowFeedbackModal(false);
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      alert('Failed to submit feedback. Please try again.');
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
 
   return (
     <div className="hidden lg:flex fixed bottom-0 left-0 right-0 items-center justify-between bg-white border-t border-gray-200 px-6 py-3 z-30">
@@ -212,6 +246,29 @@ export default function DesktopPlayer({
             className="w-20 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
+
+        {/* Station Feedback */}
+        <div className="flex items-center gap-2 ml-4">
+          <button
+            onClick={handleThumbsUp}
+            disabled={isSubmittingFeedback}
+            className="flex items-center gap-1 px-3 py-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 text-xs"
+            title="Great station"
+          >
+            <FaThumbsUp className="text-xs" />
+            <span>Great</span>
+          </button>
+          
+          <button
+            onClick={handleThumbsDown}
+            disabled={isSubmittingFeedback}
+            className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 text-xs"
+            title="Report issue"
+          >
+            <FaThumbsDown className="text-xs" />
+            <span>Report</span>
+          </button>
+        </div>
       </div>
 
       {/* Ad Banner - Desktop Player */}
@@ -231,6 +288,15 @@ export default function DesktopPlayer({
       >
         Desktop Ad Space
       </div>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        onSubmit={handleFeedbackSubmit}
+        stationName={station.name}
+        isSubmitting={isSubmittingFeedback}
+      />
     </div>
   );
 }

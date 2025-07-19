@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import { FaHeart } from 'react-icons/fa6';
 import { authService, type User } from './services/auth';
 import { favoritesService } from './services/favorites';
+import { submitFavoriteVote } from './utils/feedbackApi';
 import { analytics } from './utils/analytics';
 // import AdBanner from './components/AdBanner';
 import Layout from './components/Layout';
@@ -194,6 +195,11 @@ function App() {
     
     const action = result.favorites.some(f => f.id === station.id) ? 'add' : 'remove';
     analytics.trackStationFavorite(station.name, station.country || 'unknown', action);
+    
+    // Auto-submit positive vote when adding to favorites
+    if (action === 'add') {
+      submitFavoriteVote(station.id);
+    }
   }, [user]);
 
   const handleVolumeChange = useCallback((newVolume: number) => {

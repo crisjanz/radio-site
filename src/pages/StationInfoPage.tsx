@@ -18,8 +18,12 @@ import {
   FaLanguage,
   FaRadio,
   FaGaugeHigh,
-  FaGear
+  FaGear,
+  FaThumbsUp,
+  FaThumbsDown
 } from 'react-icons/fa6';
+import FeedbackModal from '../components/FeedbackModal';
+import { submitFeedback } from '../utils/feedbackApi';
 import { 
   FaMapMarkerAlt,
   FaCalendarAlt
@@ -41,8 +45,43 @@ export default function StationInfoPage({
   const navigate = useNavigate();
   const [station, setStation] = useState<Station | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Feedback system state  
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
   const API_BASE = API_CONFIG.BASE_URL;
+
+  const handleThumbsUp = async () => {
+    if (!station) return;
+    try {
+      setIsSubmittingFeedback(true);
+      await submitFeedback(station.id, { type: 'great_station' });
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      alert('Failed to submit feedback. Please try again.');
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
+
+  const handleThumbsDown = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const handleFeedbackSubmit = async (feedback: { type: string; details?: string }) => {
+    if (!station) return;
+    setIsSubmittingFeedback(true);
+    try {
+      await submitFeedback(station.id, feedback);
+      setShowFeedbackModal(false);
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      alert('Failed to submit feedback. Please try again.');
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
 
   useEffect(() => {
     const fetchStation = async () => {
@@ -161,6 +200,30 @@ export default function StationInfoPage({
                 </button>
               )}
               
+              {/* Station Feedback */}
+              <div className="mt-6">
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    onClick={handleThumbsUp}
+                    disabled={isSubmittingFeedback}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 rounded-lg transition-colors disabled:opacity-50"
+                    title="Great station"
+                  >
+                    <FaThumbsUp className="text-sm" />
+                    <span className="text-sm font-medium">Great Station</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleThumbsDown}
+                    disabled={isSubmittingFeedback}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors disabled:opacity-50"
+                    title="Report issue"
+                  >
+                    <FaThumbsDown className="text-sm" />
+                    <span className="text-sm font-medium">Report Issue</span>
+                  </button>
+                </div>
+              </div>
               
               {/* About Content */}
               {station.description && (
@@ -446,6 +509,17 @@ export default function StationInfoPage({
 
           </div>
         </div>
+
+        {/* Feedback Modal */}
+        {station && (
+          <FeedbackModal
+            isOpen={showFeedbackModal}
+            onClose={() => setShowFeedbackModal(false)}
+            onSubmit={handleFeedbackSubmit}
+            stationName={station.name}
+            isSubmitting={isSubmittingFeedback}
+          />
+        )}
     </div>
   );
 }

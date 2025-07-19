@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaPlay, FaStop, FaSpinner, FaChevronDown, FaHeart, FaRegHeart, FaInfo, FaVolumeHigh, FaVolumeLow, FaVolumeOff, FaMusic, FaRadio } from 'react-icons/fa6';
+import { FaPlay, FaStop, FaSpinner, FaChevronDown, FaHeart, FaRegHeart, FaInfo, FaVolumeHigh, FaVolumeLow, FaVolumeOff, FaMusic, FaRadio, FaThumbsUp, FaThumbsDown } from 'react-icons/fa6';
+import FeedbackModal from './FeedbackModal';
+import { submitFeedback, submitFavoriteVote } from '../utils/feedbackApi';
 import { getFaviconUrl } from '../config/api';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
 import type { Station } from '../types/Station';
@@ -43,6 +45,10 @@ export default function FullScreenPlayer({
   const [showScrolling, setShowScrolling] = useState(false);
   const trackTextRef = useRef<HTMLHeadingElement>(null);
   const trackContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Feedback system state
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
   // Fetch metadata when station changes or starts playing
   useEffect(() => {
@@ -147,6 +153,40 @@ export default function FullScreenPlayer({
     }
   };
 
+  const handleThumbsUp = async () => {
+    if (isLoggedIn && onToggleFavorite && !isFavorite) {
+      // For logged-in users, thumbs up = add to favorites (which auto-votes)
+      onToggleFavorite(station);
+    } else if (!isLoggedIn) {
+      // For anonymous users, show feedback modal with positive feedback
+      try {
+        setIsSubmittingFeedback(true);
+        await submitFeedback(station.id, { type: 'great_station' });
+      } catch (error) {
+        console.error('Failed to submit feedback:', error);
+      } finally {
+        setIsSubmittingFeedback(false);
+      }
+    }
+  };
+
+  const handleThumbsDown = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const handleFeedbackSubmit = async (feedback: { type: string; details?: string }) => {
+    setIsSubmittingFeedback(true);
+    try {
+      await submitFeedback(station.id, feedback);
+      setShowFeedbackModal(false);
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      alert('Failed to submit feedback. Please try again.');
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
+
   const getVolumeIcon = () => {
     if (isMuted || volume === 0) return FaVolumeOff;
     if (volume < 50) return FaVolumeLow;
@@ -176,14 +216,14 @@ export default function FullScreenPlayer({
       </style>
       <div className="lg:hidden fixed inset-0 bg-white z-50 flex flex-col animate-in slide-in-from-bottom duration-300">
       {/* Header */}
-      <div className="flex items-center p-4 border-b border-gray-100 relative">
+      <div className="flex items-center p-4 border-b border-gray-100 relative z-10">
         {/* Left spacer */}
         <div className="flex-1"></div>
         
         {/* Centered minimize button */}
         <button 
           onClick={onMinimize}
-          className="text-center flex flex-col items-center p-2 hover:text-gray-600 transition-colors absolute left-1/2 transform -translate-x-1/2"
+          className="text-center flex flex-col items-center p-2 hover:text-gray-600 transition-colors absolute left-1/2 transform -translate-x-1/2 z-20"
         >
           <FaChevronDown className="text-gray-400 text-sm" />
           <FaChevronDown className="text-gray-400 text-sm -mt-1" />
@@ -194,7 +234,7 @@ export default function FullScreenPlayer({
           {isLoggedIn && onToggleFavorite && (
             <button
               onClick={handleFavoriteClick}
-              className="p-2 text-red-500 hover:text-red-600 transition-colors"
+              className="p-2 text-red-500 hover:text-red-600 transition-colors z-20 relative"
             >
               {isFavorite ? <FaHeart className="text-lg" /> : <FaRegHeart className="text-lg" />}
             </button>
@@ -203,7 +243,7 @@ export default function FullScreenPlayer({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col px-8 py-6 min-h-0">
+      <div className="flex-1 flex flex-col px-8 py-6 min-h-0 relative z-0">
         {/* Station/Track Artwork */}
         <div className="w-80 h-80 mx-auto mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg relative flex-shrink-0">
           {/* Track artwork (highest priority) */}
@@ -251,7 +291,7 @@ export default function FullScreenPlayer({
                 </div>
                 <div 
                   ref={trackContainerRef}
-                  className="relative overflow-hidden max-w-[320px] mx-auto"
+                  className="relative overflow-hidden max-w-[320px] mx-auto z-0"
                 >
                   <h2 
                     ref={trackTextRef}
@@ -323,10 +363,21 @@ export default function FullScreenPlayer({
         </div>
 
         {/* Controls - Fixed position */}
-        <div className="flex items-center justify-center flex-shrink-0">
+        <div className="flex items-center justify-center gap-6 flex-shrink-0 relative z-10">
+          {/* Thumbs Up */}
+          <button
+            onClick={handleThumbsUp}
+            disabled={isSubmittingFeedback}
+            className="w-12 h-12 bg-gray-100 text-gray-600 rounded-full hover:text-green-600 transition-colors disabled:opacity-50 flex items-center justify-center"
+            title={isLoggedIn && !isFavorite ? "Add to favorites" : "Great station"}
+          >
+            <FaThumbsUp className="text-lg" />
+          </button>
+
+          {/* Play/Stop Button */}
           <button
             onClick={onPlayPause}
-            className="w-20 h-20 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center shadow-lg"
+            className="w-20 h-20 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center shadow-lg relative z-20"
           >
             {isLoading && isPlaying ? (
               <FaSpinner className="text-2xl animate-spin" />
@@ -335,6 +386,16 @@ export default function FullScreenPlayer({
             ) : (
               <FaPlay className="text-2xl ml-1" />
             )}
+          </button>
+
+          {/* Thumbs Down */}
+          <button
+            onClick={handleThumbsDown}
+            disabled={isSubmittingFeedback}
+            className="w-12 h-12 bg-gray-100 text-gray-600 rounded-full hover:text-red-600 transition-colors disabled:opacity-50 flex items-center justify-center"
+            title="Report issue"
+          >
+            <FaThumbsDown className="text-lg" />
           </button>
         </div>
 
@@ -349,6 +410,15 @@ export default function FullScreenPlayer({
         </div>
       </div>
       </div>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        onSubmit={handleFeedbackSubmit}
+        stationName={station.name}
+        isSubmitting={isSubmittingFeedback}
+      />
     </>
   );
 }
