@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FaPlay, FaStop, FaSpinner, FaChevronDown, FaHeart, FaRegHeart, FaInfo, FaVolumeHigh, FaVolumeLow, FaVolumeOff, FaMusic, FaRadio } from 'react-icons/fa6';
 import { getFaviconUrl } from '../config/api';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
@@ -39,6 +39,10 @@ export default function FullScreenPlayer({
   const [currentArtwork, setCurrentArtwork] = useState<string | null>(null);
   const [metadataChecked, setMetadataChecked] = useState(false);
   const [isRequestingMetadata, setIsRequestingMetadata] = useState(false);
+  const [shouldScroll, setShouldScroll] = useState(false);
+  const [showScrolling, setShowScrolling] = useState(false);
+  const trackTextRef = useRef<HTMLHeadingElement>(null);
+  const trackContainerRef = useRef<HTMLDivElement>(null);
 
   // Fetch metadata when station changes or starts playing
   useEffect(() => {
@@ -106,6 +110,37 @@ export default function FullScreenPlayer({
     };
   }, [station, isPlaying]);
 
+  // Check if track text needs scrolling and handle delay
+  useEffect(() => {
+    if (!currentSong || currentSong === 'METADATA_SUPPORTED') {
+      setShouldScroll(false);
+      setShowScrolling(false);
+      return;
+    }
+
+    // Reset scrolling state
+    setShowScrolling(false);
+    setShouldScroll(false);
+
+    // Check if text overflows after a small delay to ensure DOM is updated
+    const checkOverflow = () => {
+      if (trackTextRef.current && trackContainerRef.current) {
+        const textWidth = trackTextRef.current.scrollWidth;
+        const containerWidth = trackContainerRef.current.clientWidth;
+        
+        if (textWidth > containerWidth) {
+          setShouldScroll(true);
+          // Wait 3 seconds before starting scroll animation
+          setTimeout(() => {
+            setShowScrolling(true);
+          }, 3000);
+        }
+      }
+    };
+
+    setTimeout(checkOverflow, 100);
+  }, [currentSong]);
+
   const handleFavoriteClick = () => {
     if (isLoggedIn && onToggleFavorite) {
       onToggleFavorite(station);
@@ -121,20 +156,41 @@ export default function FullScreenPlayer({
   const VolumeIcon = getVolumeIcon();
 
   return (
-    <div className="lg:hidden fixed inset-0 bg-white z-50 flex flex-col animate-in slide-in-from-bottom duration-300">
+    <>
+      <style>
+        {`
+          @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+          }
+          .animate-marquee {
+            animation: marquee 12s linear infinite;
+          }
+          .animate-marquee:hover {
+            animation-play-state: paused;
+          }
+          .track-text {
+            transition: transform 0.3s ease;
+          }
+        `}
+      </style>
+      <div className="lg:hidden fixed inset-0 bg-white z-50 flex flex-col animate-in slide-in-from-bottom duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-100">
-        <div className="w-10"></div> {/* Spacer for centering */}
+      <div className="flex items-center p-4 border-b border-gray-100 relative">
+        {/* Left spacer */}
+        <div className="flex-1"></div>
         
+        {/* Centered minimize button */}
         <button 
           onClick={onMinimize}
-          className="text-center flex flex-col items-center p-2 hover:text-gray-600 transition-colors"
+          className="text-center flex flex-col items-center p-2 hover:text-gray-600 transition-colors absolute left-1/2 transform -translate-x-1/2"
         >
           <FaChevronDown className="text-gray-400 text-sm" />
           <FaChevronDown className="text-gray-400 text-sm -mt-1" />
         </button>
         
-        <div className="flex items-center gap-2">
+        {/* Right side - favorite button */}
+        <div className="flex-1 flex justify-end">
           {isLoggedIn && onToggleFavorite && (
             <button
               onClick={handleFavoriteClick}
@@ -147,9 +203,9 @@ export default function FullScreenPlayer({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col justify-center px-8 py-6">
+      <div className="flex-1 flex flex-col px-8 py-6 min-h-0">
         {/* Station/Track Artwork */}
-        <div className="w-80 h-80 mx-auto mb-8 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg relative">
+        <div className="w-80 h-80 mx-auto mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg relative flex-shrink-0">
           {/* Track artwork (highest priority) */}
           {currentArtwork ? (
             <img
@@ -184,46 +240,60 @@ export default function FullScreenPlayer({
         </div>
 
         {/* Track/Station Info */}
-        <div className="text-center mb-8">
-          {/* Current song/metadata info */}
-          {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
-            <div className="mb-3">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <FaMusic className="text-blue-600 text-sm" />
-                <span className="text-sm font-medium text-blue-600">Now Playing</span>
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900 leading-tight px-4">
-                {currentSong}
-              </h2>
-            </div>
-          ) : (isPlaying && (metadataChecked || currentSong === 'METADATA_SUPPORTED')) ? (
-            <div className="mb-3">
-              <div className="flex items-center justify-center gap-2 mb-1">
+        <div className="text-center mb-6 flex-shrink-0">
+          {/* Track info section - Always reserve space */}
+          <div className="mb-3 h-[60px] flex flex-col justify-center">
+            {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
+              <>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <FaMusic className="text-blue-600 text-sm" />
+                  <span className="text-sm font-medium text-blue-600">Now Playing</span>
+                </div>
+                <div 
+                  ref={trackContainerRef}
+                  className="relative overflow-hidden max-w-[320px] mx-auto"
+                >
+                  <h2 
+                    ref={trackTextRef}
+                    className={`text-lg font-semibold text-gray-900 px-4 whitespace-nowrap track-text ${shouldScroll && showScrolling ? 'animate-marquee' : ''}`}
+                  >
+                    {currentSong}
+                  </h2>
+                </div>
+              </>
+            ) : (isPlaying && (metadataChecked || currentSong === 'METADATA_SUPPORTED')) ? (
+              <div className="flex items-center justify-center gap-2">
                 <FaRadio className="text-blue-600 text-sm" />
                 <span className="text-sm font-medium text-blue-600">Live Radio</span>
               </div>
-            </div>
-          ) : null}
+            ) : (
+              // Empty space to maintain layout consistency
+              <div></div>
+            )}
+          </div>
           
-          <h1 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
-            {station.name}
-          </h1>
-          <p className="text-lg text-gray-600 mb-4">
+          {/* Station name with info button - Single line truncated */}
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <h1 className="text-xl font-bold text-gray-900 truncate max-w-[250px]">
+              {station.name}
+            </h1>
+            <button
+              onClick={() => onStationInfo(station)}
+              className="w-6 h-6 bg-white text-black hover:text-gray-700 flex items-center justify-center rounded-full shadow-sm text-xs flex-shrink-0"
+              title="Station Info"
+              style={{ fontFamily: 'Times, serif', fontStyle: 'italic', fontWeight: 'bold' }}
+            >
+              i
+            </button>
+          </div>
+          
+          <p className="text-base text-gray-600 truncate">
             {station.city ? `${station.city}, ${station.country}` : station.country}
           </p>
-          
-          {/* More Info Link */}
-          <button
-            onClick={() => onStationInfo(station)}
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mx-auto text-sm font-medium"
-          >
-            <FaInfo className="text-xs" />
-            More Info
-          </button>
         </div>
 
         {/* Volume Control */}
-        <div className="mb-8">
+        <div className="mb-6 flex-shrink-0">
           <div className="flex items-center gap-4 max-w-xs mx-auto">
             <button
               onClick={onToggleMute}
@@ -252,8 +322,8 @@ export default function FullScreenPlayer({
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center justify-center">
+        {/* Controls - Fixed position */}
+        <div className="flex items-center justify-center flex-shrink-0">
           <button
             onClick={onPlayPause}
             className="w-20 h-20 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center shadow-lg"
@@ -269,7 +339,7 @@ export default function FullScreenPlayer({
         </div>
 
         {/* Ad Space Placeholder */}
-        <div className="mt-8">
+        <div className="mt-6 flex-shrink-0">
           <div 
             className="h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center"
             style={{ display: 'none' }} // Hidden for now
@@ -278,6 +348,7 @@ export default function FullScreenPlayer({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
