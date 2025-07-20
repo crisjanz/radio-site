@@ -20,7 +20,9 @@ import {
   FaGaugeHigh,
   FaGear,
   FaThumbsUp,
-  FaThumbsDown
+  FaThumbsDown,
+  FaPlay,
+  FaStop
 } from 'react-icons/fa6';
 import FeedbackModal from '../components/FeedbackModal';
 import { submitFeedback } from '../utils/feedbackApi';
@@ -56,7 +58,7 @@ export default function StationInfoPage({
     if (!station) return;
     try {
       setIsSubmittingFeedback(true);
-      await submitFeedback(station.id, { type: 'great_station' });
+      await submitFeedback(station.nanoid || station.id, { type: 'great_station' });
     } catch (error) {
       console.error('Failed to submit feedback:', error);
       alert('Failed to submit feedback. Please try again.');
@@ -73,7 +75,7 @@ export default function StationInfoPage({
     if (!station) return;
     setIsSubmittingFeedback(true);
     try {
-      await submitFeedback(station.id, feedback);
+      await submitFeedback(station.nanoid || station.id, feedback);
       setShowFeedbackModal(false);
     } catch (error) {
       console.error('Failed to submit feedback:', error);
@@ -193,12 +195,45 @@ export default function StationInfoPage({
               {(station.latitude && station.longitude) && (
                 <button
                   onClick={() => navigate(`/?tab=discover&lat=${station.latitude}&lng=${station.longitude}`)}
-                  className="text-blue-600 hover:text-blue-700 text-sm mb-6 flex items-center gap-1 mx-auto"
+                  className="text-blue-600 hover:text-blue-700 text-sm mb-4 flex items-center gap-1 mx-auto"
                 >
                   <FaMapMarkerAlt className="text-xs" />
                   See on Map
                 </button>
               )}
+              
+              {/* Play/Stop Button */}
+              <div className="mb-6">
+                {(() => {
+                  const isCurrentStationPlaying = _currentStation && 
+                    ((_currentStation.nanoid && _currentStation.nanoid === station.nanoid) || 
+                     (_currentStation.id === station.id)) && 
+                    _isPlaying;
+
+                  return (
+                    <button
+                      onClick={() => _onPlayStation(station)}
+                      className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-colors mx-auto ${
+                        isCurrentStationPlaying
+                          ? 'bg-red-600 text-white hover:bg-red-700'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      {isCurrentStationPlaying ? (
+                        <>
+                          <FaStop className="text-sm" />
+                          <span className="font-medium">Stop Playing</span>
+                        </>
+                      ) : (
+                        <>
+                          <FaPlay className="text-sm" />
+                          <span className="font-medium">Play Station</span>
+                        </>
+                      )}
+                    </button>
+                  );
+                })()}
+              </div>
               
               {/* Station Feedback */}
               <div className="mt-6">

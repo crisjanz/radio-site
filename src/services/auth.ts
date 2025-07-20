@@ -23,7 +23,7 @@ class AuthService {
     if (userData) {
       try {
         this.user = JSON.parse(userData);
-      } catch (e) {
+      } catch {
         // Invalid user data, clear it
         localStorage.removeItem('auth_user');
       }
@@ -134,7 +134,7 @@ class AuthService {
       localStorage.setItem('auth_user', JSON.stringify(data.user));
       
       return data.user;
-    } catch (error) {
+    } catch {
       this.logout();
       return null;
     }

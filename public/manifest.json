@@ -1,0 +1,72 @@
+{
+  "name": "Streemr Radio",
+  "short_name": "Streemr",
+  "description": "Live radio streaming from around the world",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "categories": ["music", "entertainment", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/streemr-play.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/streemr-play.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Discover Stations",
+      "short_name": "Discover",
+      "description": "Browse stations on the map",
+      "url": "/?tab=discover",
+      "icons": [
+        {
+          "src": "/streemr-play.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Browse All",
+      "short_name": "Browse",
+      "description": "Browse all radio stations",
+      "url": "/?tab=browse",
+      "icons": [
+        {
+          "src": "/streemr-play.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Favorites",
+      "short_name": "Favorites",
+      "description": "Your favorite stations",
+      "url": "/?tab=favorites",
+      "icons": [
+        {
+          "src": "/streemr-play.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+streemr",
+      "url": "/station/%s"
+    }
+  ]
+}

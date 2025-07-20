@@ -15,7 +15,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
   ];
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 pb-safe">
       <div className="flex">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -37,6 +37,8 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
           );
         })}
       </div>
+      {/* Safe area padding for iOS home indicator */}
+      <div className="h-safe-bottom bg-white"></div>
     </nav>
   );
 }

@@ -35,7 +35,7 @@ class FavoritesService {
     }
   }
 
-  async addFavorite(stationId: number): Promise<boolean> {
+  async addFavorite(stationId: number | string): Promise<boolean> {
     try {
       console.log('Adding favorite:', { stationId, baseUrl: this.baseUrl, headers: authService.getAuthHeaders() });
       const response = await fetch(this.baseUrl, {
@@ -61,7 +61,7 @@ class FavoritesService {
     }
   }
 
-  async removeFavorite(stationId: number): Promise<boolean> {
+  async removeFavorite(stationId: number | string): Promise<boolean> {
     try {
       const response = await fetch(`${this.baseUrl}/${stationId}`, {
         method: 'DELETE',
@@ -88,10 +88,11 @@ class FavoritesService {
       const isCurrentlyFavorite = currentFavorites.some(fav => fav.id === station.id);
 
       let success: boolean;
+      const stationId = station.nanoid || station.id;
       if (isCurrentlyFavorite) {
-        success = await this.removeFavorite(station.id);
+        success = await this.removeFavorite(stationId);
       } else {
-        success = await this.addFavorite(station.id);
+        success = await this.addFavorite(stationId);
       }
 
       if (success) {

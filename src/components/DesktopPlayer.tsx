@@ -54,7 +54,7 @@ export default function DesktopPlayer({
     const fetchMetadata = async () => {
       try {
         console.log('🎵 Fetching metadata for station:', station.id, station.name);
-        const metadata = await fetchStreamMetadata(station.id);
+        const metadata = await fetchStreamMetadata(station);
         console.log('🎵 Metadata response:', metadata);
         
         setMetadataChecked(true);
@@ -118,7 +118,7 @@ export default function DesktopPlayer({
   const handleThumbsUp = async () => {
     try {
       setIsSubmittingFeedback(true);
-      await submitFeedback(station.id, { type: 'great_station' });
+      await submitFeedback(station.nanoid || station.id, { type: 'great_station' });
     } catch (error) {
       console.error('Failed to submit feedback:', error);
     } finally {
@@ -133,7 +133,7 @@ export default function DesktopPlayer({
   const handleFeedbackSubmit = async (feedback: { type: string; details?: string }) => {
     setIsSubmittingFeedback(true);
     try {
-      await submitFeedback(station.id, feedback);
+      await submitFeedback(station.nanoid || station.id, feedback);
       setShowFeedbackModal(false);
     } catch (error) {
       console.error('Failed to submit feedback:', error);

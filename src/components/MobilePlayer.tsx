@@ -48,7 +48,7 @@ export default function MobilePlayer({
       
       try {
         setIsRequestingMetadata(true);
-        const metadata = await fetchStreamMetadata(station.id);
+        const metadata = await fetchStreamMetadata(station);
         
         setMetadataChecked(true);
         
@@ -69,7 +69,7 @@ export default function MobilePlayer({
           setCurrentSong(null);
           setCurrentArtwork(null);
         }
-      } catch (error) {
+      } catch {
         setMetadataChecked(true);
         setCurrentSong(null);
         setCurrentArtwork(null);
@@ -92,7 +92,7 @@ export default function MobilePlayer({
     };
   }, [station, isPlaying]);
   return (
-    <div className="lg:hidden fixed left-0 right-0 bg-white z-30" style={{ bottom: '3.25rem' }}>
+    <div className="lg:hidden fixed left-0 right-0 bg-white z-30 mobile-player-bottom">
         <div className="flex items-center px-4 py-3">
           {/* Station/Track Artwork */}
           <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 mr-3 relative">

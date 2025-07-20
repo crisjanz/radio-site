@@ -1,5 +1,6 @@
 export interface Station {
   id: number;
+  nanoid?: string;
   name: string;
   country: string;
   genre?: string;

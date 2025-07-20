@@ -134,7 +134,7 @@ export default function HomeContent({
           }
         `}
       </style>
-      <div className="p-6 space-y-8">
+      <div className="p-6 space-y-8 max-w-6xl mx-auto">
       {/* Hero Section - Desktop Only */}
       {!searchTerm && (
         <div className="hidden lg:block text-center py-4 lg:py-8">
@@ -343,11 +343,11 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
   
   return (
     <div 
-      className="group cursor-pointer md:w-64"
+      className="group cursor-pointer md:w-32"
       onClick={onPlay}
     >
       {/* Icon */}
-      <div className="aspect-square md:w-64 md:h-64 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+      <div className="aspect-square md:w-32 md:h-32 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
         {getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? (
           <img
             src={getFaviconUrl(station, { width: 256, height: 256, quality: 85 })!}
@@ -364,14 +364,14 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
           />
         ) : null}
         <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? 'hidden' : ''}`}>
-          <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
+          <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
         </div>
         
         {/* Favorite button - top left */}
         {onToggleFavorite && (
           <button
             onClick={handleFavoriteClick}
-            className="absolute top-2 left-2 w-7 h-7 bg-white/80 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm"
+            className="absolute top-1 left-1 w-6 h-6 bg-white/80 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm"
             title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
             {isFavorite ? <FaHeart className="text-xs" /> : <FaRegHeart className="text-xs" />}
@@ -381,7 +381,7 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
         {/* Info button - always visible on mobile, hover on desktop */}
         <button
           onClick={handleInfoClick}
-          className="absolute top-2 right-2 w-7 h-7 bg-white text-black hover:text-gray-700 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm text-sm"
+          className="absolute top-1 right-1 w-5 h-5 bg-white text-black hover:text-gray-700 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm text-xs"
           title="Station Info"
           style={{ fontFamily: 'Times, serif', fontStyle: 'italic', fontWeight: 'bold' }}
         >

@@ -22,6 +22,7 @@ interface StationMapProps {
   selectedCountry: string;
   selectedGenre: string;
   selectedType: string;
+  initialCoordinates?: {lat: number; lng: number} | null;
 }
 
 // Custom radio station icon with Streemr play logo
@@ -81,10 +82,17 @@ const createRadioIcon = (count: number = 1) => {
 };
 
 // Component to fit map bounds to stations
-const FitBounds: React.FC<{ stations: Station[] }> = ({ stations }) => {
+const FitBounds: React.FC<{ stations: Station[]; initialCoordinates?: {lat: number; lng: number} | null }> = ({ stations, initialCoordinates }) => {
   const map = useMap();
 
   useEffect(() => {
+    // Priority 1: Use initial coordinates if provided (from URL)
+    if (initialCoordinates) {
+      map.setView([initialCoordinates.lat, initialCoordinates.lng], 12);
+      return;
+    }
+
+    // Priority 2: Fit to stations if no initial coordinates
     if (stations.length === 0) return;
 
     const validStations = stations.filter(s => s.latitude && s.longitude);
@@ -101,7 +109,7 @@ const FitBounds: React.FC<{ stations: Station[] }> = ({ stations }) => {
       );
       map.fitBounds(bounds, { padding: [20, 20] });
     }
-  }, [stations, map]);
+  }, [stations, map, initialCoordinates]);
 
   return null;
 };
@@ -111,7 +119,8 @@ const StationMap: React.FC<StationMapProps> = ({
   searchTerm,
   selectedCountry,
   selectedGenre,
-  selectedType
+  selectedType,
+  initialCoordinates
 }) => {
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
@@ -232,7 +241,7 @@ const StationMap: React.FC<StationMapProps> = ({
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
           
-          <FitBounds stations={filteredStations} />
+          <FitBounds stations={filteredStations} initialCoordinates={initialCoordinates} />
           
           {Object.entries(groupedStations).map(([key, stationsAtLocation]) => {
             const [lat, lng] = key.split(',').map(Number);

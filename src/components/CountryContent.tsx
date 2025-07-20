@@ -83,7 +83,7 @@ export default function CountryContent({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button
@@ -186,11 +186,11 @@ interface StationCardProps {
 function StationCard({ station, onPlay, onInfo }: StationCardProps) {
   return (
     <div 
-      className="group cursor-pointer md:w-64"
+      className="group cursor-pointer md:w-32"
       onClick={onPlay}
     >
       {/* Icon */}
-      <div className="aspect-square md:w-64 md:h-64 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+      <div className="aspect-square md:w-32 md:h-32 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
         {getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? (
           <img
             src={getFaviconUrl(station, { width: 256, height: 256, quality: 85 })!}
@@ -207,14 +207,14 @@ function StationCard({ station, onPlay, onInfo }: StationCardProps) {
           />
         ) : null}
         <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? 'hidden' : ''}`}>
-          <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
+          <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
         </div>
         
         {/* Info button */}
         {onInfo && (
           <button
             onClick={onInfo}
-            className="absolute top-2 right-2 w-8 h-8 text-gray-600 hover:text-gray-800 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
+            className="absolute top-1 right-1 w-5 h-5 text-gray-600 hover:text-gray-800 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
             title="Station Info"
           >
             <FaCircleInfo className="text-sm" />

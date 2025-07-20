@@ -1,10 +1,12 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { FaHeart } from 'react-icons/fa6';
+import { Howl } from 'howler';
 import { authService, type User } from './services/auth';
 import { favoritesService } from './services/favorites';
 import { submitFavoriteVote } from './utils/feedbackApi';
 import { analytics } from './utils/analytics';
+import { mediaSessionService } from './services/mediaSession';
 // import AdBanner from './components/AdBanner';
 import Layout from './components/Layout';
 import StationInfoPage from "./pages/StationInfoPage";
@@ -21,7 +23,8 @@ import type { Station } from "./types/Station";
 
 function App() {
   const navigate = useNavigate();
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const location = useLocation();
+  const howlRef = useRef<Howl | null>(null);
   const [volume, setVolume] = useState(80);
   const [isMuted, setIsMuted] = useState(false);
   
@@ -35,6 +38,7 @@ function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [favorites, setFavorites] = useState<Station[]>([]);
   const [showFullScreenPlayer, setShowFullScreenPlayer] = useState(false);
+  const [mapCoordinates, setMapCoordinates] = useState<{lat: number; lng: number} | null>(null);
 
   // Initialize authentication and favorites
   useEffect(() => {
@@ -51,59 +55,106 @@ function App() {
       }
     };
     initAuth();
+
+    // Initialize Media Session API
+    mediaSessionService.setActionHandlers(
+      () => setIsPlaying(true), // Play
+      () => setIsPlaying(false), // Pause
+      undefined, // Previous track (can add station switching later)
+      undefined  // Next track (can add station switching later)
+    );
   }, []);
+
+  // Handle URL parameters for map navigation
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const tab = urlParams.get('tab');
+    const lat = urlParams.get('lat');
+    const lng = urlParams.get('lng');
+
+    // If discover tab with coordinates, set active tab and map coordinates
+    if (tab === 'discover' && lat && lng) {
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lng);
+      
+      if (!isNaN(latitude) && !isNaN(longitude)) {
+        setActiveTab('discover');
+        setMapCoordinates({ lat: latitude, lng: longitude });
+      }
+    }
+  }, [location.search]);
 
   // Handle audio playback
   useEffect(() => {
-    if (audioRef.current && currentStation) {
+    if (howlRef.current && currentStation) {
       if (isPlaying) {
         setIsLoading(true);
-        audioRef.current.play()
-          .then(() => setIsLoading(false))
-          .catch(err => {
-            console.error('Failed to play:', err);
-            setIsLoading(false);
-          });
+        howlRef.current.play();
       } else {
-        audioRef.current.pause();
+        howlRef.current.pause();
         setIsLoading(false);
       }
     }
   }, [isPlaying]);
 
   useEffect(() => {
-    if (audioRef.current && currentStation) {
+    if (currentStation) {
       setIsLoading(true);
       
-      let streamUrl = currentStation.streamUrl;
-      if (streamUrl.startsWith('http://') && window.location.protocol === 'https:') {
-        console.log('⚠️ HTTP stream on HTTPS site, attempting workaround');
-        audioRef.current.setAttribute('src', streamUrl);
-      } else {
-        audioRef.current.src = streamUrl;
+      // Destroy previous Howl instance
+      if (howlRef.current) {
+        howlRef.current.unload();
       }
       
-      audioRef.current.volume = isMuted ? 0 : volume / 100;
-      audioRef.current.addEventListener('loadstart', () => setIsLoading(true));
-      audioRef.current.addEventListener('canplay', () => setIsLoading(false));
-      audioRef.current.addEventListener('error', () => setIsLoading(false));
+      const streamUrl = currentStation.streamUrl;
+      
+      // Create new Howl instance
+      howlRef.current = new Howl({
+        src: [streamUrl],
+        html5: true, // Use HTML5 Audio for streaming
+        volume: isMuted ? 0 : volume / 100,
+        onload: () => {
+          setIsLoading(false);
+          console.log('✅ Stream loaded successfully');
+        },
+        onloaderror: (_, error) => {
+          console.error('❌ Failed to load stream:', error);
+          setIsLoading(false);
+        },
+        onplay: () => {
+          setIsLoading(false);
+          console.log('▶️ Stream started playing');
+        },
+        onpause: () => {
+          console.log('⏸️ Stream paused');
+        },
+        onstop: () => {
+          setIsPlaying(false);
+          console.log('⏹️ Stream stopped');
+        },
+        onplayerror: (_, error) => {
+          console.error('❌ Playback error:', error);
+          setIsLoading(false);
+          setIsPlaying(false);
+        }
+      });
       
       if (isPlaying) {
-        audioRef.current.play()
-          .then(() => setIsLoading(false))
-          .catch(err => {
-            console.error('Failed to play:', err);
-            setIsLoading(false);
-          });
+        howlRef.current.play();
       }
     }
   }, [currentStation]);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume / 100;
+    if (howlRef.current) {
+      howlRef.current.volume(isMuted ? 0 : volume / 100);
     }
   }, [volume, isMuted]);
+
+  // Update Media Session metadata when station or playing state changes
+  useEffect(() => {
+    mediaSessionService.updateMetadata(currentStation, isPlaying);
+  }, [currentStation, isPlaying]);
 
   const handlePlayStation = useCallback((station: Station) => {
     if (currentStation && currentStation.id === station.id) {
@@ -198,7 +249,7 @@ function App() {
     
     // Auto-submit positive vote when adding to favorites
     if (action === 'add') {
-      submitFavoriteVote(station.id);
+      submitFavoriteVote(station.nanoid || station.id);
     }
   }, [user]);
 
@@ -222,7 +273,7 @@ function App() {
   const handleStationInfo = useCallback((station: Station) => {
     // Hide full-screen player when navigating to station info
     setShowFullScreenPlayer(false);
-    navigate(`/station/${station.id}/info`);
+    navigate(`/station/${station.nanoid || station.id}/info`);
   }, [navigate]);
 
   const renderTabContent = () => {
@@ -259,6 +310,7 @@ function App() {
             selectedCountry=""
             selectedGenre=""
             selectedType=""
+            initialCoordinates={mapCoordinates}
           />
         );
       case 'favorites':
@@ -365,14 +417,6 @@ function App() {
 
   return (
     <>
-    {/* Audio Element */}
-    <audio 
-      ref={audioRef} 
-      preload="none"
-      crossOrigin="anonymous"
-      controls={false}
-    />
-    
     <Routes>
       <Route 
         path="/" 

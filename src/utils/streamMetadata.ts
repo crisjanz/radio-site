@@ -23,8 +23,9 @@ interface ArtworkInfo {
 const activeMetadataRequests = new Map<string, Promise<StreamMetadata | null>>();
 const REQUEST_DEDUPE_DURATION = 10000; // 10 seconds
 
-// Try to fetch metadata from backend using station ID
-export const fetchStreamMetadata = async (stationId: number): Promise<StreamMetadata | null> => {
+// Try to fetch metadata from backend using station ID or nanoid
+export const fetchStreamMetadata = async (station: { id: number; nanoid?: string }): Promise<StreamMetadata | null> => {
+  const stationId = station.nanoid || station.id;
   const stationKey = `station-${stationId}`;
   
   // Check if we already have an active request for this station
@@ -35,7 +36,7 @@ export const fetchStreamMetadata = async (stationId: number): Promise<StreamMeta
   }
   
   // Create new request and track it
-  const requestPromise = performMetadataRequest(stationId);
+  const requestPromise = performMetadataRequest(station);
   activeMetadataRequests.set(stationKey, requestPromise);
   
   // Clean up tracking after completion
@@ -48,8 +49,10 @@ export const fetchStreamMetadata = async (stationId: number): Promise<StreamMeta
   return requestPromise;
 };
 
-// Actual metadata request implementation using station ID
-const performMetadataRequest = async (stationId: number): Promise<StreamMetadata | null> => {
+// Actual metadata request implementation using station ID or nanoid
+const performMetadataRequest = async (station: { id: number; nanoid?: string }): Promise<StreamMetadata | null> => {
+  const stationId = station.nanoid || station.id;
+  
   // Try local metadata server first (enhanced features)
   try {
     console.log('🏠 Trying local metadata server for station:', stationId);
@@ -57,7 +60,7 @@ const performMetadataRequest = async (stationId: number): Promise<StreamMetadata
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout for local server
     
-    const response = await fetch(buildMetadataUrl(stationId.toString()), {
+    const response = await fetch(buildMetadataUrl(station), {
       headers: {
         'Accept': 'application/json',
       },

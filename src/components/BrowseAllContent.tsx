@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaArrowLeft, FaArrowRight, FaFilter, FaX, FaHeart, FaRegHeart, FaGlobe, FaRadio, FaMusic, FaSignal } from 'react-icons/fa6';
 import { API_CONFIG, getFaviconUrl } from '../config/api';
+import { getTransmissionType } from '../utils/stationUtils';
 import type { Station } from '../types/Station';
 
 interface BrowseAllContentProps {
@@ -13,7 +14,15 @@ interface BrowseAllContentProps {
   isLoggedIn?: boolean;
 }
 
-const STATIONS_PER_PAGE = 20;
+// Dynamic stations per page calculation
+// We'll calculate based on available width and aim for 3 complete rows
+const calculateStationsPerPage = () => {
+  // 7 cards per row with better spacing
+  const estimatedCardsPerRow = 7;
+  return estimatedCardsPerRow * 3; // 3 rows
+};
+
+const STATIONS_PER_PAGE = calculateStationsPerPage();
 
 // Normalized categories based on database analysis
 const STATION_TYPES = [
@@ -21,6 +30,13 @@ const STATION_TYPES = [
   { value: 'news', label: 'News' },
   { value: 'talk', label: 'Talk' },
   { value: 'sport', label: 'Sports' }
+];
+
+// Transmission types
+const TRANSMISSION_TYPES = [
+  { value: 'fm', label: 'FM Radio', icon: '📡' },
+  { value: 'am', label: 'AM Radio', icon: '📻' },
+  { value: 'net', label: 'Online', icon: '🌐' }
 ];
 
 const MUSIC_GENRES = [
@@ -43,7 +59,6 @@ interface FilterState {
   country: string;
   genre: string;
   type: string;
-  quality: string;
   liveOnly: boolean;
 }
 
@@ -75,7 +90,6 @@ export default function BrowseAllContent({
     country: '',
     genre: '',
     type: '',
-    quality: '',
     liveOnly: false
   });
 
@@ -88,7 +102,7 @@ export default function BrowseAllContent({
     const fetchStations = async () => {
       setLoading(true);
       try {
-        const hasFiltersApplied = filters.country || filters.genre || filters.type || filters.quality;
+        const hasFiltersApplied = filters.country || filters.genre || filters.type;
         
         let url;
         if (searchTerm.trim()) {
@@ -135,14 +149,38 @@ export default function BrowseAllContent({
     };
 
     fetchStations();
-  }, [currentPage, searchTerm, filters.sortBy, filters.country, filters.genre, filters.type, filters.quality]);
+  }, [currentPage, searchTerm, filters.sortBy]);
+  
+  // Load all stations when filters are first applied (without loading state to prevent flicker)
+  useEffect(() => {
+    const hasFiltersApplied = filters.country || filters.genre || filters.type;
+    
+    if (hasFiltersApplied && !searchTerm.trim()) {
+      // Only fetch if we don't already have a large dataset for filtering
+      if (stations.length < 500) {
+        const fetchAllStations = async () => {
+          try {
+            const response = await fetch(`${API_BASE}/stations?limit=1000`);
+            if (response.ok) {
+              const data = await response.json();
+              setStations(data.stations || data);
+              setTotalStations(data.total || data.length);
+            }
+          } catch (err) {
+            console.error('Failed to load stations for filtering:', err);
+          }
+        };
+        fetchAllStations();
+      }
+    }
+  }, [filters.country, filters.genre, filters.type]);
   
   // Reset to page 1 when filters change (separate effect to avoid infinite loops)
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-  }, [filters.country, filters.genre, filters.type, filters.quality]);
+  }, [filters.country, filters.genre, filters.type]);
 
   // Get unique countries from stations data
   const getUniqueCountries = (stations: Station[]) => {
@@ -191,12 +229,6 @@ export default function BrowseAllContent({
       });
     }
 
-    if (filters.quality) {
-      const minBitrate = parseInt(filters.quality);
-      filtered = filtered.filter(station => 
-        station.bitrate && parseInt(station.bitrate.toString()) >= minBitrate
-      );
-    }
 
     // Apply sorting
     switch (filters.sortBy) {
@@ -230,7 +262,7 @@ export default function BrowseAllContent({
   const filteredStations = !searchTerm.trim() ? getFilteredAndSortedStations(stations) : stations;
   
   // Handle pagination for filtered results vs server-side pagination
-  const hasFiltersApplied = filters.country || filters.genre || filters.type || filters.quality;
+  const hasFiltersApplied = filters.country || filters.genre || filters.type;
   
   let displayStations, actualTotal, totalPages;
   
@@ -285,51 +317,53 @@ export default function BrowseAllContent({
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-4">
-        {!isMainBrowsePage && (
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0"
-          >
-            <FaArrowLeft />
-            <span className="hidden sm:inline">Back</span>
-          </button>
-        )}
-        <div className="flex-1">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-            {searchTerm.trim() ? `Search: "${searchTerm}"` : 'Browse Stations'}
-          </h2>
-          {isMainBrowsePage && (
-            <p className="text-gray-600 text-sm mt-1">
-              Explore our complete collection of radio stations
-            </p>
+    <>
+      <style>
+        {`
+          select:focus {
+            outline: none !important;
+            border-color: rgb(229 231 235) !important;
+            box-shadow: none !important;
+          }
+          select:active {
+            outline: none !important;
+            border-color: rgb(229 231 235) !important;
+            box-shadow: none !important;
+          }
+        `}
+      </style>
+      <div className="p-6 space-y-6 max-w-6xl mx-auto">
+      {/* Header - only show when searching */}
+      {searchTerm.trim() && (
+        <div className="flex items-center gap-4 mb-4">
+          {!isMainBrowsePage && (
+            <button
+              onClick={onBack}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0"
+            >
+              <FaArrowLeft />
+              <span className="hidden sm:inline">Back</span>
+            </button>
           )}
+          <div className="flex-1">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              Search: "{searchTerm}"
+            </h2>
+          </div>
         </div>
-        {isMainBrowsePage && (
-          <a 
-            href="#" 
-            onClick={(e) => { e.preventDefault(); /* TODO: Show categories modal */ }}
-            className="text-blue-600 hover:text-blue-700 text-sm font-medium hidden sm:block"
-          >
-            Browse Categories
-          </a>
-        )}
-      </div>
+      )}
 
       {/* Filters */}
       {!searchTerm.trim() && (
         <>
           {/* Desktop Filters */}
-          <div className="hidden lg:flex items-center gap-4 bg-white rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Sort:</span>
+          <div className="hidden lg:block bg-white rounded-xl p-4 border border-gray-200">
+            <div className="flex items-center gap-6">
+              <div className="relative">
                 <select 
                   value={filters.sortBy}
                   onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value }))}
-                  className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="text-sm bg-transparent border-0 border-b-2 border-gray-200 px-2 py-2 pr-8 focus:ring-0 focus:border-gray-200 focus:outline-none appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-0 active:outline-none"
                 >
                   <option value="popular">Most Popular</option>
                   <option value="recent">Recently Added</option>
@@ -337,70 +371,104 @@ export default function BrowseAllContent({
                   <option value="alphabetical-desc">Z-A</option>
                   <option value="bitrate">Highest Quality</option>
                 </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
               
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Country:</span>
+              <div className="relative">
                 <select 
                   value={filters.country}
                   onChange={(e) => setFilters(prev => ({ ...prev, country: e.target.value }))}
-                  className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="text-sm bg-transparent border-0 border-b-2 border-gray-200 px-2 py-2 pr-8 focus:ring-0 focus:border-gray-200 focus:outline-none appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-0 active:outline-none"
                 >
                   <option value="">All Countries</option>
                   {uniqueCountries.map(country => (
                     <option key={country} value={country}>{country}</option>
                   ))}
                 </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
               
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Type:</span>
+              <div className="relative">
                 <select 
                   value={filters.type}
                   onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
-                  className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="text-sm bg-transparent border-0 border-b-2 border-gray-200 px-2 py-2 pr-8 focus:ring-0 focus:border-gray-200 focus:outline-none appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-0 active:outline-none"
                 >
                   <option value="">All Types</option>
                   {STATION_TYPES.map(type => (
                     <option key={type.value} value={type.value}>{type.label}</option>
                   ))}
                 </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
-              
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Genre:</span>
+
+              <div className="relative">
                 <select 
                   value={filters.genre}
                   onChange={(e) => setFilters(prev => ({ ...prev, genre: e.target.value }))}
-                  className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="text-sm bg-transparent border-0 border-b-2 border-gray-200 px-2 py-2 pr-8 focus:ring-0 focus:border-gray-200 focus:outline-none appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-0 active:outline-none"
                 >
                   <option value="">All Genres</option>
                   {MUSIC_GENRES.map(genre => (
                     <option key={genre.value} value={genre.value}>{genre.label}</option>
                   ))}
                 </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
-              
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Quality:</span>
-                <select 
-                  value={filters.quality}
-                  onChange={(e) => setFilters(prev => ({ ...prev, quality: e.target.value }))}
-                  className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">All Quality</option>
-                  <option value="128">High (128kbps+)</option>
-                  <option value="320">Premium (320kbps)</option>
-                </select>
-              </div>
+
+              <button
+                onClick={() => setFilters({ sortBy: 'popular', country: '', genre: '', type: '', liveOnly: false })}
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Clear Filters
+              </button>
             </div>
-            
-            <button
-              onClick={() => setFilters({ sortBy: 'popular', country: '', genre: '', type: '', quality: '', liveOnly: false })}
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              Clear Filters
-            </button>
+
+            {/* Active Filter Chips - Inside Desktop Filter Card */}
+            {(filters.country || filters.genre || filters.type) && (
+              <div className="flex flex-wrap gap-2 pt-3">
+                {filters.country && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                    <FaGlobe className="text-xs" /> {filters.country}
+                    <button onClick={() => setFilters(prev => ({ ...prev, country: '' }))}>
+                      <FaX className="text-xs ml-1 hover:text-blue-600" />
+                    </button>
+                  </span>
+                )}
+                {filters.type && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded-full">
+                    <FaRadio className="text-xs" /> {STATION_TYPES.find(t => t.value === filters.type)?.label || filters.type}
+                    <button onClick={() => setFilters(prev => ({ ...prev, type: '' }))}>
+                      <FaX className="text-xs ml-1 hover:text-orange-600" />
+                    </button>
+                  </span>
+                )}
+                {filters.genre && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">
+                    <FaMusic className="text-xs" /> {MUSIC_GENRES.find(g => g.value === filters.genre)?.label || filters.genre}
+                    <button onClick={() => setFilters(prev => ({ ...prev, genre: '' }))}>
+                      <FaX className="text-xs ml-1 hover:text-purple-600" />
+                    </button>
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Mobile Filters */}
@@ -426,12 +494,12 @@ export default function BrowseAllContent({
                 className="flex items-center gap-2 px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <FaFilter className="text-xs" />
-                Filters {(filters.country || filters.genre || filters.type || filters.quality) && '(•)'}
+                Filters {(filters.country || filters.genre || filters.type || filters.transmissionType || filters.quality) && '(•)'}
               </button>
             </div>
             
             {/* Active Filter Chips */}
-            {(filters.country || filters.genre || filters.type || filters.quality) && (
+            {(filters.country || filters.genre || filters.type || filters.transmissionType || filters.quality) && (
               <div className="flex flex-wrap gap-2">
                 {filters.country && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
@@ -445,6 +513,15 @@ export default function BrowseAllContent({
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
                     <FaRadio className="text-xs" /> {STATION_TYPES.find(t => t.value === filters.type)?.label || filters.type}
                     <button onClick={() => setFilters(prev => ({ ...prev, type: '' }))}>
+                      <FaX className="text-xs" />
+                    </button>
+                  </span>
+                )}
+                {filters.transmissionType && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    <span className="text-xs">{TRANSMISSION_TYPES.find(t => t.value === filters.transmissionType)?.icon}</span>
+                    {TRANSMISSION_TYPES.find(t => t.value === filters.transmissionType)?.label || filters.transmissionType}
+                    <button onClick={() => setFilters(prev => ({ ...prev, transmissionType: '' }))}>
                       <FaX className="text-xs" />
                     </button>
                   </span>
@@ -471,34 +548,18 @@ export default function BrowseAllContent({
         </>
       )}
 
-      {/* Stats */}
-      <div className="bg-white rounded-xl p-4 border border-gray-200">
-        <p className="text-gray-600 text-sm">
-          {searchTerm.trim() ? (
-            `Found ${totalStations} stations matching "${searchTerm}"`
-          ) : (
-            <>
-              <span className="hidden sm:inline">
-                {(filters.country || filters.genre || filters.type || filters.quality) ? (
-                  `Showing ${actualTotal} filtered stations`
-                ) : (
-                  `Showing ${((currentPage - 1) * STATIONS_PER_PAGE) + 1}-${Math.min(currentPage * STATIONS_PER_PAGE, actualTotal)} of ${actualTotal} stations`
-                )}
-              </span>
-              <span className="sm:hidden">
-                {(filters.country || filters.genre || filters.type || filters.quality) ? (
-                  `${actualTotal} stations`
-                ) : (
-                  `Page ${currentPage} of ${Math.ceil(actualTotal / STATIONS_PER_PAGE)} • ${actualTotal} total`
-                )}
-              </span>
-            </>
-          )}
-        </p>
-      </div>
+
+      {/* Search Results Info - only for search */}
+      {searchTerm.trim() && (
+        <div className="bg-white rounded-xl p-4 border border-gray-200">
+          <p className="text-gray-600 text-sm">
+            Found {totalStations} stations matching "{searchTerm}"
+          </p>
+        </div>
+      )}
 
       {/* Stations Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:flex md:flex-wrap md:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 lg:grid-cols-7 lg:gap-8">
         {displayStations.map((station) => (
           <StationCard 
             key={station.id} 
@@ -602,6 +663,20 @@ export default function BrowseAllContent({
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Medium</label>
+                <select 
+                  value={filters.transmissionType}
+                  onChange={(e) => setFilters(prev => ({ ...prev, transmissionType: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">All Mediums</option>
+                  {TRANSMISSION_TYPES.map(type => (
+                    <option key={type.value} value={type.value}>{type.icon} {type.label}</option>
+                  ))}
+                </select>
+              </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Genre</label>
@@ -633,7 +708,7 @@ export default function BrowseAllContent({
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => {
-                    setFilters({ sortBy: filters.sortBy, country: '', genre: '', type: '', quality: '', liveOnly: false });
+                    setFilters({ sortBy: filters.sortBy, country: '', genre: '', type: '', transmissionType: '', quality: '', liveOnly: false });
                     setShowFilters(false);
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -651,7 +726,8 @@ export default function BrowseAllContent({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -671,11 +747,11 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
   };
   return (
     <div 
-      className="group cursor-pointer md:w-64"
+      className="group cursor-pointer md:w-32"
       onClick={onPlay}
     >
       {/* Icon */}
-      <div className="aspect-square md:w-64 md:h-64 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+      <div className="aspect-square md:w-32 md:h-32 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
         {getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? (
           <img
             src={getFaviconUrl(station, { width: 256, height: 256, quality: 85 })!}
@@ -692,17 +768,17 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
           />
         ) : null}
         <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? 'hidden' : ''}`}>
-          <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
+          <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
         </div>
         
         {/* Favorite button - top left */}
         {onToggleFavorite && (
           <button
             onClick={handleFavoriteClick}
-            className="absolute top-2 left-2 w-8 h-8 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
+            className="absolute top-1 left-1 w-6 h-6 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
             title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
-            {isFavorite ? <FaHeart className="text-sm" /> : <FaRegHeart className="text-sm" />}
+            {isFavorite ? <FaHeart className="text-xs" /> : <FaRegHeart className="text-xs" />}
           </button>
         )}
         
@@ -710,7 +786,7 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
         {onInfo && (
           <button
             onClick={onInfo}
-            className="absolute top-2 right-2 w-7 h-7 bg-white text-black hover:text-gray-700 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm text-xs"
+            className="absolute top-1 right-1 w-5 h-5 bg-white text-black hover:text-gray-700 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm text-xs"
             title="Station Info"
             style={{ fontFamily: 'Times, serif', fontStyle: 'italic', fontWeight: 'bold' }}
           >

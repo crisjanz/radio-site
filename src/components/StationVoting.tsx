@@ -45,7 +45,7 @@ export default function StationVoting({
   const handleFeedbackSubmit = async (feedback: { type: string; details?: string }) => {
     setIsSubmitting(true);
     try {
-      await submitFeedback(station.id, feedback);
+      await submitFeedback(station.nanoid || station.id, feedback);
       setTimeout(() => {
         setShowFeedbackModal(false);
       }, 1500);

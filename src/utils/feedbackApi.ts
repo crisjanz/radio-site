@@ -19,7 +19,7 @@ const getAuthToken = (): string | null => {
 };
 
 // Submit feedback for a station
-export const submitFeedback = async (stationId: number, feedback: FeedbackSubmission): Promise<void> => {
+export const submitFeedback = async (stationId: number | string, feedback: FeedbackSubmission): Promise<void> => {
   const token = getAuthToken();
   
   const response = await fetch(`${API_BASE}/api/feedback/stations/${stationId}`, {
@@ -41,7 +41,7 @@ export const submitFeedback = async (stationId: number, feedback: FeedbackSubmis
 };
 
 // Get feedback summary for a station
-export const getFeedbackSummary = async (stationId: number): Promise<FeedbackSummary> => {
+export const getFeedbackSummary = async (stationId: number | string): Promise<FeedbackSummary> => {
   const response = await fetch(`${API_BASE}/api/feedback/stations/${stationId}/summary`);
   
   if (!response.ok) {
@@ -73,7 +73,7 @@ export const getUserFeedbackHistory = async (): Promise<any[]> => {
 };
 
 // Auto-submit positive feedback when user adds to favorites
-export const submitFavoriteVote = async (stationId: number): Promise<void> => {
+export const submitFavoriteVote = async (stationId: number | string): Promise<void> => {
   try {
     await submitFeedback(stationId, { type: 'great_station' });
   } catch (error) {

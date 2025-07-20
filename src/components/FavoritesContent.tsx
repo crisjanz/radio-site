@@ -32,7 +32,7 @@ export default function FavoritesContent({
   };
   if (!isLoggedIn) {
     return (
-      <div className="p-6">
+      <div className="max-w-6xl mx-auto p-6">
         <div className="text-center py-12">
         <div className="text-6xl mb-4 text-red-500"><FaHeart /></div>
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -54,7 +54,7 @@ export default function FavoritesContent({
 
   if (favorites.length === 0) {
     return (
-      <div className="p-6">
+      <div className="max-w-6xl mx-auto p-6">
         <div className="text-center py-12">
         <div className="text-6xl mb-4 text-red-500"><FaHeart /></div>
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -69,7 +69,7 @@ export default function FavoritesContent({
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <FaHeart className="text-red-500" />
@@ -129,11 +129,11 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
 
   return (
     <div 
-      className="group cursor-pointer md:w-64"
+      className="group cursor-pointer md:w-32"
       onClick={onPlay}
     >
       {/* Icon */}
-      <div className="aspect-square md:w-64 md:h-64 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+      <div className="aspect-square md:w-32 md:h-32 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
         {getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? (
           <img
             src={getFaviconUrl(station, { width: 256, height: 256, quality: 85 })!}
@@ -150,13 +150,13 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
           />
         ) : null}
         <div className={`favicon-fallback w-full h-full flex items-center justify-center ${getFaviconUrl(station, { width: 256, height: 256, quality: 85 }) ? 'hidden' : ''}`}>
-          <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
+          <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
         </div>
         
         {/* Favorite button - top left */}
         <button
           onClick={handleFavoriteClick}
-          className="absolute top-2 left-2 w-8 h-8 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
+          className="absolute top-1 left-1 w-6 h-6 text-red-500 hover:text-red-600 flex items-center justify-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
           title="Remove from favorites"
         >
           <FaHeart className="text-sm" />
@@ -165,7 +165,7 @@ function StationCard({ station, onPlay, onInfo, onToggleFavorite }: StationCardP
         {/* Info button */}
         <button
           onClick={handleInfoClick}
-          className="absolute top-2 right-2 w-7 h-7 bg-white text-black hover:text-gray-700 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm text-xs"
+          className="absolute top-1 right-1 w-5 h-5 bg-white text-black hover:text-gray-700 flex items-center justify-center opacity-100 transition-all duration-200 rounded-full shadow-sm text-xs"
           title="Station Info"
           style={{ fontFamily: 'Times, serif', fontStyle: 'italic', fontWeight: 'bold' }}
         >

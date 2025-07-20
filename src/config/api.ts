@@ -51,8 +51,9 @@ export const buildApiUrl = (endpoint: string, params?: Record<string, string>) =
   return url.toString();
 };
 
-// Helper function specifically for metadata URLs with graceful fallback
-export const buildMetadataUrl = (stationId: string) => {
+// Helper function specifically for metadata URLs with graceful fallback  
+export const buildMetadataUrl = (station: { id: number; nanoid?: string }) => {
+  const stationId = station.nanoid || station.id;
   return `${API_CONFIG.METADATA_URL}/metadata/${stationId}`;
 };
 
