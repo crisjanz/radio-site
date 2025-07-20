@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaArrowLeft, FaArrowRight, FaFilter, FaX, FaHeart, FaRegHeart, FaGlobe, FaRadio, FaMusic, FaSignal } from 'react-icons/fa6';
 import { API_CONFIG, getFaviconUrl } from '../config/api';
-import { getTransmissionType } from '../utils/stationUtils';
 import type { Station } from '../types/Station';
 
 interface BrowseAllContentProps {
@@ -59,6 +58,8 @@ interface FilterState {
   country: string;
   genre: string;
   type: string;
+  transmissionType: string;
+  quality: string;
   liveOnly: boolean;
 }
 
@@ -90,6 +91,8 @@ export default function BrowseAllContent({
     country: '',
     genre: '',
     type: '',
+    transmissionType: '',
+    quality: '',
     liveOnly: false
   });
 
@@ -433,7 +436,7 @@ export default function BrowseAllContent({
               </div>
 
               <button
-                onClick={() => setFilters({ sortBy: 'popular', country: '', genre: '', type: '', liveOnly: false })}
+                onClick={() => setFilters({ sortBy: 'popular', country: '', genre: '', type: '', transmissionType: '', quality: '', liveOnly: false })}
                 className="text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Clear Filters
