@@ -229,7 +229,7 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
           </div>
         )}
 
-        {!loading && !error && displayedTracks.map((play, index) => (
+        {!loading && !error && displayedTracks.map((play) => (
           <div key={play.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
             {/* Artwork or Music Icon */}
             <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
