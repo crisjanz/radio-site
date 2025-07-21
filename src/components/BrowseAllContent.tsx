@@ -621,6 +621,28 @@ export default function BrowseAllContent({
         </div>
       )}
 
+{/* Ad Banner - After Pagination */}
+<div className="flex justify-center mt-8">
+  <div 
+    style={{ 
+      width: '100%',
+      maxWidth: '728px',
+      height: '90px',
+      backgroundColor: '#f8f9fa',
+      border: '1px dashed #e9ecef',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '12px',
+      color: '#6c757d'
+    }}
+  >
+    Browse Page Ad Space
+  </div>
+</div>
+
+
+
       {/* Mobile Filter Modal */}
       {showFilters && (
         <div 
@@ -808,5 +830,8 @@ function StationCard({ station, onPlay, onInfo, isFavorite = false, onToggleFavo
         </p>
       </div>
     </div>
+
+
   );
 }
+

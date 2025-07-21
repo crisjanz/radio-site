@@ -54,8 +54,8 @@ export default function HomeContent({
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         
-        setTrendingStations(popularStations.slice(0, 8));
-        setRecentStations(recentStations.slice(0, 8));
+        setTrendingStations(popularStations.slice(0, 7));
+        setRecentStations(recentStations.slice(0, 7));
         
         // Favorites are now managed globally in App.tsx
       } catch (err) {
@@ -276,6 +276,26 @@ export default function HomeContent({
           </div>
         </section>
       )}
+
+        {/* Ad Banner - Responsive */}
+        <div className="flex justify-center">
+          <div 
+            style={{ 
+              width: '100%',
+              maxWidth: '728px',
+              height: '90px',
+              backgroundColor: '#f8f9fa',
+              border: '1px dashed #e9ecef',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              color: '#6c757d'
+            }}
+          >
+            Home Ad Space
+          </div>
+        </div>
 
       {/* Recently Added */}
       {filteredRecent.length > 0 && (

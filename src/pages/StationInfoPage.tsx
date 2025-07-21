@@ -25,6 +25,7 @@ import {
   FaStop
 } from 'react-icons/fa6';
 import FeedbackModal from '../components/FeedbackModal';
+import RecentlyPlayed from '../components/RecentlyPlayed';
 import { submitFeedback } from '../utils/feedbackApi';
 import { 
   FaMapMarkerAlt,
@@ -172,105 +173,109 @@ export default function StationInfoPage({
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left Column - Station Header */}
-            <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
-                {getFaviconUrl(station, { width: 512, height: 512, quality: 90, cacheBust: true }) ? (
-                  <img
-                    src={getFaviconUrl(station, { width: 512, height: 512, quality: 90, cacheBust: true })!}
-                    alt={station.name}
-                    className="max-w-full max-h-full object-contain rounded-xl"
-                  />
-                ) : (
-                  <img src="/streemr-play.png" alt="Streemr" className="w-16 h-16 object-contain" />
-                )}
-              </div>
-              
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{station.name}</h2>
-              <p className="text-gray-600 mb-4">
-                {station.city ? `${station.city}, ${station.country}` : station.country}
-              </p>
-              
-              {(station.latitude && station.longitude) && (
-                <button
-                  onClick={() => navigate(`/?tab=discover&lat=${station.latitude}&lng=${station.longitude}`)}
-                  className="text-blue-600 hover:text-blue-700 text-sm mb-4 flex items-center gap-1 mx-auto"
-                >
-                  <FaMapMarkerAlt className="text-xs" />
-                  See on Map
-                </button>
-              )}
-              
-              {/* Play/Stop Button */}
-              <div className="mb-6">
-                {(() => {
-                  const isCurrentStationPlaying = _currentStation && 
-                    ((_currentStation.nanoid && _currentStation.nanoid === station.nanoid) || 
-                     (_currentStation.id === station.id)) && 
-                    _isPlaying;
-
-                  return (
-                    <button
-                      onClick={() => _onPlayStation(station)}
-                      className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-colors mx-auto ${
-                        isCurrentStationPlaying
-                          ? 'bg-red-600 text-white hover:bg-red-700'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
-                      }`}
-                    >
-                      {isCurrentStationPlaying ? (
-                        <>
-                          <FaStop className="text-sm" />
-                          <span className="font-medium">Stop Playing</span>
-                        </>
-                      ) : (
-                        <>
-                          <FaPlay className="text-sm" />
-                          <span className="font-medium">Play Station</span>
-                        </>
-                      )}
-                    </button>
-                  );
-                })()}
-              </div>
-              
-              {/* Station Feedback */}
-              <div className="mt-6">
-                <div className="flex items-center justify-center gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Left Column - Station Header (Bigger) */}
+            <div className="lg:col-span-3 bg-white rounded-xl p-8">
+              {/* Centered Header Design - Mimicking FullScreenPlayer */}
+              <div className="text-center mb-8">
+                {/* Station Logo - Centered and Square */}
+                <div className="w-48 h-48 mx-auto mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg flex items-center justify-center">
+                  {getFaviconUrl(station, { width: 512, height: 512, quality: 90, cacheBust: true }) ? (
+                    <img
+                      src={getFaviconUrl(station, { width: 512, height: 512, quality: 90, cacheBust: true })!}
+                      alt={station.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img src="/streemr-play.png" alt="Streemr" className="w-24 h-24 object-contain" />
+                  )}
+                </div>
+                
+                {/* Station Name */}
+                <h1 className="text-3xl font-bold text-gray-900 mb-4">{station.name}</h1>
+                
+                {/* City/Country */}
+                <p className="text-lg text-gray-600 mb-6">
+                  {station.city ? `${station.city}, ${station.country}` : station.country}
+                </p>
+                
+                {/* Controls - Mimicking FullScreenPlayer Layout */}
+                <div className="flex items-center justify-center gap-6 mb-6">
+                  {/* Thumbs Up */}
                   <button
                     onClick={handleThumbsUp}
                     disabled={isSubmittingFeedback}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 rounded-lg transition-colors disabled:opacity-50"
+                    className="w-12 h-12 bg-gray-100 text-gray-600 rounded-full hover:text-green-600 transition-colors disabled:opacity-50 flex items-center justify-center"
                     title="Great station"
                   >
-                    <FaThumbsUp className="text-sm" />
-                    <span className="text-sm font-medium">Great Station</span>
+                    <FaThumbsUp className="text-lg" />
                   </button>
-                  
+
+                  {/* Play/Stop Button - Round like FullScreenPlayer */}
+                  {(() => {
+                    const isCurrentStationPlaying = _currentStation && 
+                      ((_currentStation.nanoid && _currentStation.nanoid === station.nanoid) || 
+                       (_currentStation.id === station.id)) && 
+                      _isPlaying;
+
+                    return (
+                      <button
+                        onClick={() => _onPlayStation(station)}
+                        className={`w-20 h-20 rounded-full transition-colors flex items-center justify-center shadow-lg ${
+                          isCurrentStationPlaying
+                            ? 'bg-red-600 text-white hover:bg-red-700'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                      >
+                        {isCurrentStationPlaying ? (
+                          <FaStop className="text-2xl" />
+                        ) : (
+                          <FaPlay className="text-2xl ml-1" />
+                        )}
+                      </button>
+                    );
+                  })()}
+
+                  {/* Thumbs Down */}
                   <button
                     onClick={handleThumbsDown}
                     disabled={isSubmittingFeedback}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors disabled:opacity-50"
+                    className="w-12 h-12 bg-gray-100 text-gray-600 rounded-full hover:text-red-600 transition-colors disabled:opacity-50 flex items-center justify-center"
                     title="Report issue"
                   >
-                    <FaThumbsDown className="text-sm" />
-                    <span className="text-sm font-medium">Report Issue</span>
+                    <FaThumbsDown className="text-lg" />
                   </button>
                 </div>
+                
+                {/* See on Map - Centered below controls */}
+                {(station.latitude && station.longitude) && (
+                  <button
+                    onClick={() => navigate(`/?tab=discover&lat=${station.latitude}&lng=${station.longitude}`)}
+                    className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 justify-center"
+                  >
+                    <FaMapMarkerAlt className="text-xs" />
+                    See on Map
+                  </button>
+                )}
               </div>
               
               {/* About Content */}
               {station.description && (
-                <div className="mt-6 bg-white rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">About</h3>
-                  <p className="text-gray-600 leading-relaxed">{station.description}</p>
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">About</h3>
+                  <p className="text-gray-700 leading-relaxed">{station.description}</p>
                 </div>
               )}
+              
+              {/* Recently Played Section - Now inside main card */}
+              <RecentlyPlayed 
+                stationId={station.nanoid || station.id} 
+                stationName={station.name} 
+              />
             </div>
 
-            {/* Right Column - Station Info, Technical Details, Contact */}
-            <div className="space-y-6">
+            {/* Right Column - Station Info, Technical Details, Contact (Smaller) */}
+            <div className="lg:col-span-1 space-y-6">
               {/* Station Information */}
               <div className="bg-white rounded-xl p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Station Information</h3>

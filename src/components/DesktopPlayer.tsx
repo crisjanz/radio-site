@@ -5,6 +5,7 @@ import FeedbackModal from './FeedbackModal';
 import { submitFeedback } from '../utils/feedbackApi';
 import type { Station } from '../types/Station';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
+import { decodeHtmlEntities } from '../utils/htmlDecoding';
 // import AdBanner from './AdBanner';
 
 interface DesktopPlayerProps {
@@ -213,7 +214,7 @@ export default function DesktopPlayer({
           {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
             <div className="text-xs font-medium text-blue-600 mb-1 truncate flex items-center gap-1">
               <FaMusic className="text-xs" />
-              {currentSong}
+              {decodeHtmlEntities(currentSong)}
             </div>
           ) : (isPlaying && (metadataChecked || currentSong === 'METADATA_SUPPORTED')) ? (
             <div className="text-xs text-gray-500 mb-1 italic flex items-center gap-1">
@@ -271,23 +272,6 @@ export default function DesktopPlayer({
         </div>
       </div>
 
-      {/* Ad Banner - Desktop Player */}
-      <div 
-        className="ml-6 flex-shrink-0"
-        style={{
-          width: '240px',
-          height: '40px',
-          backgroundColor: '#f8f9fa',
-          border: '1px dashed #e9ecef',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '10px',
-          color: '#6c757d'
-        }}
-      >
-        Desktop Ad Space
-      </div>
 
       {/* Feedback Modal */}
       <FeedbackModal

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio } from 'react-icons/fa6';
 import { getFaviconUrl } from '../config/api';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
+import { decodeHtmlEntities } from '../utils/htmlDecoding';
 import type { Station } from '../types/Station';
 
 interface MobilePlayerProps {
@@ -149,7 +150,7 @@ export default function MobilePlayer({
           {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
             <div className="text-xs font-medium text-blue-600 truncate flex items-center gap-1">
               <FaMusic className="text-xs" />
-              {currentSong}
+              {decodeHtmlEntities(currentSong)}
             </div>
           ) : (isPlaying && (metadataChecked || currentSong === 'METADATA_SUPPORTED')) ? (
             <div className="text-xs text-gray-500 italic flex items-center gap-1">

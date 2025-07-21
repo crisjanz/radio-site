@@ -4,6 +4,7 @@ import FeedbackModal from './FeedbackModal';
 import { submitFeedback } from '../utils/feedbackApi';
 import { getFaviconUrl } from '../config/api';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
+import { decodeHtmlEntities } from '../utils/htmlDecoding';
 import type { Station } from '../types/Station';
 
 interface FullScreenPlayerProps {
@@ -297,7 +298,7 @@ export default function FullScreenPlayer({
                     ref={trackTextRef}
                     className={`text-lg font-semibold text-gray-900 px-4 whitespace-nowrap track-text ${shouldScroll && showScrolling ? 'animate-marquee' : ''}`}
                   >
-                    {currentSong}
+                    {decodeHtmlEntities(currentSong)}
                   </h2>
                 </div>
               </>
