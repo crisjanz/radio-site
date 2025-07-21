@@ -54,8 +54,8 @@ export default function HomeContent({
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         
-        setTrendingStations(popularStations.slice(0, 7));
-        setRecentStations(recentStations.slice(0, 7));
+        setTrendingStations(popularStations.slice(0, 6));
+        setRecentStations(recentStations.slice(0, 6));
         
         // Favorites are now managed globally in App.tsx
       } catch (err) {
@@ -262,7 +262,9 @@ export default function HomeContent({
             </button>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:flex md:flex-wrap md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-center mx-auto">
+
+
             {filteredTrending.map((station) => (
               <StationCard 
                 key={station.id} 
@@ -309,7 +311,7 @@ export default function HomeContent({
             </button>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:flex md:flex-wrap md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-center mx-auto">
             {filteredRecent.map((station) => (
               <StationCard 
                 key={station.id} 
