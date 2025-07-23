@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { FaPlay, FaGlobe, FaMusic, FaInfoCircle } from 'react-icons/fa';
+import { FaPlay, FaGlobe, FaMusic, FaInfoCircle, FaLocationArrow } from 'react-icons/fa';
 import { FaGlobe as FaGlobe6 } from 'react-icons/fa6';
 import type { Station } from '../types/Station';
 import { API_CONFIG } from '../config/api';
@@ -81,8 +81,51 @@ const createRadioIcon = (count: number = 1) => {
   });
 };
 
+// Create user location icon
+const createUserLocationIcon = () => {
+  return L.divIcon({
+    className: 'custom-user-location-marker',
+    html: `
+      <div style="
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #3b82f6;
+        border: 3px solid #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        position: relative;
+      ">
+        <div style="
+          position: absolute;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background-color: rgba(59, 130, 246, 0.2);
+          top: -7px;
+          left: -7px;
+          animation: pulse 2s infinite;
+        "></div>
+      </div>
+      <style>
+        @keyframes pulse {
+          0% { transform: scale(0.8); opacity: 0.8; }
+          50% { transform: scale(1.2); opacity: 0.4; }
+          100% { transform: scale(0.8); opacity: 0.8; }
+        }
+      </style>
+    `,
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+    popupAnchor: [0, -8]
+  });
+};
+
 // Component to fit map bounds to stations
-const FitBounds: React.FC<{ stations: Station[]; initialCoordinates?: {lat: number; lng: number} | null }> = ({ stations, initialCoordinates }) => {
+const FitBounds: React.FC<{ 
+  stations: Station[]; 
+  initialCoordinates?: {lat: number; lng: number} | null;
+  userLocation?: {lat: number; lng: number} | null;
+}> = ({ stations, initialCoordinates, userLocation }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -92,7 +135,13 @@ const FitBounds: React.FC<{ stations: Station[]; initialCoordinates?: {lat: numb
       return;
     }
 
-    // Priority 2: Fit to stations if no initial coordinates
+    // Priority 2: Use user's current location if available
+    if (userLocation) {
+      map.setView([userLocation.lat, userLocation.lng], 10);
+      return;
+    }
+
+    // Priority 3: Fit to stations if no coordinates available
     if (stations.length === 0) return;
 
     const validStations = stations.filter(s => s.latitude && s.longitude);
@@ -109,7 +158,7 @@ const FitBounds: React.FC<{ stations: Station[]; initialCoordinates?: {lat: numb
       );
       map.fitBounds(bounds, { padding: [20, 20] });
     }
-  }, [stations, map, initialCoordinates]);
+  }, [stations, map, initialCoordinates, userLocation]);
 
   return null;
 };
@@ -125,8 +174,74 @@ const StationMap: React.FC<StationMapProps> = ({
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+  const [isRequestingLocation, setIsRequestingLocation] = useState(false);
+  const [showLocationSuccess, setShowLocationSuccess] = useState(false);
 
   const API_BASE = API_CONFIG.BASE_URL;
+
+  // Function to request user's current location
+  const requestLocation = () => {
+    // Only try to get location if we don't have initial coordinates from URL
+    if (initialCoordinates) {
+      return;
+    }
+
+    setIsRequestingLocation(true);
+    setLocationPermissionDenied(false);
+
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+          setLocationPermissionDenied(false);
+          setIsRequestingLocation(false);
+          setShowLocationSuccess(true);
+          
+          // Hide success notification after 3 seconds
+          setTimeout(() => setShowLocationSuccess(false), 3000);
+          
+          console.log('✅ User location obtained:', position.coords.latitude, position.coords.longitude);
+        },
+        (error) => {
+          console.warn('⚠️ Geolocation error:', error.message);
+          setLocationPermissionDenied(true);
+          setIsRequestingLocation(false);
+          
+          // Log specific error types for debugging
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              console.log('📍 User denied location permission');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.log('📍 Location information is unavailable');
+              break;
+            case error.TIMEOUT:
+              console.log('📍 Location request timed out');
+              break;
+          }
+        },
+        {
+          enableHighAccuracy: false, // Use less battery
+          timeout: 10000, // 10 second timeout
+          maximumAge: 300000 // Use cached location if less than 5 minutes old
+        }
+      );
+    } else {
+      console.log('📍 Geolocation is not supported by this browser');
+      setLocationPermissionDenied(true);
+      setIsRequestingLocation(false);
+    }
+  };
+
+  // Get user's current location on mount
+  useEffect(() => {
+    requestLocation();
+  }, [initialCoordinates]);
 
   // Fetch stations with coordinates
   useEffect(() => {
@@ -241,7 +356,29 @@ const StationMap: React.FC<StationMapProps> = ({
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
           
-          <FitBounds stations={filteredStations} initialCoordinates={initialCoordinates} />
+          <FitBounds 
+            stations={filteredStations} 
+            initialCoordinates={initialCoordinates} 
+            userLocation={userLocation} 
+          />
+          
+          {/* User location marker */}
+          {userLocation && !initialCoordinates && (
+            <Marker
+              position={[userLocation.lat, userLocation.lng]}
+              icon={createUserLocationIcon()}
+              zIndexOffset={1000} // Ensure it appears on top
+            >
+              <Popup>
+                <div className="text-center p-2">
+                  <p className="font-semibold text-blue-600 mb-1">Your Location</p>
+                  <p className="text-sm text-gray-600">
+                    Lat: {userLocation.lat.toFixed(4)}, Lng: {userLocation.lng.toFixed(4)}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          )}
           
           {Object.entries(groupedStations).map(([key, stationsAtLocation]) => {
             const [lat, lng] = key.split(',').map(Number);
@@ -270,9 +407,9 @@ const StationMap: React.FC<StationMapProps> = ({
                       {stationsAtLocation.map((station, index) => (
                         <div key={station.id} className={`${index > 0 && stationCount > 1 ? 'pt-3 border-t border-gray-100' : ''}`}>
                           <div className="flex items-center gap-3 mb-2">
-                            {station.favicon && (
+                            {(station.local_image_url || station.logo) && (
                               <img
-                                src={station.favicon}
+                                src={station.local_image_url || station.logo}
                                 alt={station.name}
                                 className="w-8 h-8 rounded border flex-shrink-0"
                                 onError={(e) => {
@@ -349,6 +486,46 @@ const StationMap: React.FC<StationMapProps> = ({
             {filteredStations.length} station{filteredStations.length !== 1 ? 's' : ''}
           </p>
         </div>
+
+        {/* Location permission notification */}
+        {!initialCoordinates && locationPermissionDenied && !userLocation && (
+          <div className="absolute top-4 left-4 bg-blue-50 border border-blue-200 px-4 py-3 rounded-lg shadow-md z-10 max-w-xs">
+            <div className="flex items-center gap-2 mb-2">
+              <FaLocationArrow className="text-blue-600 text-sm" />
+              <p className="text-sm font-medium text-blue-900">Find stations near you</p>
+            </div>
+            <p className="text-xs text-blue-700 mb-3">
+              Allow location access to see radio stations in your area
+            </p>
+            <button
+              onClick={requestLocation}
+              disabled={isRequestingLocation}
+              className="w-full bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isRequestingLocation ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                  Getting location...
+                </span>
+              ) : (
+                'Enable Location'
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* User location success notification */}
+        {!initialCoordinates && userLocation && showLocationSuccess && (
+          <div className="absolute top-4 left-4 bg-green-50 border border-green-200 px-4 py-3 rounded-lg shadow-md z-10 max-w-xs">
+            <div className="flex items-center gap-2">
+              <FaLocationArrow className="text-green-600 text-sm" />
+              <p className="text-sm font-medium text-green-900">Location found!</p>
+            </div>
+            <p className="text-xs text-green-700 mt-1">
+              Map centered on your location
+            </p>
+          </div>
+        )}
       </div>
     </div>
     </div>

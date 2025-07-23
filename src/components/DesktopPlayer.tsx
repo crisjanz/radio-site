@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio, FaThumbsUp, FaThumbsDown } from 'react-icons/fa6';
-import { FaVolumeUp, FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
+import { FaVolumeUp, FaVolumeDown, FaVolumeMute, FaInfoCircle } from 'react-icons/fa';
 import FeedbackModal from './FeedbackModal';
 import { submitFeedback } from '../utils/feedbackApi';
 import type { Station } from '../types/Station';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
 import { decodeHtmlEntities } from '../utils/htmlDecoding';
+import { API_CONFIG } from '../config/api';
 // import AdBanner from './AdBanner';
 
 interface DesktopPlayerProps {
@@ -13,6 +14,7 @@ interface DesktopPlayerProps {
   isPlaying: boolean;
   isLoading?: boolean;
   onPlayPause: () => void;
+  onStationInfo?: (station: Station) => void;
   volume: number;
   isMuted: boolean;
   onVolumeChange: (volume: number) => void;
@@ -24,6 +26,7 @@ export default function DesktopPlayer({
   isPlaying, 
   isLoading = false,
   onPlayPause,
+  onStationInfo,
   volume,
   isMuted,
   onVolumeChange,
@@ -36,6 +39,34 @@ export default function DesktopPlayer({
   // Feedback system state
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+
+  // Music service click handlers
+  const handleAppleMusicClick = async (songTitle: string) => {
+    // Extract artist and title from the song string (usually "Artist - Title" format)
+    const parts = songTitle.split(' - ');
+    const artist = parts.length > 1 ? parts[0].trim() : '';
+    const title = parts.length > 1 ? parts.slice(1).join(' - ').trim() : songTitle.trim();
+    
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-links/itunes?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+      const data = await response.json();
+      
+      if (data.found && data.trackId) {
+        // Try to open directly in Apple Music app
+        const appUrl = `music://music.apple.com/us/song/${data.trackId}`;
+        window.location.href = appUrl;
+      }
+    } catch (error) {
+      console.error('Error fetching iTunes link:', error);
+    }
+  };
+
+  const handleSpotifyClick = async (songTitle: string) => {
+    // Try to open directly in Spotify app
+    const searchQuery = encodeURIComponent(songTitle);
+    const spotifyAppUrl = `spotify:search:${searchQuery}`;
+    window.location.href = spotifyAppUrl;
+  };
 
   // Fetch metadata when station changes or starts playing
   useEffect(() => {
@@ -145,92 +176,144 @@ export default function DesktopPlayer({
   };
 
   return (
-    <div className="hidden lg:flex fixed bottom-0 left-0 right-0 items-center justify-between bg-white border-t border-gray-200 px-6 py-3 z-30">
-      {/* Station Info & Controls */}
-      <div className="flex items-center gap-4 flex-1">
-        {/* Station/Track Artwork */}
-        <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 relative">
-          {/* Track artwork (highest priority) */}
-          {currentArtwork ? (
-            <img
-              src={currentArtwork}
-              alt="Track artwork"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.currentTarget;
-                target.style.display = 'none';
-                // Show station logo fallback
-                const stationLogo = target.parentElement?.querySelector('.station-logo') as HTMLElement;
-                if (stationLogo) {
-                  stationLogo.classList.remove('hidden');
-                }
-              }}
-            />
-          ) : null}
-          
-          {/* Station logo (medium priority) */}
-          {station.favicon ? (
-            <img
-              src={station.favicon}
-              alt={`${station.name} logo`}
-              className={`station-logo w-full h-full object-fill ${currentArtwork ? 'hidden' : ''}`}
-              style={{ width: '100%', height: '100%' }}
-              onError={(e) => {
-                const target = e.currentTarget;
-                target.style.display = 'none';
-                const fallback = target.parentElement?.querySelector('.streemr-fallback') as HTMLElement;
-                if (fallback) {
-                  fallback.classList.remove('hidden');
-                }
-              }}
-            />
-          ) : null}
-          
-          {/* Streemr logo fallback (lowest priority) */}
-          <div className={`streemr-fallback w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${(currentArtwork || station.favicon) ? 'hidden' : ''}`}>
-            <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
+    <>
+      <div className="hidden lg:flex fixed bottom-0 left-0 right-0 items-center bg-white border-t border-gray-200 px-4 py-3 z-30">
+        {/* Left: Larger Artwork */}
+        <div className="flex items-center gap-4 flex-1">
+          {/* Station/Track Artwork - Larger */}
+          <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 relative">
+            {/* Track artwork (highest priority) */}
+            {currentArtwork ? (
+              <img
+                src={currentArtwork}
+                alt="Track artwork"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  target.style.display = 'none';
+                  // Show station logo fallback
+                  const stationLogo = target.parentElement?.querySelector('.station-logo') as HTMLElement;
+                  if (stationLogo) {
+                    stationLogo.classList.remove('hidden');
+                  }
+                }}
+              />
+            ) : null}
+            
+            {/* Station logo (medium priority) */}
+            {station.logo ? (
+              <img
+                src={station.logo}
+                alt={`${station.name} logo`}
+                className={`station-logo w-full h-full object-fill ${currentArtwork ? 'hidden' : ''}`}
+                style={{ width: '100%', height: '100%' }}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  target.style.display = 'none';
+                  const fallback = target.parentElement?.querySelector('.streemr-fallback') as HTMLElement;
+                  if (fallback) {
+                    fallback.classList.remove('hidden');
+                  }
+                }}
+              />
+            ) : null}
+            
+            {/* Streemr logo fallback (lowest priority) */}
+            <div className={`streemr-fallback w-full h-full bg-white flex items-center justify-center ${(currentArtwork || station.logo) ? 'hidden' : ''}`}>
+              <img src="/streemr-play.png" alt="Streemr" className="w-12 h-12 object-contain" />
+            </div>
+          </div>
+
+          {/* Station Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-900 truncate">{station.name}</h3>
+              {onStationInfo && (
+                <button
+                  onClick={() => onStationInfo(station)}
+                  className="p-1 text-gray-400 hover:text-blue-600 transition-colors flex-shrink-0"
+                  title="Station Info"
+                >
+                  <FaInfoCircle className="text-sm" />
+                </button>
+              )}
+            </div>
+            
+            {/* Current song/metadata info - Larger and darker */}
+            {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
+              <div className="text-sm font-medium text-gray-700 mb-1 truncate">
+                {decodeHtmlEntities(currentSong)}
+              </div>
+            ) : (isPlaying && (metadataChecked || currentSong === 'METADATA_SUPPORTED')) ? (
+              <div className="text-sm text-gray-500 mb-1 italic">
+                Live Radio
+              </div>
+            ) : null}
+            
+            {/* Music Service Links - only show when track is playing */}
+            {currentSong && currentSong !== 'METADATA_SUPPORTED' && 
+             !currentSong.toLowerCase().includes('live radio') &&
+             !currentSong.toLowerCase().includes('stream') &&
+             currentSong.toLowerCase() !== 'live' && (
+              <div className="flex gap-1">
+                <button 
+                  onClick={() => handleAppleMusicClick(currentSong)}
+                  className="hover:opacity-80 transition-opacity"
+                  title="Find on Apple Music"
+                >
+                  <img src="/apple.png" alt="Apple Music" className="h-6" />
+                </button>
+                <button 
+                  onClick={() => handleSpotifyClick(currentSong)}
+                  className="hover:opacity-80 transition-opacity"
+                  title="Find on Spotify"
+                >
+                  <img src="/spotify.png" alt="Spotify" className="h-6" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Play/Pause Button */}
-        <button
-          onClick={onPlayPause}
-          className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-        >
-          {isLoading && isPlaying ? (
-            <FaSpinner className="text-lg animate-spin" />
-          ) : isPlaying ? (
-            <FaStop className="text-lg" />
-          ) : (
-            <FaPlay className="text-lg ml-0.5" />
-          )}
-        </button>
+        {/* Center: Play Button with Feedback on sides */}
+        <div className="flex items-center gap-6">
+          {/* Thumbs Up */}
+          <button
+            onClick={handleThumbsUp}
+            disabled={isSubmittingFeedback}
+            className="w-10 h-10 bg-gray-100 text-gray-600 rounded-full hover:text-green-600 transition-colors disabled:opacity-50 flex items-center justify-center"
+            title="Great station"
+          >
+            <FaThumbsUp className="text-sm" />
+          </button>
 
-        {/* Station Info */}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 truncate">{station.name}</h3>
-          
-          {/* Current song/metadata info */}
-          {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
-            <div className="text-xs font-medium text-blue-600 mb-1 truncate flex items-center gap-1">
-              <FaMusic className="text-xs" />
-              {decodeHtmlEntities(currentSong)}
-            </div>
-          ) : (isPlaying && (metadataChecked || currentSong === 'METADATA_SUPPORTED')) ? (
-            <div className="text-xs text-gray-500 mb-1 italic flex items-center gap-1">
-              <FaRadio className="text-xs" />
-              Live Radio
-            </div>
-          ) : null}
-          
-          <p className="text-xs text-gray-600 truncate">
-            {station.city ? `${station.city}, ${station.country}` : station.country}
-            {station.genre && ` • ${station.genre}`}
-          </p>
+          {/* Play/Pause Button */}
+          <button
+            onClick={onPlayPause}
+            className="w-16 h-16 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center shadow-lg"
+          >
+            {isLoading && isPlaying ? (
+              <FaSpinner className="text-xl animate-spin" />
+            ) : isPlaying ? (
+              <FaStop className="text-xl" />
+            ) : (
+              <FaPlay className="text-xl ml-0.5" />
+            )}
+          </button>
+
+          {/* Thumbs Down */}
+          <button
+            onClick={handleThumbsDown}
+            disabled={isSubmittingFeedback}
+            className="w-10 h-10 bg-gray-100 text-gray-600 rounded-full hover:text-red-600 transition-colors disabled:opacity-50 flex items-center justify-center"
+            title="Report issue"
+          >
+            <FaThumbsDown className="text-sm" />
+          </button>
         </div>
 
-        {/* Volume Controls */}
-        <div className="flex items-center gap-2">
+        {/* Right: Volume Controls */}
+        <div className="flex items-center gap-2 flex-1 justify-end">
           <button
             onClick={onToggleMute}
             className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -247,31 +330,7 @@ export default function DesktopPlayer({
             className="w-20 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
           />
         </div>
-
-        {/* Station Feedback */}
-        <div className="flex items-center gap-2 ml-4">
-          <button
-            onClick={handleThumbsUp}
-            disabled={isSubmittingFeedback}
-            className="flex items-center gap-1 px-3 py-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 text-xs"
-            title="Great station"
-          >
-            <FaThumbsUp className="text-xs" />
-            <span>Great</span>
-          </button>
-          
-          <button
-            onClick={handleThumbsDown}
-            disabled={isSubmittingFeedback}
-            className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 text-xs"
-            title="Report issue"
-          >
-            <FaThumbsDown className="text-xs" />
-            <span>Report</span>
-          </button>
-        </div>
       </div>
-
 
       {/* Feedback Modal */}
       <FeedbackModal
@@ -281,6 +340,6 @@ export default function DesktopPlayer({
         stationName={station.name}
         isSubmitting={isSubmittingFeedback}
       />
-    </div>
+    </>
   );
 }

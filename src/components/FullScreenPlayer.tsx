@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FaPlay, FaStop, FaSpinner, FaChevronDown, FaHeart, FaRegHeart, FaVolumeHigh, FaVolumeLow, FaVolumeOff, FaMusic, FaRadio, FaThumbsUp, FaThumbsDown } from 'react-icons/fa6';
 import FeedbackModal from './FeedbackModal';
 import { submitFeedback } from '../utils/feedbackApi';
-import { getFaviconUrl } from '../config/api';
+import { getFaviconUrl, API_CONFIG } from '../config/api';
 import { fetchStreamMetadata, getBestArtwork } from '../utils/streamMetadata';
 import { decodeHtmlEntities } from '../utils/htmlDecoding';
 import type { Station } from '../types/Station';
@@ -46,6 +46,33 @@ export default function FullScreenPlayer({
   const [showScrolling, setShowScrolling] = useState(false);
   const trackTextRef = useRef<HTMLHeadingElement>(null);
   const trackContainerRef = useRef<HTMLDivElement>(null);
+
+  // Music service click handlers
+  const handleAppleMusicClick = async (songTitle: string) => {
+    const parts = songTitle.split(' - ');
+    const artist = parts.length > 1 ? parts[0].trim() : '';
+    const title = parts.length > 1 ? parts.slice(1).join(' - ').trim() : songTitle.trim();
+    
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-links/itunes?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+      const data = await response.json();
+      
+      if (data.found && data.trackId) {
+        // Try to open directly in Apple Music app
+        const appUrl = `music://music.apple.com/us/song/${data.trackId}`;
+        window.location.href = appUrl;
+      }
+    } catch (error) {
+      console.error('Error fetching iTunes link:', error);
+    }
+  };
+
+  const handleSpotifyClick = async (songTitle: string) => {
+    // Try to open directly in Spotify app
+    const searchQuery = encodeURIComponent(songTitle);
+    const spotifyAppUrl = `spotify:search:${searchQuery}`;
+    window.location.href = spotifyAppUrl;
+  };
   
   // Feedback system state
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -287,8 +314,8 @@ export default function FullScreenPlayer({
             {currentSong && currentSong !== 'METADATA_SUPPORTED' ? (
               <>
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <FaMusic className="text-blue-600 text-sm" />
-                  <span className="text-sm font-medium text-blue-600">Now Playing</span>
+                  <FaMusic className="text-gray-600 text-sm" />
+                  <span className="text-sm font-medium text-gray-600">Now Playing</span>
                 </div>
                 <div 
                   ref={trackContainerRef}
@@ -313,6 +340,29 @@ export default function FullScreenPlayer({
             )}
           </div>
           
+          {/* Music Service Links - only show when track is playing */}
+          {currentSong && currentSong !== 'METADATA_SUPPORTED' && 
+           !currentSong.toLowerCase().includes('live radio') &&
+           !currentSong.toLowerCase().includes('stream') &&
+           currentSong.toLowerCase() !== 'live' && (
+            <div className="flex justify-center gap-2 mb-4">
+              <button 
+                onClick={() => handleAppleMusicClick(currentSong)}
+                className="hover:opacity-80 transition-opacity"
+                title="Find on Apple Music"
+              >
+                <img src="/apple.png" alt="Apple Music" className="h-8" />
+              </button>
+              <button 
+                onClick={() => handleSpotifyClick(currentSong)}
+                className="hover:opacity-80 transition-opacity"
+                title="Find on Spotify"
+              >
+                <img src="/spotify.png" alt="Spotify" className="h-8" />
+              </button>
+            </div>
+          )}
+          
           {/* Station name with info button - Single line truncated */}
           <div className="flex items-center justify-center gap-2 mb-2">
             <h1 className="text-xl font-bold text-gray-900 truncate max-w-[250px]">
@@ -328,9 +378,6 @@ export default function FullScreenPlayer({
             </button>
           </div>
           
-          <p className="text-base text-gray-600 truncate">
-            {station.city ? `${station.city}, ${station.country}` : station.country}
-          </p>
         </div>
 
         {/* Volume Control */}

@@ -195,9 +195,22 @@ export default function StationInfoPage({
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">{station.name}</h1>
                 
                 {/* City/Country */}
-                <p className="text-lg text-gray-600 mb-6">
+                <p className="text-lg text-gray-600 mb-2">
                   {station.city ? `${station.city}, ${station.country}` : station.country}
                 </p>
+
+                {/* See on Map - Centered below controls */}
+<div className="flex items-center justify-center gap-6 mb-6">
+                {(station.latitude && station.longitude) && (
+                  <button
+                    onClick={() => navigate(`/?tab=discover&lat=${station.latitude}&lng=${station.longitude}`)}
+                    className="text-gray-600 hover:text-blue-700 text-sm flex items-center gap-1 justify-center"
+                  >
+                    <FaMapMarkerAlt className="text-xs" />
+                    See on Map
+                  </button>
+                )}
+</div>
                 
                 {/* Controls - Mimicking FullScreenPlayer Layout */}
                 <div className="flex items-center justify-center gap-6 mb-6">
@@ -221,9 +234,9 @@ export default function StationInfoPage({
                     return (
                       <button
                         onClick={() => _onPlayStation(station)}
-                        className={`w-20 h-20 rounded-full transition-colors flex items-center justify-center shadow-lg ${
+                        className={`w-18 h-18 rounded-full transition-colors flex items-center justify-center shadow-lg ${
                           isCurrentStationPlaying
-                            ? 'bg-red-600 text-white hover:bg-red-700'
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
                             : 'bg-blue-600 text-white hover:bg-blue-700'
                         }`}
                       >
@@ -247,16 +260,7 @@ export default function StationInfoPage({
                   </button>
                 </div>
                 
-                {/* See on Map - Centered below controls */}
-                {(station.latitude && station.longitude) && (
-                  <button
-                    onClick={() => navigate(`/?tab=discover&lat=${station.latitude}&lng=${station.longitude}`)}
-                    className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 justify-center"
-                  >
-                    <FaMapMarkerAlt className="text-xs" />
-                    See on Map
-                  </button>
-                )}
+
               </div>
               
               {/* About Content */}

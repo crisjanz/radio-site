@@ -218,6 +218,7 @@ export default function Layout({
           isPlaying={isPlaying}
           isLoading={isLoading}
           onPlayPause={onPlayPause}
+          onStationInfo={onStationInfo}
           volume={volume}
           isMuted={isMuted}
           onVolumeChange={onVolumeChange}

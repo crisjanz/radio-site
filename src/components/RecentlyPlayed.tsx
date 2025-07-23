@@ -46,15 +46,36 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
     loadAvailableDays();
   }, [stationId]);
 
-  const loadTodayTracks = async (page: number = 1) => {
-    setLoading(true);
-    setError(null);
+  // Auto-refresh today's tracks every 30 seconds when viewing today
+  useEffect(() => {
+    if (selectedDate !== 'today') return;
+
+    const interval = setInterval(() => {
+      loadTodayTracks(1, true); // Silent refresh - no loading indicators
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [selectedDate]);
+
+  const loadTodayTracks = async (page: number = 1, silent: boolean = false) => {
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+    }
     try {
       const offset = (page - 1) * tracksPerPage;
       const response = await fetch(`${API_BASE}/stations/${stationId}/recently-played?limit=${tracksPerPage}&offset=${offset}`);
       if (response.ok) {
         const data = await response.json();
-        const tracks = Array.isArray(data) ? data : data.tracks || [];
+        const rawTracks = Array.isArray(data) ? data : data.tracks || [];
+        // Filter out generic live radio entries
+        const tracks = rawTracks.filter(track => {
+          const title = track.track?.title?.toLowerCase() || '';
+          return !title.includes('live radio') && 
+                 !title.includes('stream') && 
+                 title !== 'live' &&
+                 title.trim() !== '';
+        });
         const total = data.total || tracks.length;
         
         if (page === 1) {
@@ -63,14 +84,18 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
           setTodayTracks(prev => [...prev, ...tracks]);
         }
         setTotalTracks(total);
-      } else {
+      } else if (!silent) {
         setError('Failed to load recent tracks');
       }
     } catch (err) {
       console.error('Failed to load today tracks:', err);
-      setError('Failed to load recent tracks');
+      if (!silent) {
+        setError('Failed to load recent tracks');
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   };
 
@@ -126,7 +151,7 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
     return date.toLocaleTimeString(undefined, { 
       hour: '2-digit', 
       minute: '2-digit',
-      hour12: false
+      hour12: true
     });
   };
 
@@ -152,6 +177,34 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
     }
   };
 
+  // Music service click handlers
+  const handleAppleMusicClick = async (artist: string, title: string) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/music-links/itunes?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+      const data = await response.json();
+      
+      if (data.found && data.trackId) {
+        // Try to open directly in Apple Music app
+        const appUrl = `music://music.apple.com/us/song/${data.trackId}`;
+        window.location.href = appUrl;
+      } else {
+        // Fallback to search
+        window.open(`https://music.apple.com/search?term=${encodeURIComponent(`${artist} ${title}`)}`, '_blank');
+      }
+    } catch (error) {
+      console.error('Error fetching iTunes link:', error);
+      // Fallback to search on error
+      window.open(`https://music.apple.com/search?term=${encodeURIComponent(`${artist} ${title}`)}`, '_blank');
+    }
+  };
+
+  const handleSpotifyClick = async (artist: string, title: string) => {
+    // Try to open directly in Spotify app
+    const searchQuery = encodeURIComponent(`${artist} ${title}`);
+    const spotifyAppUrl = `spotify:search:${searchQuery}`;
+    window.location.href = spotifyAppUrl;
+  };
+
   if (!hasAnyTracks && !loading) {
     return null; // Don't show component if no track data available
   }
@@ -159,48 +212,12 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
   return (
     <div className="bg-white rounded-xl p-6">
       <div className="flex items-center gap-2 mb-4">
-        <FaMusic className="text-blue-600" />
+        <FaMusic className="text-gray-600" />
         <h3 className="text-lg font-semibold text-gray-900">Recently Played</h3>
         <span className="text-sm text-gray-500">on {stationName}</span>
       </div>
 
-      {/* Date Navigation */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-        <button 
-          onClick={() => {
-            setSelectedDate('today');
-            setCurrentPage(1);
-            setError(null);
-          }}
-          className={`px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors ${
-            selectedDate === 'today' 
-              ? 'bg-blue-500 text-white' 
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          <div className="flex items-center gap-1">
-            <FaCalendarDay className="text-xs" />
-            Today
-          </div>
-        </button>
-        
-        {availableDays.map(date => (
-          <button 
-            key={date}
-            onClick={() => loadPastDay(date)}
-            className={`px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors ${
-              selectedDate === date 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <div className="flex items-center gap-1">
-              <FaClockRotateLeft className="text-xs" />
-              {formatDate(date)}
-            </div>
-          </button>
-        ))}
-      </div>
+  
 
       {/* Track List */}
       <div className="space-y-3">
@@ -259,23 +276,11 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
                   <h4 className="font-medium text-gray-900 truncate">
                     {decodeHtmlEntities(play.track.title)}
                   </h4>
-                  {play.track.artist && (
+                  {(play.track.artist || play.track.album) && (
                     <p className="text-sm text-gray-600 truncate">
-                      {decodeHtmlEntities(play.track.artist)}
-                    </p>
-                  )}
-                  {play.track.album && (
-                    <p className="text-xs text-gray-500 truncate">
-                      {decodeHtmlEntities(play.track.album)}
-                    </p>
-                  )}
-                  
-                  {/* Show/DJ Info */}
-                  {(play.showName || play.djName) && (
-                    <p className="text-xs text-blue-600 truncate mt-1">
-                      {play.showName && play.djName 
-                        ? `${decodeHtmlEntities(play.showName)} with ${decodeHtmlEntities(play.djName)}`
-                        : decodeHtmlEntities(play.showName || play.djName || '')
+                      {play.track.artist && play.track.album 
+                        ? `${decodeHtmlEntities(play.track.artist)} - ${decodeHtmlEntities(play.track.album)}`
+                        : decodeHtmlEntities(play.track.artist || play.track.album || '')
                       }
                     </p>
                   )}
@@ -292,9 +297,26 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
                       {formatDuration(play.track.duration)}
                     </div>
                   )}
-                  <div className="mt-1 text-xs text-gray-400 capitalize">
-                    {play.source}
-                  </div>
+                  
+                  {/* Music Service Links */}
+                  {(play.track.title && play.track.artist) && (
+                    <div className="flex gap-1 mt-2">
+                      <button 
+                        onClick={() => handleAppleMusicClick(play.track.artist!, play.track.title)}
+                        className="hover:opacity-80 transition-opacity"
+                        title="Find on Apple Music"
+                      >
+                        <img src="/apple.png" alt="Apple Music" className="h-6" />
+                      </button>
+                      <button 
+                        onClick={() => handleSpotifyClick(play.track.artist!, play.track.title)}
+                        className="hover:opacity-80 transition-opacity"
+                        title="Find on Spotify"
+                      >
+                        <img src="/spotify.png" alt="Spotify" className="h-6" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
