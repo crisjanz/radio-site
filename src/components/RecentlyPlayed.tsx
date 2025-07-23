@@ -156,7 +156,7 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
   }
 
   return (
-    <div className="bg-white rounded-xl p-6">
+    <div className="bg-white rounded-xl p-2 md:p-6">
       <div className="flex items-center gap-2 mb-4">
         <FaMusic className="text-gray-600" />
         <h3 className="text-lg font-semibold text-gray-900">Recently Played</h3>
@@ -190,7 +190,7 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
         )}
 
         {!loading && !error && displayedTracks.map((play: Track) => (
-          <div key={play.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div key={play.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
             {/* Artwork or Music Icon */}
             <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
               {play.track.artwork ? (
@@ -227,10 +227,30 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
                       }
                     </p>
                   )}
+                  
+                  {/* Music Service Links - Mobile: Below track info */}
+                  {(play.track.title && play.track.artist) && (
+                    <div className="flex gap-1 mt-2 md:hidden">
+                      <button 
+                        onClick={() => handleAppleMusicClick(play.track.artist!, play.track.title)}
+                        className="hover:opacity-80 transition-opacity"
+                        title="Find on Apple Music"
+                      >
+                        <img src="/apple.png" alt="Apple Music" className="h-6" />
+                      </button>
+                      <button 
+                        onClick={() => handleSpotifyClick(play.track.artist!, play.track.title)}
+                        className="hover:opacity-80 transition-opacity"
+                        title="Find on Spotify"
+                      >
+                        <img src="/spotify.png" alt="Spotify" className="h-6" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Time and Duration */}
-                <div className="flex flex-col items-end text-xs text-gray-500 ml-3">
+                {/* Time and Duration - Top Right */}
+                <div className="flex flex-col items-end text-xs text-gray-500 ml-4">
                   <div className="flex items-center gap-1">
                     <FaClock className="text-xs" />
                     {formatTime(play.playedAt)}
@@ -241,9 +261,9 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
                     </div>
                   )}
                   
-                  {/* Music Service Links */}
+                  {/* Music Service Links - Desktop: Right side horizontal */}
                   {(play.track.title && play.track.artist) && (
-                    <div className="flex gap-1 mt-2">
+                    <div className="hidden md:flex gap-1 mt-2">
                       <button 
                         onClick={() => handleAppleMusicClick(play.track.artist!, play.track.title)}
                         className="hover:opacity-80 transition-opacity"

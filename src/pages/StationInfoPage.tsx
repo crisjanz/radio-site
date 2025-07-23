@@ -132,7 +132,7 @@ export default function StationInfoPage({
 
 
   return (
-    <div className="p-6 overflow-x-hidden">
+    <div className="p-2 md:p-6 overflow-x-hidden">
         <div className="max-w-4xl mx-auto">
 
           
@@ -233,13 +233,6 @@ export default function StationInfoPage({
                   <p className="text-gray-700 leading-relaxed">{station.description}</p>
                 </div>
               )}
-              
-              {/* Recently Played Section - Now inside main card */}
-              <RecentlyPlayed 
-                stationId={station.nanoid || station.id} 
-                stationName={station.name} 
-              />
-            </div>
           {/* Ad Banner - Top of page */}
           <div className="mb-6">
             {/* Mobile Ad */}
@@ -278,6 +271,14 @@ export default function StationInfoPage({
               </div>
             </div>
           </div>
+              
+              {/* Recently Played Section - Now inside main card */}
+              <RecentlyPlayed 
+                stationId={station.nanoid || station.id} 
+                stationName={station.name} 
+              />
+            </div>
+
 
             {/* Right Column - Station Info, Technical Details, Contact (Smaller) */}
             <div className="lg:col-span-1 space-y-6">

@@ -3,7 +3,7 @@ const CACHE_NAME = 'streemr-v1';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/streemr-play.png'
+  '/app-icon-192x192.png'
 ];
 
 // Install event - cache static assets
@@ -113,8 +113,8 @@ self.addEventListener('push', (event) => {
   
   const options = {
     body: 'New content available!',
-    icon: '/streemr-play.png',
-    badge: '/streemr-play.png',
+    icon: '/app-icon-192x192.png',
+    badge: '/app-icon-192x192.png',
     tag: 'streemr-notification'
   };
 
