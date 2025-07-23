@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/streemr-play.png" />
+    <link rel="icon" type="image/png" href="/app-icon-192x192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Streemr - World Radio</title>
     
@@ -12,7 +12,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Streemr" />
-    <link rel="apple-touch-icon" href="/streemr-play.png" />
+    <link rel="apple-touch-icon" href="/app-icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/app-icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/app-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/app-icon-144x144.png" />
     
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JQGKMR2WET"></script>
@@ -47,5 +50,31 @@
   <body class="h-full">
     <div id="root" class="h-full"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      console.log('🔧 PWA Debug: Service Worker support:', 'serviceWorker' in navigator);
+      
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          console.log('🔧 PWA Debug: Attempting to register service worker...');
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('✅ Service Worker registered:', registration.scope);
+              console.log('✅ Service Worker state:', registration.installing ? 'installing' : registration.waiting ? 'waiting' : registration.active ? 'active' : 'unknown');
+              
+              // Listen for service worker updates
+              registration.addEventListener('updatefound', () => {
+                console.log('🔄 Service Worker: Update found');
+              });
+            })
+            .catch((error) => {
+              console.error('❌ Service Worker registration failed:', error);
+            });
+        });
+      } else {
+        console.warn('⚠️ Service Worker not supported in this browser');
+      }
+    </script>
   </body>
 </html>

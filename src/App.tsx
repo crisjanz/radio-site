@@ -19,6 +19,8 @@ import StationMap from "./components/StationMap";
 import BrowseAllContent from "./components/BrowseAllContent";
 import FavoritesContent from "./components/FavoritesContent";
 import LoginModal from "./components/LoginModal";
+import InstallPromptModal from "./components/InstallPromptModal";
+import { installPromptManager } from "./utils/installPrompt"; // Initialize PWA install prompt manager
 import type { Station } from "./types/Station";
 
 function App() {
@@ -39,6 +41,11 @@ function App() {
   const [favorites, setFavorites] = useState<Station[]>([]);
   const [showFullScreenPlayer, setShowFullScreenPlayer] = useState(false);
   const [mapCoordinates, setMapCoordinates] = useState<{lat: number; lng: number} | null>(null);
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [installPromptHandlers, setInstallPromptHandlers] = useState<{
+    install: () => Promise<boolean>;
+    dismiss: () => void;
+  } | null>(null);
 
   // Initialize authentication and favorites
   useEffect(() => {
@@ -63,6 +70,24 @@ function App() {
       undefined, // Previous track (can add station switching later)
       undefined  // Next track (can add station switching later)
     );
+
+    // Listen for install prompt events
+    const handleInstallPrompt = (event: CustomEvent) => {
+      setInstallPromptHandlers({
+        install: event.detail.install,
+        dismiss: event.detail.dismiss
+      });
+      setShowInstallPrompt(true);
+    };
+
+    window.addEventListener('showInstallPrompt', handleInstallPrompt as EventListener);
+
+    // Initialize install prompt manager (importing it starts the timer)
+    console.log('PWA install manager:', installPromptManager.isInstallAvailable());
+
+    return () => {
+      window.removeEventListener('showInstallPrompt', handleInstallPrompt as EventListener);
+    };
   }, []);
 
   // Handle URL parameters for map navigation
@@ -214,6 +239,30 @@ function App() {
       setShowLoginModal(true);
     }
   }, [user]);
+
+  // Install prompt handlers
+  const handleInstallApp = async (): Promise<boolean> => {
+    if (installPromptHandlers) {
+      const success = await installPromptHandlers.install();
+      setShowInstallPrompt(false);
+      setInstallPromptHandlers(null);
+      
+      if (success) {
+        console.log('PWA install successful');
+      }
+      return success;
+    }
+    return false;
+  };
+
+  const handleDismissInstall = () => {
+    if (installPromptHandlers) {
+      installPromptHandlers.dismiss();
+    }
+    setShowInstallPrompt(false);
+    setInstallPromptHandlers(null);
+    console.log('PWA install dismissed');
+  };
 
   const handleLoginSubmit = useCallback(async (email: string, password: string) => {
     const response = await authService.login(email, password);
@@ -659,6 +708,14 @@ function App() {
       onSignup={handleSignupSubmit}
       onPasswordReset={handlePasswordReset}
     />
+
+    {/* Install Prompt Modal */}
+    {showInstallPrompt && installPromptHandlers && (
+      <InstallPromptModal
+        onInstall={handleInstallApp}
+        onDismiss={handleDismissInstall}
+      />
+    )}
 
     </>
   );

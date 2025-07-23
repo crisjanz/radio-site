@@ -1,6 +1,7 @@
 {
   "name": "Streemr Radio",
   "short_name": "Streemr",
+  "version": "2.0",
   "description": "Live radio streaming from around the world",
   "start_url": "/",
   "display": "standalone",

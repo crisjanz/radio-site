@@ -134,44 +134,7 @@ export default function StationInfoPage({
   return (
     <div className="p-6 overflow-x-hidden">
         <div className="max-w-4xl mx-auto">
-          {/* Ad Banner - Top of page */}
-          <div className="mb-6">
-            {/* Mobile Ad */}
-            <div className="block md:hidden">
-              <div 
-                style={{
-                  height: '50px',
-                  backgroundColor: '#f8f9fa',
-                  border: '1px dashed #e9ecef',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  color: '#6c757d'
-                }}
-              >
-                Mobile Station Ad
-              </div>
-            </div>
-            
-            {/* Desktop Ad */}
-            <div className="hidden md:block">
-              <div 
-                style={{
-                  height: '90px',
-                  backgroundColor: '#f8f9fa',
-                  border: '1px dashed #e9ecef',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  color: '#6c757d'
-                }}
-              >
-                Desktop Station Ad
-              </div>
-            </div>
-          </div>
+
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Left Column - Station Header (Bigger) */}
@@ -277,6 +240,44 @@ export default function StationInfoPage({
                 stationName={station.name} 
               />
             </div>
+          {/* Ad Banner - Top of page */}
+          <div className="mb-6">
+            {/* Mobile Ad */}
+            <div className="block md:hidden">
+              <div 
+                style={{
+                  height: '50px',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px dashed #e9ecef',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  color: '#6c757d'
+                }}
+              >
+                Mobile Station Ad
+              </div>
+            </div>
+            
+            {/* Desktop Ad */}
+            <div className="hidden md:block">
+              <div 
+                style={{
+                  height: '90px',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px dashed #e9ecef',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  color: '#6c757d'
+                }}
+              >
+                Desktop Station Ad
+              </div>
+            </div>
+          </div>
 
             {/* Right Column - Station Info, Technical Details, Contact (Smaller) */}
             <div className="lg:col-span-1 space-y-6">
