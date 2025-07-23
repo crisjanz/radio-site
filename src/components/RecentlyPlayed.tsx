@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { API_CONFIG } from '../config/api';
-import { FaMusic, FaSpinner, FaCalendarDay, FaClock, FaClockRotateLeft } from 'react-icons/fa6';
+import { FaMusic, FaSpinner, FaClock } from 'react-icons/fa6';
 import { decodeHtmlEntities } from '../utils/htmlDecoding';
 
 interface Track {
@@ -27,9 +27,7 @@ interface RecentlyPlayedProps {
 
 export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlayedProps) {
   const [todayTracks, setTodayTracks] = useState<Track[]>([]);
-  const [pastTracks, setPastTracks] = useState<Record<string, Track[]>>({});
-  const [selectedDate, setSelectedDate] = useState('today');
-  const [availableDays, setAvailableDays] = useState<string[]>([]);
+  // Historical track state removed - only today's tracks supported
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,19 +41,16 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
     setCurrentPage(1);
     setTodayTracks([]);
     loadTodayTracks(1);
-    loadAvailableDays();
   }, [stationId]);
 
-  // Auto-refresh today's tracks every 30 seconds when viewing today
+  // Auto-refresh today's tracks every 30 seconds
   useEffect(() => {
-    if (selectedDate !== 'today') return;
-
     const interval = setInterval(() => {
       loadTodayTracks(1, true); // Silent refresh - no loading indicators
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [selectedDate]);
+  }, []);
 
   const loadTodayTracks = async (page: number = 1, silent: boolean = false) => {
     if (!silent) {
@@ -69,7 +64,7 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
         const data = await response.json();
         const rawTracks = Array.isArray(data) ? data : data.tracks || [];
         // Filter out generic live radio entries
-        const tracks = rawTracks.filter(track => {
+        const tracks = rawTracks.filter((track: Track) => {
           const title = track.track?.title?.toLowerCase() || '';
           return !title.includes('live radio') && 
                  !title.includes('stream') && 
@@ -99,52 +94,7 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
     }
   };
 
-  const loadAvailableDays = async () => {
-    try {
-      const response = await fetch(`${API_BASE}/api/tracks/stations/${stationId}/available-days`);
-      if (response.ok) {
-        const dates = await response.json();
-        setAvailableDays(dates.slice(0, 6)); // Show only last 6 days
-      }
-    } catch (err) {
-      console.error('Failed to load available days:', err);
-    }
-  };
-
-  const loadPastDay = async (date: string) => {
-    if (pastTracks[date]) {
-      setSelectedDate(date);
-      setCurrentPage(1);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${API_BASE}/api/tracks/stations/${stationId}/tracks/${date}`);
-      if (response.ok) {
-        const tracks = await response.json();
-        setPastTracks(prev => ({ ...prev, [date]: tracks }));
-        setSelectedDate(date);
-        setCurrentPage(1);
-      } else {
-        setError('No track data available for this date');
-      }
-    } catch (err) {
-      console.error('Failed to load past day:', err);
-      setError('Failed to load historical tracks');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, { 
-      month: 'short', 
-      day: 'numeric' 
-    });
-  };
+  // Historical track functions removed - only today's tracks supported
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -162,19 +112,15 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentTracks = selectedDate === 'today' ? todayTracks : (pastTracks[selectedDate] || []);
-  const displayedTracks = selectedDate === 'today' ? currentTracks : currentTracks.slice(0, currentPage * tracksPerPage);
-  const hasAnyTracks = todayTracks.length > 0 || availableDays.length > 0;
-  const hasMoreTracks = selectedDate === 'today' ? todayTracks.length < totalTracks : currentTracks.length > currentPage * tracksPerPage;
+  // Simplified for today's tracks only
+  const displayedTracks = todayTracks;
+  const hasAnyTracks = todayTracks.length > 0;
+  const hasMoreTracks = todayTracks.length < totalTracks;
   
   const loadMoreTracks = () => {
-    if (selectedDate === 'today') {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      loadTodayTracks(nextPage);
-    } else {
-      setCurrentPage(prev => prev + 1);
-    }
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    loadTodayTracks(nextPage);
   };
 
   // Music service click handlers
@@ -238,15 +184,12 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
           <div className="text-center py-8">
             <FaMusic className="text-gray-300 text-2xl mx-auto mb-2" />
             <p className="text-gray-600">
-              {selectedDate === 'today' 
-                ? 'No tracks played today yet' 
-                : 'No tracks available for this date'
-              }
+              No tracks played today yet
             </p>
           </div>
         )}
 
-        {!loading && !error && displayedTracks.map((play) => (
+        {!loading && !error && displayedTracks.map((play: Track) => (
           <div key={play.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
             {/* Artwork or Music Icon */}
             <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -340,10 +283,7 @@ export default function RecentlyPlayed({ stationId, stationName }: RecentlyPlaye
         {!loading && !error && displayedTracks.length > 0 && (
           <div className="text-center pt-2">
             <p className="text-xs text-gray-500">
-              {selectedDate === 'today' 
-                ? `Showing ${displayedTracks.length}${totalTracks > 0 ? ` of ${totalTracks}` : ''} tracks`
-                : `Showing ${displayedTracks.length} of ${currentTracks.length} tracks`
-              }
+              Showing {displayedTracks.length}{totalTracks > 0 ? ` of ${totalTracks}` : ''} tracks
             </p>
           </div>
         )}

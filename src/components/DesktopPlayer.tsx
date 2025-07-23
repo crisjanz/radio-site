@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaPlay, FaStop, FaSpinner, FaMusic, FaRadio, FaThumbsUp, FaThumbsDown } from 'react-icons/fa6';
+import { FaPlay, FaStop, FaSpinner, FaThumbsUp, FaThumbsDown } from 'react-icons/fa6';
 import { FaVolumeUp, FaVolumeDown, FaVolumeMute, FaInfoCircle } from 'react-icons/fa';
 import FeedbackModal from './FeedbackModal';
 import { submitFeedback } from '../utils/feedbackApi';
