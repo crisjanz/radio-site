@@ -116,7 +116,9 @@ function App() {
         setIsLoading(true);
         howlRef.current.play();
       } else {
-        howlRef.current.pause();
+        // For live streams, stop and unload instead of pause to avoid buffer issues
+        howlRef.current.stop();
+        howlRef.current.unload();
         setIsLoading(false);
       }
     }
